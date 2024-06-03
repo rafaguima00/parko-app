@@ -1,20 +1,43 @@
+import 'react-native-gesture-handler'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
+import StackNavigator from './src/Navigation/stackNavigator';
+import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback } from 'react';
+import { DataUserProvider } from './src/Context/dataUserContext';
+import { ReservaProvider } from './src/Context/reservaContext';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+
+  const [fontsLoaded] = useFonts({
+    Roboto_400Regular, 
+    Roboto_700Bold
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <DataUserProvider>
+      <ReservaProvider>
+        <View 
+          style={{ flex: 1 }} 
+          onLayout={onLayoutRootView}
+        >
+          <StackNavigator />
+          <StatusBar style="auto" />
+        </View>
+      </ReservaProvider>
+    </DataUserProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

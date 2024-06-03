@@ -1,0 +1,65 @@
+import { StyleSheet, Dimensions } from "react-native"
+import { theme } from "../../Theme"
+
+const { width } = Dimensions.get('screen')
+const { fonteNegrito } = theme;
+
+export const styles = StyleSheet.create({
+    content: {
+        backgroundColor: "white",
+        alignItems: "center"
+    },
+    top: {
+        width: width,
+        height: 420
+    },
+    perfil: {
+        backgroundColor: "white",
+        marginTop: -100,
+        marginBottom: 50,
+        paddingHorizontal: 48,
+        alignSelf: "center",
+        width: width,
+    },
+    botaoEdit: {
+        backgroundColor: "#523499",
+        marginTop: -35,
+        marginBottom: 40,
+        borderWidth: 2,
+        borderColor: "white",
+        borderRadius: 45,
+        padding: 18,
+        width: 66,
+        alignSelf: "center",
+        alignItems: "center"
+    },
+    textInput: {
+        backgroundColor: '#f4f4f4',
+        width: 170,
+        paddingHorizontal: 12,
+        paddingVertical: 16,
+    },
+    nome: {
+        fontFamily: fonteNegrito,
+        color: "#545454",
+        fontSize: 16,
+        marginBottom: 12
+    },
+    displayUsuario: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 24
+    },
+    dadosUsuario: {
+        fontFamily: fonteNegrito,
+        fontSize: 22,
+        color: "#0097B9"
+    },
+    textoBotao: {
+        fontFamily: fonteNegrito,
+        fontSize: 17,
+        color: "white",
+        textAlign: "center"
+    }
+})
