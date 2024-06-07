@@ -65,11 +65,7 @@ const Searching = (props) => {
                         }}
                         onPress={() => {
                             setModalPesquisar(false)
-                            retornarCoordenadas({
-                                item, 
-                                latitude: item.coordinate.latitude,
-                                longitude: item.coordinate.longitude
-                            })
+                            retornarCoordenadas({ item })
                         }}
                     >
                         <Image
@@ -83,7 +79,7 @@ const Searching = (props) => {
                             source={{ uri: item.image }} 
                         />
                         <Text style={styles.nome}>
-                            {item.title}
+                            {item.name}
                         </Text>
                     </TouchableOpacity>
                 ))}

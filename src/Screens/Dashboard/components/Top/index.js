@@ -23,13 +23,13 @@ function Topo({ handleImageLoaded, voltar }) {
     const [favoritoAtivado, setFavoritoAtivado] = useState(false)
 
     const { destination, distance } = useContext(ReservaContext)
-    const { image, title, address, vagas, avaliacao } = destination;
+    const { image, name, end, vagas, avaliacao, vagas_ocupadas } = destination;
 
     return(
         <View style={{width: "100%"}}>
             <View>
                 <Image 
-                    source={{ uri: image }} 
+                    source={{ uri: image ? image : "" }} 
                     style={{width: width, height: 220}} 
                     onLoad={handleImageLoaded} 
                 />  
@@ -53,17 +53,17 @@ function Topo({ handleImageLoaded, voltar }) {
                 </TouchableOpacity>
             </View>
             <View style={styles.infoEstacionamento}>
-                <Text style={styles.nomeEstacionamento}>{title}</Text>
+                <Text style={styles.nomeEstacionamento}>{name}</Text>
                 <View style={styles.viewLocalEstacionamento}>
                     <MaterialCommunityIcons name="map-marker" size={14} color="#f4f4f4" />
-                    <Text style={styles.localEstacionamento}>{address}</Text>
+                    <Text style={styles.localEstacionamento}>{end}</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <FontAwesome name="arrows-h" size={16} color="#0097b9" />
                     <Text style={styles.distanciaVagaEstrela}>{distance ? distance.toFixed(1) : '-'} km</Text>
 
                     <Ionicons name="car" size={20} color="#0097b9" />
-                    <Text style={styles.distanciaVagaEstrela}>{vagas ? vagas : 0} vagas</Text>
+                    <Text style={styles.distanciaVagaEstrela}>{parseInt(vagas) - parseInt(vagas_ocupadas)} vagas</Text>
 
                     <Feather name="star" size={20} color="#0097b9" />
                     <Text style={styles.distanciaVagaEstrela}>{avaliacao ? avaliacao : 'n/a'}</Text>

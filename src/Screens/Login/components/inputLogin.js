@@ -59,7 +59,7 @@ const InputLogin = ({
             />
             <Alerta 
                 message={mensagemErro}
-                error={statusError == 'firebase'}
+                error={statusError == "no-user" ? true : false}
                 setError={setStatusError}
             />
             {error && <HelperText type="error" visible={error}>

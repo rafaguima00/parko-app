@@ -10,6 +10,9 @@ export function ReservaProvider({ children }) {
     const [reservaFeita, setReservaFeita] = useState(false)
     const [tempoTotal, setTempoTotal] = useState(0)
     const [running, setRunning] = useState(false)
+    const [reservations, setReservations] = useState([])
+    const [vagaReservada, setVagaReservada] = useState({})
+    const [horaReserva, setHoraReserva] = useState("")
 
     const value = {
         distance, 
@@ -23,7 +26,13 @@ export function ReservaProvider({ children }) {
         tempoTotal,
         setTempoTotal,
         running,
-        setRunning
+        setRunning,
+        vagaReservada,
+        setVagaReservada,
+        horaReserva, 
+        setHoraReserva,
+        reservations,
+        setReservations
     }
 
     return (

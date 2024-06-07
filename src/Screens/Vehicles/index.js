@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Text,
     View,
-    StyleSheet,
     Image,
     TouchableOpacity,
     FlatList,
@@ -15,32 +14,29 @@ import veiculo from "../../../assets/medium-vehicle.png"
 import { Ionicons, Feather } from "react-native-vector-icons"
 import { theme } from "../../Theme"
 import { Botao } from "../../Components/Botao"
-import dadosCarro from "../../Mocks/dadosVeiculo"
 import { styles } from "./style"
+import { useUser } from "../../Context/dataUserContext"
+import ReadApi from "../../Services/readData";
+import api from "../../Services/api";
 
 const { corPrimaria } = theme;
 
 export default function Vehicles({ navigation }) {
 
-    const [botaoAtivo, setBotaoAtivo] = useState(null);
-    const [veiculos, setVeiculos] = useState([])
+    const [botaoClicado, setBotaoClicado] = useState(null)
     const [carregandoVeiculos, setCarregandoVeiculos] = useState(false)
-
-    const cliqueBotao = (item) => {
-        setBotaoAtivo(item.placa);
-    };
+    const { veiculos, dataUser } = useUser()
+    const { loadVehicles } = ReadApi()
 
 
     const renderItem = ({ item }) => {
-        const botaoClicado = botaoAtivo === item.placa;
-
         return (
             <TouchableOpacity
                 activeOpacity={0.9}
                 style={(
-                    botaoClicado ? styles.botaoAtivo : styles.botaoDesativado
+                    botaoClicado == item.id ? styles.botaoAtivo : styles.botaoDesativado
                 )}
-                onPress={() => cliqueBotao(item)}
+                onPress={() => setBotaoClicado(item.id)}
             >
                 <TouchableOpacity 
                     style={{
@@ -55,11 +51,11 @@ export default function Vehicles({ navigation }) {
                     onPress={() => {
                         Alert.alert(
                             "Excluir veículo",
-                            `Tem certeza de que deseja excluir o veículo ${item.nome}?`,
+                            `Tem certeza de que deseja excluir o veículo ${item.name}?`,
                             [
                                 {
                                     text: 'OK',
-                                    onPress: () => deletarVeiculos(item.id, item.nome)
+                                    onPress: () => deletarVeiculos(item.id, item.name)
                                 },
                                 {
                                     text: 'Cancelar'
@@ -71,17 +67,29 @@ export default function Vehicles({ navigation }) {
                     <Text>X</Text>
                 </TouchableOpacity>
                 <View style={styles.viewCarro}>
-                    <Ionicons name="car" size={28} color={(botaoClicado ? '#fff' : '#545454')} />
-                    <Text style={(
-                        botaoClicado ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
-                    )}>{item.nome}</Text>
+                    <Ionicons name="car" size={28} color={(botaoClicado == item.id ? '#fff' : '#545454')} />
+                    <Text 
+                        style={(
+                            botaoClicado == item.id ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
+                        )}
+                    >
+                        {item.name}
+                    </Text>
                 </View>
-                <Text style={(
-                    botaoClicado ? styles.placaCarroAtivo : styles.placaCarroDesativado
-                )}>{item.placa}</Text>
-                <Text style={(
-                    botaoClicado ? styles.corCarroAtivo : styles.corCarroDesativado
-                )}>{item.cor}</Text>
+                <Text 
+                    style={(
+                        botaoClicado == item.id ? styles.placaCarroAtivo : styles.placaCarroDesativado
+                    )}
+                >
+                    {item.license_plate}
+                </Text>
+                <Text 
+                    style={(
+                        botaoClicado == item.id ? styles.corCarroAtivo : styles.corCarroDesativado
+                    )}
+                >
+                    {item.color}
+                </Text>
             </TouchableOpacity>
         )
     }
@@ -95,8 +103,20 @@ export default function Vehicles({ navigation }) {
     async function deletarVeiculos(idVeiculo, nomeVeiculo) {
         setCarregandoVeiculos(true)
 
-        console.log(`Veículo ${idVeiculo}, ${nomeVeiculo} excluído`)
+        await api.delete(`/vehicles/${idVeiculo}`)
+        .then(() => {
+            setCarregandoVeiculos(false)
+            Alert.alert(`Veículo ${nomeVeiculo} excluído`)
+        })
+        .catch(e => {
+            setCarregandoVeiculos(false)
+            Alert.alert("Erro ao deletar veículo", e)
+        })
     }
+
+    useEffect(() => {
+        loadVehicles(dataUser.id)
+    }, [veiculos])
 
     return (
         <SafeAreaView style={styles.areaContent}>
@@ -115,10 +135,11 @@ export default function Vehicles({ navigation }) {
             <FlatList
                 style={{ marginTop: 20, marginBottom: 46 }}
                 horizontal
-                data={dadosCarro}
+                data={veiculos}
                 renderItem={renderItem}
                 keyExtractor={item => item.placa}
                 ListEmptyComponent={EmptyListMessage}
+                showsHorizontalScrollIndicator={false}
             />
             <Botao 
                 children={'Adicionar'}

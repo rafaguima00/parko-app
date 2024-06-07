@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { styles } from "./style"
 import { ScrollView, TouchableOpacity, Image, Text } from "react-native"
 import { Feather } from "react-native-vector-icons"
@@ -8,10 +8,10 @@ import Login from "./components/loginBotao"
 import BotaoLogin from "../../Components/LoginSocialMedia"
 
 const Register = ({ navigation }) => {
-    
+
     const [dados, setDados] = useState({
         email: '',
-        senha: '',
+        password: '',
         confirmaSenha: ''
     })
 
@@ -25,21 +25,15 @@ const Register = ({ navigation }) => {
     const [statusError, setStatusError] = useState('')
     const [mensagemErro, setMensagemErro] = useState('')
 
-    async function realizarCadastro() {
-        if (dados.email === '') {
-            setMensagemErro('Preencha um e-mail válido')
-            setStatusError('email')
-        } else if (dados.senha === '') {
-            setMensagemErro('Digite sua senha')
-            setStatusError('senha')
-        } else if (dados.confirmaSenha === '') {
-            setMensagemErro('Confirme sua senha')
+    function realizarCadastro() {
+        if (dados.email === "" || dados.password === "" || dados.confirmaSenha === "") {
+            setStatusError('empty')
+            setMensagemErro("preencha o campo vazio")
+        } else if (dados.password != dados.confirmaSenha) {
             setStatusError('confirmaSenha')
-        } else if (dados.senha != dados.confirmaSenha) {
             setMensagemErro('As senhas não conferem')
-            setStatusError('confirmaSenha')
         } else {
-            navigation.navigate("Profile")
+            navigation.navigate("Profile", dados)
         }
     }
 
@@ -59,10 +53,10 @@ const Register = ({ navigation }) => {
                 error
                 messageError
                 email={dados.email}
-                senha={dados.senha}
+                password={dados.password}
                 confirmaSenha={dados.confirmaSenha}
                 setEmail={valor => alteraDados('email', valor)}
-                setSenha={valor => alteraDados('senha', valor)}
+                setSenha={valor => alteraDados('password', valor)}
                 setConfirmaSenha={valor => alteraDados('confirmaSenha', valor)}
                 secureTextEntry
             />

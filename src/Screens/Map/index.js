@@ -6,7 +6,8 @@ import {
     Platform,
     TouchableOpacity,
     Image,
-    Modal
+    Modal,
+    ActivityIndicator
 } from "react-native"
 import { Content } from "../../Components/Marker"
 import MapView, { Marker } from 'react-native-maps'
@@ -21,20 +22,26 @@ import { LinearGradient } from 'expo-linear-gradient'
 import MapViewDirections from 'react-native-maps-directions'
 import { styles } from "./styles"
 import { theme } from "../../Theme"
-import { estacionamentos } from "../../Mocks/estacionamentos"
 import { Botao } from "../../Components/Botao"
-import historicoReservas from "../../Mocks/historicoReservas"
 import { GOOGLE_API_KEY } from "@env"
 import { ReservaContext } from "../../Context/reservaContext"
 import Searching from "./components/searching"
+import { useUser } from "../../Context/dataUserContext"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { jwtDecode } from "jwt-decode"
+import ReadApi from "../../Services/readData"
+import { formatCurrency } from "../../Services/formatCurrency"
 
 export default function MapaPrincipal({ navigation }) {
+
+    const { loadParkings, loadPriceTable, loadReservations } = ReadApi()
+
     const [location, setLocation] = useState(null)
     const [errorMsg, setErrorMsg] = useState(null)
-    
     const [modalPesquisar, setModalPesquisar] = useState(false)
     const [textoDigitado, setTextoDigitado] = useState("")
     const [itensFiltrados, setItensFiltrados] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const mapEl = useRef(null)
 
@@ -44,20 +51,28 @@ export default function MapaPrincipal({ navigation }) {
         destination, 
         setDestination, 
         veiculoEscolhido,
-        reservaFeita 
+        reservaFeita,
+        horaReserva,
+        reservations
     } = useContext(ReservaContext)
+
+    const { setDataUser, estacionamentos, priceTable, dataUser } = useUser()
+    const { corFonteSecundaria, corPrimaria } = theme
 
     const filtrarItens = (text) => {
         if (text) {
             const resultadoPesquisa = estacionamentos.filter(
-                item => item.title.toLowerCase().includes(text.toLowerCase())
+                item => item.name.toLowerCase().includes(text.toLowerCase())
             )
             setItensFiltrados(resultadoPesquisa)
         }
         setTextoDigitado(text)
     }
 
-    const { corFonteSecundaria, corPrimaria } = theme
+    const findReservation = reservations.filter(
+        item => item.id_costumer == dataUser.id && 
+        (item.status == "Pendente" || item.status == "Confirmado")
+    )
 
     useEffect(() => {
         (async () => {
@@ -84,27 +99,52 @@ export default function MapaPrincipal({ navigation }) {
         })()
     }, [])
 
+    useEffect(() => {
+        (async () => {
+            const token = await AsyncStorage.getItem("token")
+    
+            if(token) {
+                const decoded = jwtDecode(token)
+                setDataUser(decoded.user)
+            } else {
+                return navigation.replace("Login")
+            }
+        })()
+
+        loadParkings()
+        loadReservations()
+    }, [])
+
+    useEffect(() => {
+        if(findReservation) {
+            // in case of reservation in progress show the info of reservation
+        }
+
+        setLoading(false)
+    }, [reservations])
+
     const retornarCoordenadas = ({ item }) => {
+
+        loadPriceTable(item.id)
+
         setDestination({
-            latitude: item.coordinate.latitude,
-            longitude: item.coordinate.longitude,
+            id: item.id,
+            latitude: item.latitude,
+            longitude: item.longitude,
             latitudeDelta: 0.0143,
             longitudeDelta: 0.0134,
-            address: item.address,
+            end: item.end,
             image: item.image,
-            title: item.title,
-            precoBarato: item.horarios[0].preco,
-            vagas: item.numeroVagas,
-            avaliacao: item.avaliacao,
-            horarioDeFuncionamento: item.horarioFuncionamento,
-            taxaHoraExtra: item.taxaHoraExtra,
-            taxaCancelamento: item.taxaCancelamento,
-            tempoTolerancia: item.tempoTolerancia,
-            horarios: item.horarios
+            name: item.name,
+            price: priceTable.valor_hora,
+            vagas: item.numero_vagas,
+            vagas_ocupadas: item.vagas_ocupadas,
+            avaliacao: item.rate,
+            tempo_tolerancia: priceTable.tempo_tolerancia
         })
     }
 
-    if (!location) {
+    if (!location || loading) {
         return (
             <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
                 <Text>Carregando...</Text>
@@ -133,15 +173,11 @@ export default function MapaPrincipal({ navigation }) {
                     <Marker
                         key={index}
                         coordinate={{
-                            latitude: item.coordinate.latitude,
-                            longitude: item.coordinate.longitude,
+                            latitude: item.latitude,
+                            longitude: item.longitude,
                         }}
-                        title={`R$ ${item.horarios[0].preco}`}
-                        onPress={() => retornarCoordenadas({
-                            item, 
-                            latitude: item.coordinate.latitude,
-                            longitude: item.coordinate.longitude,
-                        })}
+                        title={`R$ 10,00`}
+                        onPress={() => retornarCoordenadas({ item })}
                     >
                         <Content />
                     </Marker>
@@ -187,7 +223,7 @@ export default function MapaPrincipal({ navigation }) {
                     <Ionicons name="car-outline" size={28} />
                 </TouchableOpacity>
 
-                {(destination && !reservaFeita ) &&
+                {(destination && !reservaFeita) &&
                     <TouchableOpacity
                         style={[styles.icone, { position: "absolute", right: 0 }]}
                         onPress={() => {
@@ -249,13 +285,13 @@ export default function MapaPrincipal({ navigation }) {
                 />
             </Modal>
 
-            {(destination && !reservaFeita ) &&
+            {(destination && !reservaFeita) &&
                 <View style={styles.rotaEstacionamento}>
-                    <Text style={styles.tituloEstacionamento}>{destination.title}</Text>
+                    <Text style={styles.tituloEstacionamento}>{destination.name}</Text>
                     <View style={styles.infoEstacionamento}>
                         <View style={styles.infoAddress}>
                             <FontAwesome name="map-marker" size={18} color="#0097b9" />
-                            <Text style={styles.localEstacionamento}>{destination.address}</Text>
+                            <Text style={styles.localEstacionamento}>{destination.end}</Text>
                         </View>
                         <View style={styles.infoDistance}>
                             <MaterialCommunityIcons name="map-marker-distance" size={18} color="#7d7d7d" />
@@ -269,11 +305,13 @@ export default function MapaPrincipal({ navigation }) {
                     <View style={styles.viewButtons}>
                         <TouchableOpacity style={styles.botao} activeOpacity={1}>
                             <Feather name="dollar-sign" size={18} color="#7d7d7d" />
-                            <Text style={styles.textoBotaoPreco}>{destination.precoBarato}/h</Text>
+                            <Text style={styles.textoBotaoPreco}>{destination.price}/h</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.botao} activeOpacity={1}>
                             <Ionicons name="car" size={24} color="#7d7d7d" />
-                            <Text style={styles.textoBotaoPreco}>{destination.vagas}</Text>
+                            <Text style={styles.textoBotaoPreco}>
+                                {parseInt(destination.vagas) - parseInt(destination.vagas_ocupadas)}
+                            </Text>
                         </TouchableOpacity>
                         <Botao
                             children={"Abrir"}
@@ -289,35 +327,41 @@ export default function MapaPrincipal({ navigation }) {
                 </View>
             }
 
-            {reservaFeita &&
+            {/* {!findReservation &&
+                <View style={styles.itemLista}>
+                    <ActivityIndicator size="large" />
+                </View>
+            } */}
+
+            {(reservaFeita && findReservation) &&
                 <View style={styles.itemLista}>
                     <View style={styles.viewEstacionamento}>
                         <Image 
                             style={{ width: 45, height: 45, borderRadius: 50, borderWidth: 2, borderColor: corPrimaria }}
                             source={{ uri: destination.image }} 
                         />
-                        <Text style={styles.nomeEstacionamento}>{destination.title}</Text>
+                        <Text style={styles.nomeEstacionamento}>{destination.name}</Text>
                     </View>
                     <View style={styles.viewReservation}>
                         <View style={styles.infoVeiculo}>
-                            <Text style={styles.textoInicio}>{historicoReservas[0].veiculo}</Text>
+                            <Text style={styles.textoInicio}>Veículo</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItemCarro}>{veiculoEscolhido.nome}</Text>
-                                <Text style={styles.infoItemPlaca}>{veiculoEscolhido.placa}</Text>
-                                <Text style={styles.infoItemCor}>{veiculoEscolhido.cor}</Text>
+                                <Text style={styles.infoItemCarro}>{veiculoEscolhido.item.name}</Text>
+                                <Text style={styles.infoItemPlaca}>{veiculoEscolhido.item.license_plate}</Text>
+                                <Text style={styles.infoItemCor}>{veiculoEscolhido.item.color}</Text>
                             </View>
                         </View>
                         <View style={styles.infoVeiculo}>
-                            <Text style={styles.textoInicio}>{historicoReservas[0].duracao}</Text>
+                            <Text style={styles.textoInicio}>Duração</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItem}>{historicoReservas[0].tempoPermanencia}</Text>
-                                <Text style={styles.infoItem}>{historicoReservas[0].dataEntrada}</Text>
+                                <Text style={styles.infoItem}>1 hora</Text>
+                                <Text style={styles.infoItem}>{horaReserva}</Text>
                             </View>
                         </View>
                         <View style={styles.infoVeiculo}>
-                            <Text style={styles.textoInicio}>{historicoReservas[0].valor}</Text>
+                            <Text style={styles.textoInicio}>Valor</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItem}>{historicoReservas[0].quantidadeValor}</Text>
+                                <Text style={styles.infoItem}>{formatCurrency(10)}</Text>
                             </View>
                         </View>
                     </View>

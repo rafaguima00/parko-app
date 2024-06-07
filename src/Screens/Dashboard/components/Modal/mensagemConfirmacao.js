@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { theme } from "../../../../Theme";
 import { ReservaContext } from "../../../../Context/reservaContext"; 
 
-const {fonteNegrito} = theme;
+const { fonteNegrito } = theme;
 
 function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
 

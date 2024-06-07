@@ -17,6 +17,9 @@ import CountDownTimer from "react-native-countdown-timer-hooks";
 import { Botao } from "../../Components/Botao"
 import { ReservaContext } from "../../Context/reservaContext";
 import { styles } from "./style";
+import api from "../../Services/api";
+import ReadApi from "../../Services/readData";
+import { useUser } from "../../Context/dataUserContext";
 
 function TempoEspera({ navigation }) {
 
@@ -27,13 +30,25 @@ function TempoEspera({ navigation }) {
     const [modalConfirma, setModalConfirma] = useState(false)
     const [modalMsgConfirma, setModalMsgConfirma] = useState(false)
 
+    const { loadReservations } = ReadApi()
+    const { dataUser } = useUser()
+
     const { 
         setReservaFeita, 
         tempoTotal, 
         setTempoTotal, 
         setRunning,
-        setDestination
+        setDestination,
+        reservations
     } = useContext(ReservaContext)
+
+    useEffect(() => {
+        loadReservations()
+    }, [])
+
+    useEffect(() => {
+        console.log(findReservation[0])
+    }, [reservations])
 
     const abreModalEstendeHora = () => {
         setModalEstendeHora(true)
@@ -70,16 +85,39 @@ function TempoEspera({ navigation }) {
         setModalSelecionarPgto(true)
     }
 
-    function cancelaReserva() {
-        navigation.navigate('Map')
-        Alert.alert(
-            "Aviso",
-            "Sua reserva foi finalizada"
-        )
-        setRunning(false)
-        setTempoTotal(0)
-        setReservaFeita(false)
-        setDestination(false)
+    const findReservation = reservations.filter(
+        item => item.id_costumer == dataUser.id && 
+        (item.status == "Pendente" || item.status == "Confirmado")
+    )
+
+    const cancelaReserva = async (id) => {
+        await api.put(`/reservations/${id}`, {
+            data_entrada: findReservation[0].data_entrada,
+            hora_entrada: findReservation[0].hora_entrada,
+            data_saida: findReservation[0].data_saida,
+            hora_saida: findReservation[0].hora_saida,
+            value: findReservation[0].value,
+            status: 4,
+            id_vehicle: findReservation[0].id_vehicle
+        })
+        .then(() => {
+            navigation.navigate('Map')
+            Alert.alert(
+                "Aviso",
+                "Sua reserva foi finalizada"
+            )
+            setRunning(false)
+            setTempoTotal(0)
+            setReservaFeita(false)
+            setDestination(false)
+        })
+        .catch(e => {
+            Alert.alert(
+                "Aviso",
+                "Erro ao finalizar reserva"
+            )
+            console.log(e)
+        })
     }
 
     function handleFinish() {
@@ -135,7 +173,7 @@ function TempoEspera({ navigation }) {
                             [
                                 {
                                     text: "OK",
-                                    onPress: cancelaReserva
+                                    onPress: () => cancelaReserva(findReservation[0].id)
                                 },
                                 {
                                     text: "Cancelar"

@@ -23,7 +23,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
     const [botaoAtivo, setBotaoAtivo] = useState(false)
 
     const { destination } = useContext(ReservaContext)
-    const { horarioDeFuncionamento, taxaHoraExtra, taxaCancelamento, tempoTolerancia } = destination
+    const { horarioDeFuncionamento, taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
     const { corPrimaria } = theme;
 
     const renderItem = ({ item }) => {
@@ -99,7 +99,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
                             Tempo de tolerância:
-                            {tempoTolerancia}
+                            {tempo_tolerancia}
                         </Text>
                     </View>
                 </View>
@@ -114,6 +114,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                     data={infoEstacionamento.horarios}
                     renderItem={renderItem}
                     keyExtractor={item => { item.preco }}
+                    showsHorizontalScrollIndicator={false}
                 />
             </View>
 

@@ -11,7 +11,7 @@ const Inputs = ({
     error,
     messageError,
     email,
-    senha,
+    password,
     confirmaSenha,
     setEmail,
     setSenha,
@@ -51,10 +51,11 @@ const Inputs = ({
                 secureTextEntry={secureMode}
                 right={
                     secureTextEntry ?
-                        <TextInput.Icon
-                            icon={secureMode ? 'eye-off' : 'eye'}
-                            onPress={() => setSecureMode(!secureMode)}
-                        /> : null
+                    <TextInput.Icon
+                        icon={secureMode ? 'eye-off' : 'eye'}
+                        onPress={() => setSecureMode(!secureMode)}
+                    /> : 
+                    null
                 }
             />
             <TextInput
@@ -62,7 +63,7 @@ const Inputs = ({
                 outlineStyle={{ borderRadius: 50, borderColor: 'transparent' }}
                 mode="outlined"
                 onChangeText={setSenha}
-                value={senha}
+                value={password}
                 label={'Confirmar senha'}
                 error={statusError == 'confirmaSenha'}
                 messageError={mensagemErro}
@@ -81,6 +82,7 @@ const Inputs = ({
             <Alerta
                 mensagem={mensagemErro}
                 setError={setStatusError}
+                error={statusError ? true : false}
             />
             {error &&
                 <HelperText type="error" visible={error}>

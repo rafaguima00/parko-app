@@ -8,21 +8,26 @@ import {
     TouchableOpacity
 } from "react-native"
 import { Feather, Octicons } from "react-native-vector-icons"
-import { theme } from "../../Theme";
+import { theme } from "../../Theme"
 import { useNavigation } from "@react-navigation/native"
 import { Botao } from "../Botao"
 import { styles } from "./style"
 import fotoPerfil from "../../../assets/user-2.png"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useUser } from "../../Context/dataUserContext"
 
 function CustomDrawer() {
     const navigation = useNavigation()
 
-    const { corPrimaria } = theme;
+    const { corPrimaria } = theme
+    const { dataUser } = useUser()
+    const { email, password, name, cpf, tel } = dataUser
 
-    const logout = () => {
-        navigation.replace('Login')
+    const logout = async () => {
+        await AsyncStorage.removeItem("token")
+        navigation.replace("Login")
     }
-
+    
     const routes = [
         {
             navigate: "Veiculos",
@@ -59,7 +64,7 @@ function CustomDrawer() {
     return (
         <View style={styles.menuLateral} >
             <Image source={logo} style={{ width: '51%', height: '6%', marginVertical: 32 }} />
-            <TouchableOpacity onPress={() => navigation.navigate('Perfil')} >
+            <TouchableOpacity onPress={() => navigation.navigate('Profile', { email, password, name, cpf, tel })} >
                 <Image source={fotoPerfil} style={{ width: 140, height: 140 }} />
                 <View style={styles.botaoEdit}>
                     <Octicons name="pencil" size={24} color="white" />

@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
 
 const { width } = Dimensions.get('screen')
-const { fonteNegrito } = theme;
+const { fonteNegrito, corPrimaria } = theme;
 
 export const styles = StyleSheet.create({
     content: {
@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     dadosUsuario: {
         fontFamily: fonteNegrito,
         fontSize: 22,
-        color: "#0097B9"
+        color: corPrimaria
     },
     textoBotao: {
         fontFamily: fonteNegrito,

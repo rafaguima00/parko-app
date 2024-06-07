@@ -18,15 +18,18 @@ import ModalConfirmacao from "./components/Modal/confirmacao";
 import ModalMsgConfirmacao from "./components/Modal/mensagemConfirmacao";
 import DatePickerModal from "./components/Modal/datePicker";
 import { Botao } from "../../Components/Botao";
-import { estacionamentos } from "../../Mocks/estacionamentos";
 import { ReservaContext } from "../../Context/reservaContext";
+import { useUser } from "../../Context/dataUserContext"
 import infoEstacionamento from "../../Mocks/infoEstacionamento";
 import Menu from "./components/Menu";
-import dadosCarro from "../../Mocks/dadosVeiculo";
+import ReadApi from "../../Services/readData"
+import api from "../../Services/api";
 
 function Dashboard({ navigation }) {
     
-    const { corPrimaria } = theme;
+    const { corPrimaria } = theme
+    const { veiculos, dataUser } = useUser()
+    const { loadVehicles } = ReadApi()
 
     const [informacoes, setInformacoes] = useState(true)
     const [escolherVeiculo, setEscolherVeiculo] = useState(false)
@@ -37,15 +40,12 @@ function Dashboard({ navigation }) {
     const [modalConfirma, setModalConfirma] = useState(false)
     const [modalMsgConfirma, setModalMsgConfirma] = useState(false)
     const [modalDatePicker, setModalDatePicker] = useState(false)
-
     const [imageLoaded, setImageLoaded] = useState(false);
     const [botaoCarroAtivo, setBotaoCarroAtivo] = useState(false)
-
     const [nomeVeiculo, setNomeVeiculo] = useState('')
     const [placaVeiculo, setPlacaVeiculo] = useState('')
     const [corVeiculo, setCorVeiculo] = useState('')
     const [cartaoDeCredito, setCartaoDeCredito] = useState([])
-
     const [erro, setErro] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
 
@@ -67,16 +67,19 @@ function Dashboard({ navigation }) {
         },
     ]
 
-    const [veiculosCadastrados, setVeiculosCadastrados] = useState([])
-
-    const { setVeiculoEscolhido } = useContext(ReservaContext)
+    const { 
+        setVeiculoEscolhido, 
+        veiculoEscolhido, 
+        destination,
+        horaReserva
+    } = useContext(ReservaContext)
 
     const cliqueBotao = (item) => {
-        setBotaoCarroAtivo(item.placa);
+        setBotaoCarroAtivo(item.id);
     };
 
     const renderItem = ({ item }) => {
-        const botaoClicado = botaoCarroAtivo === item.placa;
+        const botaoClicado = botaoCarroAtivo === item.id;
 
         return (
             <TouchableOpacity
@@ -85,11 +88,7 @@ function Dashboard({ navigation }) {
                 )}
                 onPress={() => {
                     cliqueBotao(item)
-                    setVeiculoEscolhido({
-                        nome: item.nome,
-                        placa: item.placa,
-                        cor: item.cor
-                    })
+                    setVeiculoEscolhido({item})
                 }}
                 activeOpacity={1}
             >
@@ -125,14 +124,14 @@ function Dashboard({ navigation }) {
                     <Ionicons name="car" size={28} color={(botaoClicado ? '#fff' : '#545454')} />
                     <Text style={(
                         botaoClicado ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
-                    )}>{item.nome}</Text>
+                    )}>{item.name}</Text>
                 </View>
                 <Text style={(
                     botaoClicado ? styles.placaCarroAtivo : styles.placaCarroDesativado
-                )}>{item.placa}</Text>
+                )}>{item.license_plate}</Text>
                 <Text style={(
                     botaoClicado ? styles.corCarroAtivo : styles.corCarroDesativado
-                )}>{item.cor}</Text>
+                )}>{item.color}</Text>
             </TouchableOpacity>
         )
     }
@@ -143,6 +142,21 @@ function Dashboard({ navigation }) {
                 Nenhum cartão cadastrado no momento. Clique no "+" para adicionar seu cartão
             </Text>
         )
+    }
+
+    async function registerVehicle() {
+        await api.post("/vehicles", {
+            id_costumer: dataUser.id,
+            name_vehicle: nomeVeiculo,
+            color: corVeiculo,
+            license_plate: placaVeiculo
+        })
+        .then(() => {
+            Alert.alert("Veículo cadastrado com sucesso")
+        })
+        .catch(e => {
+            Alert.alert("Erro ao adicionar veículo", e)
+        })
     }
 
     async function adicionarVeiculo() {
@@ -159,22 +173,54 @@ function Dashboard({ navigation }) {
             setNomeVeiculo('')
             setPlacaVeiculo('')
             setCorVeiculo('')
-            console.log("Veiculo adicionado")
+            registerVehicle()
         }
     }
 
     async function deletarVeiculos(veiculoId) {
-        console.log(`Veículo ${veiculoId} removido`)
+        await api.delete(`/vehicles/${veiculoId}`)
+        .then(() => {
+            Alert.alert("Veículo excluído")
+        })
+        .catch(e => {
+            Alert.alert("Erro ao deletar veículo", e)
+        })
+    }
+
+    async function confirmaReserva() {
+        setModalConfirma(false)
+
+        await api.post("/reservations", {
+            data_entrada: horaReserva,
+            hora_entrada: "",
+            data_saida: "",
+            hora_saida: "",
+            value: 10,
+            id_costumer: dataUser.id,
+            id_vehicle: veiculoEscolhido.item.id,
+            id_establishment: destination.id,
+            parko_app: 1
+        })
+        .then(() => {
+            setModalMsgConfirma(true)
+        })
+        .catch(e => {
+            Alert.alert("Erro ao realizar reserva", e)
+        })
     }
 
     const [selectedDate, setSelectedDate] = useState('')
+
+    useEffect(() => {
+        loadVehicles(dataUser.id)
+    }, [veiculos])
 
     return (
         <SafeAreaView style={styles.content}>
 
             <Topo
                 handleImageLoaded={() => setImageLoaded(true)}
-                voltar={() => navigation.navigate('Mapa')}
+                voltar={() => navigation.navigate('Map')}
             />
 
             {(imageLoaded && informacoes) &&
@@ -210,9 +256,9 @@ function Dashboard({ navigation }) {
                         contentContainerStyle={styles.itens}
                         numColumns={2}
                         ListEmptyComponent={EmptyListMessage}
-                        data={dadosCarro}
+                        data={veiculos}
                         renderItem={renderItem}
-                        keyExtractor={item => item.placa}
+                        keyExtractor={item => item.id}
                     />
                     <View style={{ alignItems: 'center', justifyContent: 'center' }} >
                         <Botao
@@ -419,10 +465,7 @@ function Dashboard({ navigation }) {
                         setModalConfirma(false)
                         setInformacoes(true)
                     }}
-                    mensagemConfirmacao={() => {
-                        setModalConfirma(false)
-                        setModalMsgConfirma(true)
-                    }}
+                    mensagemConfirmacao={confirmaReserva}
                 />
             </Modal>
 
@@ -451,7 +494,8 @@ function Dashboard({ navigation }) {
                     setSelectedDate={setSelectedDate}
                     setModalConfirma={() => {
                         setModalDatePicker(false)
-                        setModalConfirma(true)
+                        setInformacoes(false)
+                        setEscolherVeiculo(true)
                     }}
                 />
             </Modal>

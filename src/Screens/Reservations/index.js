@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext, useEffect } from "react"
 import { Feather } from "react-native-vector-icons"
 import { 
     Text, 
@@ -9,37 +9,48 @@ import {
 } from "react-native"
 import { theme } from "../../Theme"
 import { styles } from "./style"
+import ReadApi from "../../Services/readData"
+import { ReservaContext } from "../../Context/reservaContext"
+import { useUser } from "../../Context/dataUserContext"
+import { formatCurrency } from "../../Services/formatCurrency"
 
 export default function Reservations({ navigation }) {
 
     const { fonteNegrito } = theme
+    const { loadReservations } = ReadApi()
+    const { reservations } = useContext(ReservaContext)
+    const { dataUser } = useUser()
+
+    useEffect(() => {
+        loadReservations()
+    }, [])
 
     const renderItem = ({ item }) => {
         return (
             <View>
                 <View style={styles.itemLista}>
                     <View style={styles.viewEstacionamento}>
-                        <Image source={item.imagem} />
-                        <Text style={styles.nomeEstacionamento}>{item.nomeEstacionamento}</Text>
+                        <Image source={item.image} />
+                        <Text style={styles.nomeEstacionamento}>{item.establishment}</Text>
                     </View>
                     <View style={styles.infoReserva}>
                         <View style={styles.entrada}>
-                            <Text style={styles.infoEntrada}>{item.entrada}</Text>
+                            <Text style={styles.infoEntrada}>Entrada</Text>
                             <View style={styles.horaEntrada}>
-                                <Text style={styles.infoData}>{item.dataEntrada}</Text>
-                                <Text style={styles.infoData}>{item.horarioEntrada}</Text>
+                                <Text style={styles.infoData}>{item.data_entrada}</Text>
+                                <Text style={styles.infoData}>{item.hora_entrada}</Text>
                             </View>
                         </View>
                         <View style={styles.entrada}>
-                            <Text style={styles.infoEntrada}>{item.saida}</Text>
+                            <Text style={styles.infoEntrada}>Saída</Text>
                             <View style={styles.horaEntrada}>
-                                <Text style={styles.infoData}>{item.dataSaida}</Text>
-                                <Text style={styles.infoData}>{item.horarioSaida}</Text>
+                                <Text style={styles.infoData}>{item.data_saida}</Text>
+                                <Text style={styles.infoData}>{item.hora_saida}</Text>
                             </View>
                         </View>
                         <View style={styles.entrada}>
-                            <Text style={styles.infoEntrada}>{item.valor}</Text>
-                            <Text style={styles.infoData}>{item.quantidadeValor}</Text>
+                            <Text style={styles.infoEntrada}>Valor</Text>
+                            <Text style={styles.infoData}>{formatCurrency(item.value)}</Text>
                         </View>
                     </View>
                     <View style={styles.areaAvaliacao}>
@@ -58,11 +69,16 @@ export default function Reservations({ navigation }) {
                     onPress={() => {
                         alert('Sua avaliação foi enviada!')
                     }}>
-                    <Text style={{ 
-                        fontSize: 17, 
-                        textAlign: 'center', 
-                        fontFamily: fonteNegrito, 
-                        color: "#fff" }}>Faça uma reclamação</Text>
+                    <Text 
+                        style={{ 
+                            fontSize: 17, 
+                            textAlign: 'center', 
+                            fontFamily: fonteNegrito, 
+                            color: "#fff" 
+                        }}
+                    >
+                        Faça uma reclamação
+                    </Text>
                 </TouchableOpacity>
             </View>
         )
@@ -76,6 +92,11 @@ export default function Reservations({ navigation }) {
         )
     }
 
+    const reservaFinalizada = reservations.filter(
+        item => item.id_costumer == dataUser.id && 
+        item.status == "Finalizado"
+    )
+
     return (
         <View style={styles.areaContent}>
             <View style={styles.cabecalho}>
@@ -87,10 +108,11 @@ export default function Reservations({ navigation }) {
                 <Text style={styles.topoReservas}>Reservas</Text>
             </View>
             <FlatList 
-                data={{}}
+                data={reservaFinalizada}
                 renderItem={renderItem}
-                keyExtractor={item => item.nomeEstacionamento}
+                keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
+                showsVerticalScrollIndicator={false}
             />
         </View>
     )

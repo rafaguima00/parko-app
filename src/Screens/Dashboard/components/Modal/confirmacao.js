@@ -5,7 +5,10 @@ import { Botao } from "../../../../Components/Botao";
 
 const { fonteNegrito, corPrimaria } = theme
 
-function ModalConfirmacao({ handleClose, mensagemConfirmacao }) {
+function ModalConfirmacao({ 
+    handleClose, mensagemConfirmacao
+}) {
+
     return (
         <View style={estilos.modalContainer}>
             <View style={estilos.modalContent}>
