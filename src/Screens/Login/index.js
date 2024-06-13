@@ -60,21 +60,15 @@ const Login = () => {
 
     function realizarLogin() {
         if (dados.email === '') {
-            setMensagemErro('O e-mail é obrigatório')
             setStatusError('email')
+            setMensagemErro('O e-mail é obrigatório')
         } else if (dados.senha === '') {
-            setMensagemErro('A senha é obrigatória')
             setStatusError('senha')
+            setMensagemErro('A senha é obrigatória')
         } else {
             handleLogin()
         }
     }
-
-    // useEffect(() => {
-    //     if(token) {
-    //         return navigation.replace("Map")
-    //     }
-    // }, [navigation, token])
 
     return (
         <SafeAreaView style={styles.displayTela} >

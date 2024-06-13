@@ -23,6 +23,8 @@ function CustomDrawer() {
     const { dataUser } = useUser()
     const { email, password, name, cpf, tel } = dataUser
 
+    let register = false
+
     const logout = async () => {
         await AsyncStorage.removeItem("token")
         navigation.replace("Login")
@@ -64,7 +66,7 @@ function CustomDrawer() {
     return (
         <View style={styles.menuLateral} >
             <Image source={logo} style={{ width: '51%', height: '6%', marginVertical: 32 }} />
-            <TouchableOpacity onPress={() => navigation.navigate('Profile', { email, password, name, cpf, tel })} >
+            <TouchableOpacity onPress={() => navigation.navigate('Profile', { email, password, name, cpf, tel, register })} >
                 <Image source={fotoPerfil} style={{ width: 140, height: 140 }} />
                 <View style={styles.botaoEdit}>
                     <Octicons name="pencil" size={24} color="white" />

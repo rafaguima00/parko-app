@@ -21,8 +21,8 @@ import { TextInputMask } from 'react-native-masked-text'
 import { styles } from "./style"
 import api from "../../Services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import ReadApi from "../../Services/readData"
 import { useUser } from "../../Context/dataUserContext"
+import { jwtDecode } from "jwt-decode"
 
 export default function Profile({ navigation, route }) {
 
@@ -31,9 +31,8 @@ export default function Profile({ navigation, route }) {
     const [carregando, setCarregando] = useState(false)
     const [dados, setDados] = useState({})
 
-    const { loadUsers } = ReadApi()
-    const { email, password, name, sobrenome, cpf, tel } = route.params
-    const token = AsyncStorage.getItem("token")
+    const { dataUser, setDataUser } = useUser()
+    const { email, password, name, sobrenome, cpf, tel, register } = route.params
 
     function sobreNome() {
         const segundoNome = name.split(' ')
@@ -63,7 +62,7 @@ export default function Profile({ navigation, route }) {
                 [
                     {
                         text: 'Sim',
-                        onPress: () => criarUsuario(email)
+                        onPress: () => criarUsuario(dataUser.id)
                     },
                     {
                         text: 'Não'
@@ -73,48 +72,48 @@ export default function Profile({ navigation, route }) {
         }
     }
 
-    async function criarUsuario() {
+    async function criarUsuario(id) {
         setCarregando(true)
 
-        if(token) {
-            setCarregando(false)
-            return navigation.navigate('Map')
-        }
-
-        await api.post("/users", { 
-            name_user: `${dados.name} ${dados.sobrenome}`, 
-            email: email, 
-            password: password,
-            cpf: dados.cpf, 
-            rg: "", 
-            tel: dados.tel, 
-            data_nasc: ""
+        await api.put(`/users/${id}`, { 
+            name: `${dados.name} ${dados.sobrenome}`, 
+            cpf: dados.cpf,
+            tel: dados.tel
         })
         .then(() => {
-            handleLogin()
+            if(register) Alert.alert(`Bem-vindo(a) ${dados.name}!`)
+            navigation.navigate("Map")
         })
         .catch(e => {
             setCarregando(false)
-            Alert.alert(e)
+            Alert.alert(e.response.data.message)
         })
     }
 
-    async function handleLogin() {
-        await api.post("/users/login", {
-            email: email,
-            password: password
-        })
-        .then(res => {
-            AsyncStorage.setItem("token", JSON.stringify(res.data))
-        })
+    const alertWarning = (id) => {
+        Alert.alert(
+            "Desativar conta",
+            "Você tem certeza que deseja desativar sua conta? Você irá perder todos os dados do seu cartão de crédito, veículos... tudo que você tem direito",
+            [
+                {
+                    text: 'Sim',
+                    onPress: () => deleteAccount(id)
+                },
+                {
+                    text: 'Não'
+                }
+            ]
+        )
+    }
+
+    const deleteAccount = async (id) => {
+        await api.delete(`/users/${id}`)
         .then(() => {
-            setCarregando(false)
-            alert(`Seja bem-vindo(a) ${dados.name}!`)
-            navigation.replace("Map")
+            Alert.alert("Sua conta foi desativada")
+            navigation.replace("Login")
         })
         .catch(e => {
-            setCarregando(false)
-            console.log(e)
+            Alert.alert("Erro ao deletar conta", e.message)
         })
     }
 
@@ -122,8 +121,18 @@ export default function Profile({ navigation, route }) {
         if(name) {
             sobreNome()
         }
-            
-        loadUsers()
+
+        (async () => {
+            const token = await AsyncStorage.getItem("token")
+    
+            if(register) {
+                const decode = jwtDecode(token)
+                setDataUser(decode.user)
+            } else {
+                setDados(dataUser)
+            }
+        }
+        )()
     }, [])
 
     return (
@@ -135,6 +144,7 @@ export default function Profile({ navigation, route }) {
                     <TouchableOpacity
                         onPress={salvarDados}
                         style={{ marginHorizontal: 36, marginTop: 38 }}
+                        activeOpacity={0.9}
                     >
                         <Feather name="arrow-left" size={36} color="black" />
                     </TouchableOpacity>
@@ -226,7 +236,7 @@ export default function Profile({ navigation, route }) {
                         corDeFundo={corVermelha}
                         negrito
                         corDoTexto={'#fff'}
-                        disabled
+                        aoPressionar={() => alertWarning(dataUser.id)}
                     />
                 </View>
                 <Modal

@@ -59,7 +59,7 @@ const InputLogin = ({
             />
             <Alerta 
                 message={mensagemErro}
-                error={statusError == "no-user" ? true : false}
+                error={statusError}
                 setError={setStatusError}
             />
             {error && <HelperText type="error" visible={error}>
