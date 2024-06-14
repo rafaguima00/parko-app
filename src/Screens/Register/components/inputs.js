@@ -9,7 +9,6 @@ const Inputs = ({
     setStatusError,
     mensagemErro,
     error,
-    messageError,
     email,
     password,
     confirmaSenha,
@@ -33,7 +32,6 @@ const Inputs = ({
                 keyboardType='email-address'
                 label={'Email'}
                 error={statusError == 'email'}
-                messageError={mensagemErro}
                 activeOutlineColor="#545454"
                 autoCapitalize='none'
             />
@@ -45,7 +43,6 @@ const Inputs = ({
                 value={confirmaSenha}
                 label={'Senha'}
                 error={statusError == 'senha'}
-                messageError={mensagemErro}
                 activeOutlineColor="#545454"
                 autoCapitalize='none'
                 secureTextEntry={secureMode}
@@ -66,7 +63,6 @@ const Inputs = ({
                 value={password}
                 label={'Confirmar senha'}
                 error={statusError == 'confirmaSenha'}
-                messageError={mensagemErro}
                 activeOutlineColor="#545454"
                 autoCapitalize='none'
                 secureTextEntry={secureMode2}
@@ -79,16 +75,11 @@ const Inputs = ({
                     null
                 }
             />
-            <Alerta
-                mensagem={mensagemErro}
+            <Alerta 
+                message={mensagemErro}
+                error={statusError}
                 setError={setStatusError}
-                error={statusError ? true : false}
             />
-            {error &&
-                <HelperText type="error" visible={error}>
-                    { messageError }
-                </HelperText>
-            }
         </View>
     )
 }

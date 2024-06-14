@@ -33,7 +33,7 @@ const Register = ({ navigation }) => {
         })
     }
 
-    const [statusError, setStatusError] = useState('')
+    const [statusError, setStatusError] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
     const [carregando, setCarregando] = useState(false)
 
@@ -41,10 +41,10 @@ const Register = ({ navigation }) => {
 
     function realizarCadastro() {
         if (dados.email === "" || dados.password === "" || dados.confirmaSenha === "") {
-            setStatusError('empty')
-            setMensagemErro("preencha o campo vazio")
+            setStatusError(true)
+            setMensagemErro("Preencha o campo vazio")
         } else if (dados.password != dados.confirmaSenha) {
-            setStatusError('confirmaSenha')
+            setStatusError(true)
             setMensagemErro('As senhas não conferem')
         } else {
             registrarUsuario()
@@ -67,7 +67,6 @@ const Register = ({ navigation }) => {
         .catch(e => {
             setStatusError(true)
             setMensagemErro(e.response.data.message)
-            console.log(e.response.data.message)
         })
     }
 
@@ -89,9 +88,8 @@ const Register = ({ navigation }) => {
         })
         .catch(e => {
             setCarregando(false)
+            setStatusError(true)
             setMensagemErro(e.response.data.message)
-            console.log("erro ao logar na conta")
-            console.log(e.response.data.message)
         })
     }
 

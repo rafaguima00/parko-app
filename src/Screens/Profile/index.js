@@ -50,9 +50,9 @@ export default function Profile({ navigation, route }) {
     function salvarDados() {
 
         if (
-            dados.name == '' ||
-            dados.tel == '' ||
-            dados.cpf == ''
+            dados.name === '' ||
+            dados.tel === '' ||
+            dados.cpf === ''
         ) {
             Alert.alert('Aviso', 'Preencha os campos vazios')
         } else {

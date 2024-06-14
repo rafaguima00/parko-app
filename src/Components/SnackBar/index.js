@@ -1,5 +1,6 @@
 import React from "react"
 import { Snackbar } from "react-native-paper"
+import { View } from "react-native"
 
 export function Alerta({ 
     message, 
@@ -7,18 +8,27 @@ export function Alerta({
     setError 
 }) {
     return (
-        <Snackbar
-            visible={error}
-            onDismiss={() => setError(false)}
-            duration={4000}
-            action={{
-                label:"OK",
-                onPress: () => {
-                    setError(false)
-                }
+        <View 
+            style={{
+                backgroundColor: "red",
+                display: error ? "flex" : "none",
+                justifyContent: "center",
+                marginTop: 36
             }}
         >
-            {message}
-        </Snackbar>
+            <Snackbar
+                visible={error}
+                onDismiss={() => setError(false)}
+                duration={4000}
+                action={{
+                    label:"OK",
+                    onPress: () => {
+                        setError(false)
+                    }
+                }}
+            >
+                {message}
+            </Snackbar>
+        </View>
     )
 }
