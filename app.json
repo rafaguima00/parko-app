@@ -2,12 +2,12 @@
   "expo": {
     "name": "Parko",
     "slug": "parko-app",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon_parko.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash_screen.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,9 +16,9 @@
       "bundleIdentifier": "com.rafaelgsm.parkoapp"
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 5,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon_parko.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.rafaelgsm.parkoapp"

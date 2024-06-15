@@ -33,7 +33,7 @@ const Login = () => {
         })
     }
 
-    const [statusError, setStatusError] = useState('')
+    const [statusError, setStatusError] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
     const [carregando, setCarregando] = useState(false)
 
@@ -53,17 +53,17 @@ const Login = () => {
         })
         .catch(e => {
             setCarregando(false)
-            setStatusError("no-user")
+            setStatusError(true)
             setMensagemErro(e.response.data.message)
         })
     }
 
     function realizarLogin() {
         if (dados.email === '') {
-            setStatusError('email')
+            setStatusError(true)
             setMensagemErro('O e-mail é obrigatório')
         } else if (dados.senha === '') {
-            setStatusError('senha')
+            setStatusError(true)
             setMensagemErro('A senha é obrigatória')
         } else {
             handleLogin()
