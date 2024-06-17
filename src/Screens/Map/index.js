@@ -176,6 +176,7 @@ export default function MapaPrincipal({ navigation }) {
                 loadingEnabled={true}
                 mapType="mutedStandard"
                 ref={mapEl}
+                provider="google"
             >
                 {estacionamentos.map((item) => (
                     <Marker
