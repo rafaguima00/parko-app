@@ -29,7 +29,7 @@
     "react-native": "0.74.1",
     "react-native-countdown-timer-hooks": "^1.0.5",
     "react-native-gesture-handler": "^2.16.2",
-    "react-native-maps": "^1.14.0",
+    "react-native-maps": "^1.15.6",
     "react-native-maps-directions": "^1.9.0",
     "react-native-masked-text": "^1.13.0",
     "react-native-modern-datepicker": "^1.0.0-beta.91",

@@ -18,18 +18,22 @@ const infoEstacionamento = {
     tempoTolerancia: "2 horas",
     horarios: [
         {
+            id: 1,
             tempoPermanencia: "1 hora",
             preco: "R$ 10,00"
         },
         {
+            id: 2,
             tempoPermanencia: "2 horas",
             preco: "R$ 12,00"
         },
         {
+            id: 3,
             tempoPermanencia: "3 horas",
             preco: "R$ 14,00"
         },
         {
+            id: 4,
             tempoPermanencia: "4 horas",
             preco: "R$ 16,00"
         }

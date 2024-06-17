@@ -113,7 +113,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                     horizontal
                     data={infoEstacionamento.horarios}
                     renderItem={renderItem}
-                    keyExtractor={item => { item.preco }}
+                    keyExtractor={item => item.id}
                     showsHorizontalScrollIndicator={false}
                 />
             </View>
