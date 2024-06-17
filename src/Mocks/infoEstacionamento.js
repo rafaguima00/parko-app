@@ -1,4 +1,4 @@
-import imagemTopo from '../../assets/Rectangle-26.png'
+import imagemTopo from '../../assets/image_shop.png'
 
 const infoEstacionamento = {
     id: 0,

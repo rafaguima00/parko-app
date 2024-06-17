@@ -6,8 +6,7 @@ import {
     Platform,
     TouchableOpacity,
     Image,
-    Modal,
-    ActivityIndicator
+    Modal
 } from "react-native"
 import { Content } from "../../Components/Marker"
 import MapView, { Marker } from 'react-native-maps'
@@ -31,6 +30,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { jwtDecode } from "jwt-decode"
 import ReadApi from "../../Services/readData"
 import { formatCurrency } from "../../Services/formatCurrency"
+import imageShop from "../../../assets/image_shop.png"
 
 export default function MapaPrincipal({ navigation }) {
 
@@ -146,7 +146,15 @@ export default function MapaPrincipal({ navigation }) {
 
     if (!location || loading) {
         return (
-            <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+            <View 
+                style={[
+                    styles.container, 
+                    { 
+                        alignItems: 'center', 
+                        justifyContent: 'center' 
+                    }
+                ]}
+            >
                 <Text>Carregando...</Text>
             </View>
         );
@@ -164,14 +172,14 @@ export default function MapaPrincipal({ navigation }) {
             <MapView
                 style={styles.map}
                 initialRegion={location}
-                showsUserLocation
-                loadingEnabled
+                showsUserLocation={true}
+                loadingEnabled={true}
                 mapType="mutedStandard"
                 ref={mapEl}
             >
-                {estacionamentos.map((item, index) => (
+                {estacionamentos.map((item) => (
                     <Marker
-                        key={index}
+                        key={item.id}
                         coordinate={{
                             latitude: item.latitude,
                             longitude: item.longitude,

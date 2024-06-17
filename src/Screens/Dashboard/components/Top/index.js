@@ -29,7 +29,7 @@ function Topo({ handleImageLoaded, voltar }) {
         <View style={{width: "100%"}}>
             <View>
                 <Image 
-                    source={{ uri: image ? image : "" }} 
+                    source={require("../../../../../assets/image_shop.png")} 
                     style={{width: width, height: 220}} 
                     onLoad={handleImageLoaded} 
                 />  
