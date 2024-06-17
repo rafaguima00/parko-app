@@ -9,7 +9,7 @@ import {
     Modal
 } from "react-native"
 import { Content } from "../../Components/Marker"
-import MapView, { Marker } from 'react-native-maps'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import * as Location from "expo-location"
 import {
     Feather,
@@ -30,7 +30,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { jwtDecode } from "jwt-decode"
 import ReadApi from "../../Services/readData"
 import { formatCurrency } from "../../Services/formatCurrency"
-import imageShop from "../../../assets/image_shop.png"
 
 export default function MapaPrincipal({ navigation }) {
 
@@ -176,7 +175,7 @@ export default function MapaPrincipal({ navigation }) {
                 loadingEnabled={true}
                 mapType="mutedStandard"
                 ref={mapEl}
-                provider="google"
+                provider={PROVIDER_GOOGLE}
             >
                 {estacionamentos.map((item) => (
                     <Marker
