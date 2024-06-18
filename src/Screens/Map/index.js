@@ -173,7 +173,7 @@ export default function MapaPrincipal({ navigation }) {
                 initialRegion={location}
                 showsUserLocation={true}
                 loadingEnabled={true}
-                mapType="mutedStandard"
+                mapType="standard"
                 ref={mapEl}
                 provider={PROVIDER_GOOGLE}
             >
