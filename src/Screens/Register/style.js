@@ -3,10 +3,11 @@ import { StyleSheet } from "react-native"
 export const styles = StyleSheet.create({
     displayTela: {
         alignItems: "center",
-        marginVertical: 48
+        justifyContent: "center",
+        height: "100%"
     },
     imagem: {
-        marginVertical: 40,
+        marginVertical: 32,
         paddingHorizontal: 32
     },
     esqueciASenha: {

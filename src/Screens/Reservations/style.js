@@ -1,15 +1,69 @@
 import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
+import styled from "styled-components"
 
-const { fonteNegrito, corPrimaria } = theme
+const { fonteNegrito, corPrimaria, corNeutra } = theme
 const width = Dimensions.get('screen').width
+
+export const BtRating = styled.TouchableOpacity`
+    height: 34px;
+    width: 34px;
+    background-color: ${props => props.background};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+`
+
+export const TxtButton = styled.Text`
+    font-weight: 700;
+    font-size: 16px;
+    font-family: 'Roboto';
+    color: ${props => props.textcolor};
+`
+
+export const Quit = styled.TouchableOpacity`
+    position: absolute;
+    right: 16px;
+`
+
+export const TxtQuit = styled.Text`
+    font-size: 28px;
+    font-weight: 700;
+    color: ${corNeutra};
+`
+
+export const TextArea = styled.TextInput`
+    border: 2px solid ${corPrimaria};
+    padding: 8px;
+    border-radius: 8px;
+    height: 182px;
+    text-align-vertical: top;
+`
+
+export const Div = styled.View`
+    margin: 0 16px;
+`
+
+export const FeedBackSent = styled.View`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
+
+export const TextFeedback = styled.Text`
+    color: ${corNeutra};
+    font-weight: 700;
+    font-size: 17.5px;
+`
 
 export const styles = StyleSheet.create({
     areaContent: {
         marginTop: 32,
         marginBottom: 130,
         width: width,
-        paddingHorizontal: 40
+        paddingHorizontal: 40,
+        backgroundColor: "#f4f4f4"
     },
 
     cabecalho: {
@@ -24,11 +78,16 @@ export const styles = StyleSheet.create({
         lineHeight: 32
     },
     itemLista: {
-        backgroundColor: "#d4d4d4",
+        backgroundColor: "#efefef",
         gap: 30,
         paddingVertical: 10,
-        borderTopRightRadius: 22,
-        borderTopLeftRadius: 22
+        // borderTopRightRadius: 22,
+        // borderTopLeftRadius: 22,
+        // borderBottomLeftRadius: 22,
+        // borderBottomRightRadius: 22,
+        borderRadius: 22,
+        position: "relative",
+        marginBottom: 42
     },
 
     viewEstacionamento: {
@@ -47,7 +106,7 @@ export const styles = StyleSheet.create({
     infoReserva: {
         gap: 15,
         paddingBottom: 18,
-        paddingHorizontal: 32,
+        marginHorizontal: 32,
         borderBottomWidth: 1,
         borderColor: "#C4C4C4",
         justifyContent: "space-between",
@@ -94,8 +153,7 @@ export const styles = StyleSheet.create({
         height: 54,
         borderBottomLeftRadius: 22,
         borderBottomRightRadius: 22,
-        justifyContent: "center",
-        marginBottom: 42
+        justifyContent: "center"
     },
 
     textoBotao: {

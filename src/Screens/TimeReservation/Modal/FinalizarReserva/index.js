@@ -1,46 +1,55 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { theme } from "../../../../Theme";
-import { Botao } from "../../../../Components/Botao";
+import { Text, View, Image, StyleSheet } from "react-native"
+import React, { useContext, useEffect } from "react"
+import { theme } from "../../../../Theme"
+import { Botao } from "../../../../Components/Botao"
 
 const { fonteNegrito, corPrimaria } = theme
 
-function ModalConfirmacao({ 
-    handleClose, mensagemConfirmacao
-}) {
+const FinalizarReserva = (props) => {
 
-    return (
+    const { setModalFinalizarReserva, setModalAguardar } = props.states
+
+    function denyExit() {
+        setModalFinalizarReserva(false)
+    }
+
+    function confirm() {
+        setModalFinalizarReserva(false)
+        setModalAguardar(true)
+    }
+
+    return <>
         <View style={estilos.modalContainer}>
             <View style={estilos.modalContent}>
                 <View style={estilos.confirmacao} >
-                    <Image source={require('../../../../../assets/checked.png')} />
-                    <Text style={estilos.tituloConfirmacao}>Confirmação</Text>
+                    <Image source={require('../../../..//../assets/checked.png')} />
+                    <Text style={estilos.tituloConfirmacao} >Confirmação</Text>
                     <Text style={estilos.mensagemConfirmacao}>
-                        A reserva será automaticamente cancelada se atrasar 10 minutos na chegada. Reembolso parcial da vaga contratada será aplicado.
+                        Você confirma que já está de saída do estacionamento?
                     </Text>
                 </View>
                 <View style={{alignItems: 'center', gap: 12}} >
                     <Botao 
-                        children="Concordo"
+                        children={"Confirmar"}
                         corDeFundo={corPrimaria}
                         largura={'100%'}
                         corDoTexto={'#fff'}
                         negrito
-                        aoPressionar={mensagemConfirmacao}
+                        aoPressionar={confirm}
                     />
                     <Botao 
-                        children="Não concordo"
+                        children={"Negar"}
                         corDeFundo={'#ff4a4a'}
                         largura={'100%'}
-                        negrito
                         corDoTexto={'#fff'}
-                        aoPressionar={handleClose}
+                        negrito
+                        aoPressionar={denyExit}
                     />
                 </View>
             </View>
         </View>
-    )
-}  
+    </>
+}
 
 const estilos = StyleSheet.create({
     modalContainer: {
@@ -77,4 +86,4 @@ const estilos = StyleSheet.create({
     }
 })
 
-export default ModalConfirmacao;
+export default FinalizarReserva

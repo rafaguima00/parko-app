@@ -6,7 +6,7 @@ import api from "./api"
 const ReadApi = () => {
 
     const { setEstacionamentos, setPriceTable, setVeiculos, setUsers } = useUser()
-    const { setReservations } = useContext(ReservaContext)
+    const { setReservations, setTabelaFixa } = useContext(ReservaContext)
 
     const loadParkings = async () => {
         await api.get("/establishments")
@@ -18,8 +18,8 @@ const ReadApi = () => {
         })
     }
 
-    const loadPriceTable = async (id) => {
-        await api.get(`tabela_preco/${id}`)
+    const loadPriceTable = async (idEstacionamento) => {
+        await api.get(`tabela_preco/${idEstacionamento}`)
         .then(res => {
             setPriceTable(res.data)
         })
@@ -58,12 +58,23 @@ const ReadApi = () => {
         })
     }
 
+    const loadTabelaFixa = async (idEstacionamento) => {
+        await api.get(`/tabela_fixa/${idEstacionamento}`)
+        .then(res => {
+            setTabelaFixa(res.data)
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
+
     return { 
         loadParkings, 
         loadPriceTable, 
         loadVehicles, 
         loadUsers,
-        loadReservations
+        loadReservations,
+        loadTabelaFixa
     }
 }
 

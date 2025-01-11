@@ -25,17 +25,20 @@ export default function RegisterVehicle({ navigation }) {
 
     const placeholder = [
         {
-            placeholder: 'Nome do veículo',
+            id: 1,
+            placeholder: "Modelo do veículo",
             value: dados.nome,
             onChange: text => setDados({ ...dados, nome: text })
         },
         {
-            placeholder: 'Placa do veículo',
+            id: 2,
+            placeholder: "Placa do veículo",
             value: dados.placa,
             onChange: text => setDados({ ...dados, placa: text })
         },
         {
-            placeholder: 'Cor do veículo',
+            id: 3,
+            placeholder: "Cor do veículo",
             value: dados.cor,
             onChange: text => setDados({ ...dados, cor: text })
         },
@@ -92,8 +95,8 @@ export default function RegisterVehicle({ navigation }) {
                         style={styles.input}
                         value={item.value}
                         onChangeText={item.onChange}
-                        autoCapitalize={item.placeholder == "Placa do veículo" ? 'characters' : 'words'}
-                        maxLength={item.placeholder == "Placa do veículo" ? 7 : undefined}
+                        autoCapitalize={item.id == 2 ? 'characters' : 'words'}
+                        maxLength={item.id == 2 ? 7 : undefined}
                     />
                 ))}
 

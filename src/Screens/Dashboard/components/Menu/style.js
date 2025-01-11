@@ -1,8 +1,46 @@
 import { StyleSheet, Dimensions } from "react-native"
-import { theme } from "../../../../Theme";
+import { theme } from "../../../../Theme"
+import styled from "styled-components"
 
 const { width } = Dimensions.get('screen')
-const { fonteNegrito, corPrimaria } = theme;
+const { fonteNegrito, corPrimaria, corDeFundoAzul, corNeutra } = theme
+
+export const MaisTempo = styled.View`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+`
+
+export const TextLine = styled.Text`
+    color: ${corNeutra};
+    text-decoration: underline;
+`
+
+export const TextBlue = styled.Text`
+    color: ${corDeFundoAzul};
+    text-decoration: underline;
+`
+
+export const BotaoClicar = styled.TouchableOpacity`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+`
+
+export const RenderHeader = styled.TouchableOpacity`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 22px;
+    margin-right: 20px;
+    border: 2px solid ${corPrimaria};
+    border-radius: 12px;
+    padding: 24px;
+    background-color: ${corPrimaria};
+`
 
 export const styles = StyleSheet.create({
     dashContent: {
@@ -72,7 +110,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 24,
         paddingLeft: 24,
         paddingRight: 42,
-        backgroundColor: '#509c76'
+        backgroundColor: corPrimaria
     },
     botaoHorariosDesativado: {
         marginRight: 20,

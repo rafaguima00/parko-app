@@ -96,7 +96,7 @@ const Register = ({ navigation }) => {
     return (
         <ScrollView contentContainerStyle={styles.displayTela}>
             <TouchableOpacity 
-                style={{ position: "absolute", left: 38, top: 0 }} 
+                style={{ position: "absolute", left: 38, top: 64 }} 
                 onPress={() => navigation.goBack()}
             >
                 <Feather name="arrow-left" size={32} />
@@ -117,8 +117,8 @@ const Register = ({ navigation }) => {
                 secureTextEntry
             />
             <Login realizarCadastro={realizarCadastro} />
-            <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
-            <BotaoLogin />
+            {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
+            <BotaoLogin /> */}
 
             <Modal
                 visible={carregando}

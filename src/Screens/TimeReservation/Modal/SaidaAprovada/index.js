@@ -1,31 +1,31 @@
-import React, { useEffect, useContext } from "react";
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { Feather } from 'react-native-vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { theme } from "../../../../Theme";
-import { ReservaContext } from "../../../../Context/reservaContext"; 
+import React, { useContext, useEffect } from "react"
+import { View, Text, StyleSheet } from 'react-native'
+import { Feather } from 'react-native-vector-icons'
+import { theme } from "../../../../Theme"
+import { ReservaContext } from "../../../../Context/reservaContext"
+import { useNavigation } from "@react-navigation/native"
 
-const { fonteNegrito } = theme;
+const { fonteNegrito, corPrimaria } = theme
 
-function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
+export default function SaidaAprovada(props) {
 
-    const { setReservaFeita, setRunning, setTempoTotal } = useContext(ReservaContext)
+    const { modalSaidaAprovada, setModalSaidaAprovada } = props.states
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
+    const { setDestination, setReservaFeita } = useContext(ReservaContext)
     
     useEffect(() => {
-        if(modalAtivo) {
+        if(modalSaidaAprovada) {
             const timer = setTimeout(() => {
-                handleClose()
-                setReservaFeita(true)
-                setRunning(true)
-                setTempoTotal(3600)
-                navigation.navigate('Mapa Principal')
+                setModalSaidaAprovada(false)
+                setReservaFeita(false)
+                setDestination(false)
+                return navigation.replace("Map")
             }, 4000)
 
-            return () => clearTimeout(timer);
+            return () => clearTimeout(timer)
         }
-    }, [modalAtivo])
+    }, [modalSaidaAprovada])
 
     return (
         <View style={estilos.modalContainer}>
@@ -34,8 +34,8 @@ function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
                     <View style={estilos.viewCheck} >
                         <Feather name="check" size={42} color='#f4f4f4' />
                     </View>
-                    <Text style={estilos.tituloConfirmacao}>Sucesso!</Text>
-                    <Text style={estilos.mensagemConfirmacao}>1 Vaga reservada para você!</Text>
+                    <Text style={estilos.tituloConfirmacao}>Saída aprovada</Text>
+                    <Text style={estilos.mensagemConfirmacao}>Sua saída foi confirmada, obrigado pela sua reserva, volte sempre!</Text>
                 </View>
             </View>
         </View>
@@ -63,7 +63,7 @@ const estilos = StyleSheet.create({
     viewCheck: {
         width: 80, 
         height: 80, 
-        backgroundColor: "#509C76", 
+        backgroundColor: corPrimaria, 
         justifyContent: 'center', 
         alignItems: 'center',
         borderRadius: 50
@@ -73,7 +73,7 @@ const estilos = StyleSheet.create({
         fontFamily: fonteNegrito,
         lineHeight: 25,
         paddingTop: 12,
-        color: '#523499'
+        color: corPrimaria
     },
     mensagemConfirmacao: {
         textAlign: 'center', 
@@ -84,5 +84,3 @@ const estilos = StyleSheet.create({
         padding: 12
     }
 }) 
-
-export default ModalMsgConfirmacao;

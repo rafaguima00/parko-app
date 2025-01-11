@@ -25,7 +25,6 @@ export default function RegisterCard({ navigation }) {
         dateTime: '',
         cvc: ''
     })
-
     const [erro, setErro] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
 
@@ -73,7 +72,7 @@ export default function RegisterCard({ navigation }) {
                     <View style={styles.formCard}>
                         <TextInput
                             autoCapitalize="words"
-                            placeholder="Nome Completo"
+                            placeholder="Nome Completo (conforme aparece no cartão)"
                             style={styles.input}
                             value={dados.nome}
                             onChangeText={text => setDados({ ...dados, nome: text })}
@@ -108,9 +107,10 @@ export default function RegisterCard({ navigation }) {
                         </View>
                     </View>
                     {erro ?
-                        <View style={{marginVertical: 7}}>
-                            <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
-                        </View> : ""}
+                    <View style={{marginVertical: 7}}>
+                        <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
+                    </View> : ""
+                    }
                     <Botao
                         estilo={{ marginHorizontal: 32 }}
                         children={'Adicionar'}

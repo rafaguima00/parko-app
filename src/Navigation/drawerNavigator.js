@@ -5,7 +5,7 @@ import CustomDrawer from "../Components/DrawerNavigation"
 
 function DrawerNavigation() {
     
-    const Drawer = createDrawerNavigator();
+    const Drawer = createDrawerNavigator()
 
     return (
         <Drawer.Navigator 

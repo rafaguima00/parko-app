@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
     Text,
     View,
@@ -9,17 +9,18 @@ import {
     Alert,
     Modal,
     ActivityIndicator
-} from "react-native";
-import veiculo from "../../../assets/medium-vehicle.png"
+} from "react-native"
+import veiculo from "../../../assets/image_vehicle.png"
 import { Ionicons, Feather } from "react-native-vector-icons"
 import { theme } from "../../Theme"
 import { Botao } from "../../Components/Botao"
-import { styles } from "./style"
+import { SelecionarVeiculo, styles } from "./style"
 import { useUser } from "../../Context/dataUserContext"
-import ReadApi from "../../Services/readData";
-import api from "../../Services/api";
+import ReadApi from "../../Services/readData"
+import api from "../../Services/api"
+import { emptyVehicle } from "../../Mocks/emptyList"
 
-const { corPrimaria } = theme;
+const { corPrimaria } = theme
 
 export default function Vehicles({ navigation }) {
 
@@ -31,7 +32,7 @@ export default function Vehicles({ navigation }) {
 
     const renderItem = ({ item }) => {
         return (
-            <TouchableOpacity
+            <SelecionarVeiculo
                 activeOpacity={0.9}
                 style={(
                     botaoClicado == item.id ? styles.botaoAtivo : styles.botaoDesativado
@@ -90,13 +91,13 @@ export default function Vehicles({ navigation }) {
                 >
                     {item.color}
                 </Text>
-            </TouchableOpacity>
+            </SelecionarVeiculo>
         )
     }
 
     const EmptyListMessage = () => {
         return (
-            <Text style={styles.veiculosVazio}>Nenhum veículo cadastrado</Text>
+            <Text style={styles.veiculosVazio}>{emptyVehicle}</Text>
         )
     }
 
@@ -137,7 +138,7 @@ export default function Vehicles({ navigation }) {
                 horizontal
                 data={veiculos}
                 renderItem={renderItem}
-                keyExtractor={item => item.placa}
+                keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
             />

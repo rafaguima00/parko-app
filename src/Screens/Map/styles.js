@@ -1,8 +1,16 @@
 import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
+import styled from "styled-components"
 
 const { width } = Dimensions.get('screen')
-const { fonteNegrito, corPrimaria } = theme
+const { fonteNegrito, corPrimaria, corNeutra } = theme
+
+export const TextFavorites = styled.Text`
+    color: ${corNeutra};
+    font-size: 16px;
+    font-weight: 700;
+    margin: 8px 0;
+`
 
 export const styles = StyleSheet.create({
     container: {
@@ -203,7 +211,7 @@ export const styles = StyleSheet.create({
 
     infoItem: {
         color: "#7d7d7d",
-        width: 70,
+        maxWidth: 100,
         maxHeight: 36,
         textAlign: "right"
     },
@@ -218,5 +226,10 @@ export const styles = StyleSheet.create({
     },
     viewReservation: {
         gap: 16
+    },
+    primeiraColuna: {
+        flexDirection: "row",
+        gap: 20,
+        position: "absolute"
     }
 })

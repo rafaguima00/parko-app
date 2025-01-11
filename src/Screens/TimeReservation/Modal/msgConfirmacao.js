@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet } from 'react-native';
-import { Feather } from 'react-native-vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { theme } from "../../../Theme";
+import React, { useEffect } from "react"
+import { View, Text, StyleSheet } from 'react-native'
+import { Feather } from 'react-native-vector-icons'
+import { useNavigation } from '@react-navigation/native'
+import { theme } from "../../../Theme"
 
-const { fonteNegrito } = theme;
+const { fonteNegrito } = theme
 
 export default function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
     
     useEffect(() => {
         if(modalAtivo) {
@@ -17,7 +17,7 @@ export default function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
                 navigation.navigate('Map')
             }, 4000)
 
-            return () => clearTimeout(timer);
+            return () => clearTimeout(timer)
         }
     }, [modalAtivo])
 

@@ -10,10 +10,11 @@ import {
     Modal, 
     ActivityIndicator 
 } from "react-native"
-import cartao from "../../../assets/Group-82.png"
+import cartao from "../../../assets/image_money.png"
 import { theme } from "../../Theme"
 import { styles } from "./style"
 import { Botao } from "../../Components/Botao"
+import { emptyCard } from "../../Mocks/emptyList"
 
 const { corPrimaria } = theme
 
@@ -81,7 +82,7 @@ export default function Payments({ navigation }) {
     const EmptyListMessage = () => {
         return (
             <Text style={styles.avisoCartao}>
-                Nenhum cartão cadastrado. Adicione um!
+                {emptyCard}
             </Text>
         )
     }

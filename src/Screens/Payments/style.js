@@ -13,7 +13,8 @@ export const styles = StyleSheet.create({
     },
 
     cabecalho: {
-        gap: 24
+        gap: 24,
+        marginVertical: 20
     },
 
     telaPagamento: {
@@ -24,19 +25,13 @@ export const styles = StyleSheet.create({
     },
 
     circuloAzul: {
-        backgroundColor: "#0097B9",
-        width: 160,
-        height: 160,
         marginTop: 36,
         marginBottom: 72,
-        borderRadius: 50,
-        alignSelf: "center",
-        position: "relative"
+        alignSelf: "center"
     },
 
     imagemCard: {
-        alignSelf: "center",
-        top: 17
+        alignSelf: "center"
     },
 
     selectVehicle: {

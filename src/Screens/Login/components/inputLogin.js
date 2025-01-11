@@ -5,8 +5,6 @@ import { Alerta } from "../../../Components/SnackBar";
 import { styles } from "../style";
 
 const InputLogin = ({ 
-    error, 
-    messageError,
     statusError, 
     setStatusError,
     mensagemErro,
@@ -62,8 +60,8 @@ const InputLogin = ({
                 error={statusError}
                 setError={setStatusError}
             />
-            {error && <HelperText type="error" visible={error}>
-                {messageError}
+            {statusError && <HelperText type="error" visible={statusError}>
+                {mensagemErro}
             </HelperText>}
 
         </View>

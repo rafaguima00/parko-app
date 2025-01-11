@@ -1,8 +1,9 @@
 import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
+import styled from "styled-components"
 
 const { width } = Dimensions.get('screen')
-const { fonteNegrito, corPrimaria } = theme;
+const { fonteNegrito, corPrimaria } = theme
 
 export const styles = StyleSheet.create({
     content: {
@@ -63,3 +64,9 @@ export const styles = StyleSheet.create({
         textAlign: "center"
     }
 })
+
+export const DivButton = styled.View`
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`

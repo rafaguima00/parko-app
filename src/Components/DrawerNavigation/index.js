@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react"
 import logo from "../../../assets/logo-parko.png"
 import {
     View,
@@ -15,19 +15,31 @@ import { styles } from "./style"
 import fotoPerfil from "../../../assets/user-2.png"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useUser } from "../../Context/dataUserContext"
+import LoadingModal from "../Loading"
+import { errorLogout } from "../../Mocks/errorOrRejected"
 
 function CustomDrawer() {
     const navigation = useNavigation()
 
     const { corPrimaria } = theme
-    const { dataUser } = useUser()
-    const { email, password, name, cpf, tel } = dataUser
+    const { setDataUser } = useUser()
+
+    const [loading, setLoading] = useState(false)
 
     let register = false
 
     const logout = async () => {
-        await AsyncStorage.removeItem("token")
-        navigation.replace("Login")
+        setLoading(true)
+
+        try {
+            await AsyncStorage.removeItem("token")
+            setDataUser({})
+            navigation.replace("Login")
+        } catch (error) {
+            Alert.alert("Erro", errorLogout)
+        } finally {
+            setLoading(false)
+        }
     }
     
     const routes = [
@@ -46,11 +58,11 @@ function CustomDrawer() {
             nameIcon: "dollar-sign",
             texto: 'Pagamentos'
         },
-        {
-            navigate: "Descontos",
-            nameIcon: "percent",
-            texto: 'Descontos'
-        },
+        // {
+        //     navigate: "Descontos",
+        //     nameIcon: "percent",
+        //     texto: 'Descontos'
+        // },
         {
             navigate: "Favoritos",
             nameIcon: "heart",
@@ -60,13 +72,13 @@ function CustomDrawer() {
             navigate: "Ajuda",
             nameIcon: "help-circle",
             texto: 'Ajuda'
-        },
+        }
     ]
 
     return (
         <View style={styles.menuLateral} >
             <Image source={logo} style={{ width: '51%', height: '6%', marginVertical: 32 }} />
-            <TouchableOpacity onPress={() => navigation.navigate('Profile', { email, password, name, cpf, tel, register })} >
+            <TouchableOpacity onPress={() => navigation.navigate('Profile', { register })} >
                 <Image source={fotoPerfil} style={{ width: 140, height: 140 }} />
                 <View style={styles.botaoEdit}>
                     <Octicons name="pencil" size={24} color="white" />
@@ -102,14 +114,16 @@ function CustomDrawer() {
                                 onPress: logout
                             },
                             {
-                                text: "Cancelar"
+                                text: "Cancelar",
+                                onPress: () => {}
                             }
                         ]
                     )
                 }}
             />
+            <LoadingModal loading={loading} />
         </View>
     )
 }
 
-export default CustomDrawer;
+export default CustomDrawer

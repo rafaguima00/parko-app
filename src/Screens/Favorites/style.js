@@ -1,8 +1,21 @@
 import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
+import styled from "styled-components"
 
-const { fonteNegrito } = theme
+const { fonteNegrito, corNeutra } = theme
 const { width } = Dimensions.get('screen')
+
+export const ImageParking = styled.Image`
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+`
+
+export const Separator = styled.View`
+    height: 1px;
+    background-color: ${corNeutra};
+    margin: 7px 1px;
+`
 
 export const styles = StyleSheet.create({
     areaContent: {
@@ -32,8 +45,6 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         gap: 30,
-        borderBottomWidth: 1.5,
-        borderColor: "#C4C4C4",
         paddingVertical: 10
     },
     itens: {

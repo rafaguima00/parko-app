@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 
-const DataUserContext = createContext({});
+const DataUserContext = createContext({})
 
 export function DataUserProvider({ children }) {
 
@@ -9,6 +9,8 @@ export function DataUserProvider({ children }) {
     const [priceTable, setPriceTable] = useState({})
     const [veiculos, setVeiculos] = useState([])
     const [users, setUsers] = useState([])
+    const [favorites, setFavorites] = useState([])
+    const [faq, setFaq] = useState([])
     
     const value = {
         dataUser, 
@@ -20,7 +22,11 @@ export function DataUserProvider({ children }) {
         veiculos,
         setVeiculos,
         users,
-        setUsers
+        setUsers,
+        favorites, 
+        setFavorites,
+        faq, 
+        setFaq
     }
 
     return (

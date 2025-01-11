@@ -1,7 +1,12 @@
 import { StyleSheet } from "react-native"
 import { theme } from "../../Theme"
+import styled from "styled-components"
 
-const { corPrimaria, fonteNegrito } = theme;
+const { corPrimaria, fonteNegrito } = theme
+
+export const SelecionarVeiculo = styled.TouchableOpacity`
+    box-shadow: 5px 10px #000;
+`
 
 export const styles = StyleSheet.create({
     areaContent: {
@@ -9,48 +14,34 @@ export const styles = StyleSheet.create({
         marginHorizontal: 20,
         justifyContent: "center"
     },
-
     cabecalho: {
         gap: 24,
-        marginTop: 16,
+        marginTop: 20,
         marginLeft: 28
     },
-
     telaVeiculos: {
         fontFamily: fonteNegrito,
         color: corPrimaria,
         fontSize: 26,
         lineHeight: 32
     },
-
     circuloVerde: {
-        backgroundColor: corPrimaria,
-        width: 160,
-        height: 160,
         marginTop: 64,
         marginBottom: 72,
-        borderRadius: 50,
-        alignSelf: "center",
-        position: "relative"
+        alignSelf: "center"
     },
-
     imagemVeiculo: {
-        alignSelf: "center",
-        position: "absolute",
-        top: -4
+        alignSelf: "center"
     },
-
     selectVehicle: {
         fontFamily: fonteNegrito,
         color: "#7D7D7D",
         fontSize: 18
     },
-
     fixItems: {
         marginTop: 20,
         marginBottom: 40
     },
-
     botaoAtivo: {
         marginTop: 10,
         marginRight: 20,
@@ -71,7 +62,6 @@ export const styles = StyleSheet.create({
         height: 130,
         backgroundColor: '#f3f6ff'
     },
-
     viewCarro: {
         flexDirection: "row",
         alignItems: "center",
@@ -79,7 +69,6 @@ export const styles = StyleSheet.create({
         marginBottom: 4,
         width: 'auto'
     },
-
     nomeCarroAtivo: {
         fontFamily: fonteNegrito,
         fontSize: 22,
@@ -92,7 +81,6 @@ export const styles = StyleSheet.create({
         marginRight: 18,
         color: '#545454'
     },
-
     placaCarroAtivo: {
         marginBottom: 8,
         color: 'rgba(245, 248, 255, 0.56)',
@@ -101,7 +89,6 @@ export const styles = StyleSheet.create({
         marginBottom: 8,
         color: 'rgba(0, 0, 0, 0.25)'
     },
-
     corCarroAtivo: {
         color: 'rgba(245, 248, 255, 0.56)',
     },

@@ -16,10 +16,11 @@ import BotaoLoginCadastro from "./components/loginCadastro"
 import BotaoLogin from "../../Components/LoginSocialMedia"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import api from "../../Services/api"
+import LoadingModal from "../../Components/Loading"
 
 const Login = () => {
+    
     const navigation = useNavigation()
-    const token = AsyncStorage.getItem("token")
 
     const [dados, setDados] = useState({
         email: '',
@@ -35,7 +36,7 @@ const Login = () => {
 
     const [statusError, setStatusError] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
-    const [carregando, setCarregando] = useState(false)
+    const [carregando, setCarregando] = useState(true)
 
     const handleLogin = async () => {
         setCarregando(true)
@@ -45,16 +46,17 @@ const Login = () => {
             password: dados.senha
         })
         .then(res => {
-            AsyncStorage.setItem("token", JSON.stringify(res.data))
+            AsyncStorage.setItem("token", JSON.stringify(res.data.token))
         })
         .then(() => {
-            setCarregando(false)
             navigation.replace("Map")
         })
         .catch(e => {
-            setCarregando(false)
             setStatusError(true)
             setMensagemErro(e.response.data.message)
+        })
+        .finally(() => {
+            setCarregando(false)
         })
     }
 
@@ -70,12 +72,22 @@ const Login = () => {
         }
     }
 
+    useEffect(() => {
+        const checkLogin = async () => {
+            const token = await AsyncStorage.getItem("token")
+            if (token) {
+                navigation.replace("Map")
+            }
+
+            setCarregando(false)
+        }
+        checkLogin()
+    }, [navigation])
+
     return (
         <SafeAreaView style={styles.displayTela} >
             <Image source={logo} style={styles.imagem} />
             <InputLogin
-                error
-                messageError
                 statusError={statusError}
                 setStatusError={setStatusError}
                 mensagemErro={mensagemErro}
@@ -89,27 +101,13 @@ const Login = () => {
             <TouchableOpacity activeOpacity={0.5}>
                 <Text style={styles.esqueciASenha}>Esqueci a senha</Text>
             </TouchableOpacity>
-            <Text style={styles.separacao}> ──────────  ou  ────────── </Text>
-            <BotaoLogin />
-            <Modal
-                visible={carregando}
-                transparent={true}
-                onRequestClose={() => { }}
-                animationType='fade'
-            >
-                <View
-                    style={{
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <ActivityIndicator size={'small'} color={'#fff'} />
-                </View>
-            </Modal> 
+            {/* 
+                <Text style={styles.separacao}> ──────────  ou  ────────── </Text>
+                <BotaoLogin /> 
+            */}
+            <LoadingModal loading={carregando} />
         </SafeAreaView>
     )
 }
 
-export default Login;
+export default Login

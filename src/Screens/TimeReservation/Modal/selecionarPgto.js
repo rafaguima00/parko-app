@@ -1,14 +1,33 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { theme } from "../../../Theme";
-import { styles } from "../style";
+import React from "react"
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { theme } from "../../../Theme"
+import { BotaoFechar, BotaoVoltar, styles, TopoBotao } from "../style"
+import { Feather } from "react-native-vector-icons"
 
-const { fonteNegrito } = theme;
+const { fonteNegrito } = theme
 
-export default function SelecionarPgto({ openModalPagamento }) {
+export default function SelecionarPgto({ 
+    openModalPagamento,
+    setModalSelecionarPgto,
+    setModalPagamento
+}) {
     return(
         <View style={styles.modalContainer}>
             <View style={[styles.dashContent, estilos.escolher]}>
+                <TopoBotao espacamento={1}>
+                    <BotaoVoltar
+                        activeOpacity={0.7} 
+                        onPress={() => {
+                            setModalSelecionarPgto(false)
+                            setModalPagamento(true)
+                        }}
+                    >
+                        <Feather name="arrow-left" size={32} color="#444" />
+                    </BotaoVoltar>
+                    <BotaoFechar activeOpacity={0.7} onPress={() => setModalSelecionarPgto(false)}>
+                        <Feather name="x" size={32} color="#444" />
+                    </BotaoFechar>
+                </TopoBotao>
                 <View style={{alignItems: 'center'}} >
                     <Text style={estilos.tituloPrincipal}>Pagamento</Text>
                 </View>

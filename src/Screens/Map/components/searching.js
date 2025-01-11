@@ -5,15 +5,32 @@ import {
     Image 
 } from "react-native"
 import { TextInput } from "react-native-paper"
-import { styles } from "../styles"
+import { styles, TextFavorites } from "../styles"
 import { theme } from "../../../Theme"
 import { Feather } from "react-native-vector-icons"
+import { useEffect } from "react"
+import { useUser } from "../../../Context/dataUserContext"
 
 const Searching = (props) => {
 
-    const { setModalPesquisar, setTextoDigitado, itensFiltrados, textoDigitado } = props.state
+    const { 
+        setDestinationSelected,
+        setModalPesquisar, 
+        setTextoDigitado, 
+        setItensFiltrados,
+        itensFiltrados, 
+        textoDigitado 
+    } = props.state
     const { filtrarItens, retornarCoordenadas } = props
     const { corPrimaria, corFonteSecundaria } = theme
+
+    const { favorites } = useUser()
+
+    useEffect(() => {
+        if(itensFiltrados.length == 0 && textoDigitado === "") {
+            setItensFiltrados(favorites)
+        }
+    }, [itensFiltrados, textoDigitado])
 
     return (
         <View 
@@ -50,6 +67,10 @@ const Searching = (props) => {
                     />
                 }
             />
+            {
+                textoDigitado === "" &&
+                <TextFavorites>Favoritos</TextFavorites>
+            }
             <View style={{ marginTop: 10 }}>
                 {itensFiltrados.slice(0, 6).map((item) => (
                     <TouchableOpacity 
@@ -64,6 +85,7 @@ const Searching = (props) => {
                             paddingBottom: 8
                         }}
                         onPress={() => {
+                            setDestinationSelected(item)
                             setModalPesquisar(false)
                             retornarCoordenadas({ item })
                         }}

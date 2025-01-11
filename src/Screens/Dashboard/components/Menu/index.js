@@ -1,71 +1,226 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react'
 import {
     ScrollView,
     View,
     TouchableOpacity,
     Text,
     FlatList
-} from 'react-native';
+} from 'react-native'
 import {
     Ionicons,
     FontAwesome5,
     Feather,
-    MaterialCommunityIcons
+    MaterialCommunityIcons,
+    Octicons
 } from 'react-native-vector-icons'
-import { Botao } from '../../../../Components/Botao';
-import { styles } from './style';
-import { theme } from '../../../../Theme';
-import { ReservaContext } from '../../../../Context/reservaContext';
-import infoEstacionamento from '../../../../Mocks/infoEstacionamento';
+import { Botao } from '../../../../Components/Botao'
+import { BotaoClicar, MaisTempo, RenderHeader, styles, TextBlue, TextLine } from './style'
+import { theme } from '../../../../Theme'
+import { ReservaContext } from '../../../../Context/reservaContext'
+import { formatCurrency } from "../../../../Services/formatCurrency"
+import api from '../../../../Services/api'
+import LoadingModal from '../../../../Components/Loading'
 
-const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
+const Menu = ({ 
+    setModalDatePicker, 
+    setInformacoes,
+    setEscolherVeiculo,
+    setModalMaisTempo,
+    loading
+}) => {
 
-    const [botaoAtivo, setBotaoAtivo] = useState(false)
+    const [botaoAtivo, setBotaoAtivo] = useState(null)
 
-    const { destination } = useContext(ReservaContext)
-    const { horarioDeFuncionamento, taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
-    const { corPrimaria } = theme;
+    const { 
+        destination,
+        personalizado, 
+        setTabelaFixa,
+        tabelaFixa,
+        setPriceTable,
+        priceTable,
+        setHoraFuncionamento,
+        horaFuncionamento,
+        setItemPreSelecionado,
+        setTipoReserva,
+        setValorPreSelecionado
+    } = useContext(ReservaContext)
+
+    const { taxaHoraExtra, taxaCancelamento } = destination
+
+    const { corPrimaria } = theme
+
+    function agendar() {
+        setTipoReserva("schedule")
+        
+        setModalDatePicker(true)
+    }
+
+    function irAgora() {
+        setTipoReserva("now")
+
+        setInformacoes(false)
+        setEscolherVeiculo(true)
+    }
+
+    async function retornarTabelaFixaDePreco() {
+        await api.get(`/tabela_fixa/${destination.id}`)
+        .then(res => {
+            setTabelaFixa(res.data)
+        })
+        .catch(e => {
+            console.log("Erro ao carregar tabela de preços: " + e)
+        })
+    }
+
+    async function retornarTabelaDePreco() {
+        await api.get(`/tabela_preco/${destination.id}`)
+        .then(res => {
+            setPriceTable(res.data[0])
+        })
+        .catch(e => {
+            console.log("Erro ao carregar informações do estacionamento: " + e)
+        })
+    }
+
+    async function retornarHorarioDeFuncionamento() {
+        await api.get(`/hora_funcionamento/${destination.id}`) 
+        .then(res => {
+            setHoraFuncionamento(res.data)
+        })
+        .catch(e => {
+            console.log("Erro ao carregar horário de funcionamento: " + e)
+        })
+    }
+    
+    function converterEscrita(hora) {
+
+        if(hora.startsWith("0")) {
+            const abr = hora.substring(1, 2)
+
+            if(abr > 1) {
+                return abr + " horas"
+            }
+
+            return abr + " hora"
+        }
+
+        const abreviar = hora.substring(0, hora.length)
+
+        return abreviar + " horas"
+    }
+
+    function tempoTolerancia(tempo) {
+        if(tempo) return tempo + " minutos"
+    }
+
+    function horarioDeFuncionamento(hora) {
+        let horaAbertura = hora?.hora_abertura ?? ""
+        let horaFechamento = hora?.hora_fechamento ?? ""
+        
+        if(horaAbertura == horaFechamento) {
+            return "24 horas"
+        }
+
+        return horaAbertura.slice(0, 5) + " - " + horaFechamento.slice(0, 5)
+    }
+
+    function preSelect(item) {
+        setBotaoAtivo(item.id)
+        setValorPreSelecionado(item.value)
+
+        if(item.segunda_hora.startsWith("0")) {
+            const abr = item.segunda_hora.substring(1, 2)
+
+            setItemPreSelecionado({
+                hora_saida: (parseInt(abr) * 60) * 60 // Tempo de duração da reserva em segundos
+            })
+            return
+        }
+
+        const abreviar = item.segunda_hora.substring(0, 2)
+
+        setItemPreSelecionado({
+            hora_saida: (parseInt(abreviar) * 60) * 60 // Tempo de duração da reserva em segundos
+        })
+    }
 
     const renderItem = ({ item }) => {
-        const botaoClicado = botaoAtivo === item.preco;
+        const botaoClicado = botaoAtivo === item.id
 
-        return (
-            <TouchableOpacity
-                style={(
-                    botaoClicado ? styles.botaoHorariosAtivo : styles.botaoHorariosDesativado
-                )}
-                onPress={() => {
-                    setBotaoAtivo(item.preco)
-                }}
-                activeOpacity={0.9}>
-                <Text
-                    style={(
-                        botaoClicado ? styles.textoBotaoAtivo : styles.textoBotaoDesativado
-                    )}>
-                    {item.tempoPermanencia}
-                </Text>
-                <Text
-                    style={(
-                        botaoClicado ? styles.textoBotaoPrecoAtivo : styles.textoBotaoPrecoDesativado
-                    )}>
-                    {item.preco}
-                </Text>
-            </TouchableOpacity>
-        )
+        return <>
+            {(personalizado === true && item.id == "personalizado") && 
+                <RenderHeader
+                    style={
+                        botaoClicado ? styles.botaoHorariosAtivo : styles.botaoHorariosDesativado
+                    }
+                    onPress={() => preSelect(item)}
+                    activeOpacity={0.9}
+                >
+                    <View>
+                        <Text 
+                            style={(
+                                botaoClicado ? styles.textoBotaoAtivo : styles.textoBotaoDesativado
+                            )}
+                        >
+                            Personalizado • {converterEscrita(item?.segunda_hora ?? "")}
+                        </Text>
+                        <Text 
+                            style={(
+                                botaoClicado ? styles.textoBotaoPrecoAtivo : styles.textoBotaoPrecoDesativado
+                            )}
+                        >
+                            {formatCurrency((item?.value ?? 0) * 0.95)}
+                        </Text>
+                    </View>
+                    <View>
+                        <Octicons name="pencil" size={20} color={botaoClicado ? "white" : ""} />
+                    </View>
+                </RenderHeader>
+            }
+            {item.id != "personalizado" && 
+                <TouchableOpacity
+                    style={
+                        botaoClicado ? styles.botaoHorariosAtivo : styles.botaoHorariosDesativado
+                    }
+                    onPress={() => {
+                        preSelect(item)
+                    }}
+                    activeOpacity={0.9}>
+                    <Text
+                        style={(
+                            botaoClicado ? styles.textoBotaoAtivo : styles.textoBotaoDesativado
+                        )}>
+                        {converterEscrita(item?.segunda_hora ?? "")}
+                    </Text>
+                    <Text
+                        style={(
+                            botaoClicado ? styles.textoBotaoPrecoAtivo : styles.textoBotaoPrecoDesativado
+                        )}>
+                        {formatCurrency((item?.value ?? 0) * 0.95)}
+                    </Text>
+                </TouchableOpacity>
+            }
+        </>
     }
+
+    useEffect(() => {
+        retornarTabelaFixaDePreco()
+        retornarTabelaDePreco()
+        retornarHorarioDeFuncionamento()
+    }, [])
 
     return (
         <ScrollView contentContainerStyle={styles.dashContent} >
             <View style={{ flexDirection: "row", gap: 12, justifyContent: "center" }}>
-                <TouchableOpacity style={styles.botaoLigar}>
+                <TouchableOpacity style={styles.botaoLigar} activeOpacity={0.7}>
                     <Ionicons name="call" size={14} color="#0097b9" />
                     <Text style={{ fontFamily: "Roboto_400Regular", color: "#0097b9" }}>Ligar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.botaoLigar}>
+                <TouchableOpacity style={styles.botaoLigar} activeOpacity={0.7}>
                     <FontAwesome5 name="directions" size={14} color="#0097b9" />
                     <Text style={{ fontFamily: "Roboto_400Regular", color: "#0097b9" }}>Rota</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.botaoCompartilhar}>
+                <TouchableOpacity style={styles.botaoCompartilhar} activeOpacity={0.7}>
                     <Ionicons name="share-social" size={14} color="#f4f4f4" />
                     <Text style={{ fontFamily: "Roboto_400Regular", color: "#f4f4f4" }}>Compartilhar</Text>
                 </TouchableOpacity>
@@ -77,8 +232,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                     <View style={styles.viewContent}>
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
-                            Horário de funcionamento:
-                            {horarioDeFuncionamento}
+                            Horário de funcionamento: {horarioDeFuncionamento(horaFuncionamento[0])}
                         </Text>
                     </View>
                     <View style={styles.viewContent}>
@@ -98,8 +252,7 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                     <View style={styles.viewContent}>
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
-                            Tempo de tolerância:
-                            {tempo_tolerancia}
+                            Tempo de tolerância: {tempoTolerancia(priceTable?.tempo_tolerancia ?? "")}
                         </Text>
                     </View>
                 </View>
@@ -111,35 +264,59 @@ const Menu = ({ setModalDatePicker, closeModalPrincipal }) => {
                 </View>
                 <FlatList
                     horizontal
-                    data={infoEstacionamento.horarios}
+                    data={tabelaFixa}
                     renderItem={renderItem}
-                    keyExtractor={item => item.id}
+                    keyExtractor={item => item.id.toString()}
                     showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 10 }} // Garante espaçamento
+                    style={{ flexGrow: 0 }} // Evita restrições de altura
                 />
             </View>
 
+            <MaisTempo>
+                <BotaoClicar onPress={() => setModalMaisTempo(true)}>
+                    <TextLine>Ainda precisa de mais tempo?</TextLine> 
+                    <TextBlue>Clica aqui.</TextBlue>
+                </BotaoClicar>
+            </MaisTempo>
+
             <View style={styles.botoesInferiores}>
+                {/* 
+                    Botão "Ir agora": verificar se há vagas disponíveis nos próximos momentos e confirmar a entrada da 
+                    reserva na data do dia e a hora de entrada vai ser marcado a partir do tempo estimado de chegada até 
+                    o local + tempo de tolerância. Se não tiver vagas disponíveis para o momento, mostrar um aviso indicando
+                    o horário mais próximo que terá uma vaga livre para ser reservada. Se o cliente concordar, segue o fluxo,
+                    se não concordar, fecha o modal
+                */}
                 <Botao
                     children={"Ir agora"}
                     estilo={(botaoAtivo ? styles.botaoIrAgora : styles.botaoIrAgoraInativo)}
-                    aoPressionar={closeModalPrincipal}
+                    aoPressionar={irAgora}
                     disabled={(botaoAtivo ? false : true)}
-                    largura={'45%'}
+                    largura={'47%'}
                     negrito
                     corDoTexto={(botaoAtivo ? corPrimaria : "rgba(125, 125, 125, 0.5)")}
                 />
+
+                {/* 
+                    Botão "Agendar": verificar se tem vagas disponíveis para a hora selecionada e confirmar a vaga. Se não tiver
+                    retornar um aviso indicando para escolher outro horário e sugerir um horário que esteja mais livre
+                */}
                 <Botao
                     children={"Agendar"}
                     estilo={styles.botaoAgendar}
-                    corDeFundo={corPrimaria}
+                    corDeFundo={botaoAtivo ? corPrimaria : '#7d7d7d'}
                     corDoTexto={'#fff'}
-                    largura={'45%'}
+                    largura={'47%'}
                     negrito
-                    aoPressionar={() => setModalDatePicker(true)}
+                    aoPressionar={agendar}
+                    disabled={botaoAtivo ? false : true}
                 />
             </View>
+
+            <LoadingModal loading={loading} />
         </ScrollView>
     )
 }
 
-export default Menu;
+export default Menu

@@ -1,35 +1,31 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-    SafeAreaView,
-    Modal,
-    View,
-    FlatList,
-    Text,
-    TouchableOpacity,
-    TextInput,
-    Image,
-    Alert
-} from 'react-native';
-import { Ionicons } from 'react-native-vector-icons'
-import Topo from "./components/Top";
-import { theme } from "../../Theme";
-import { styles } from "./style";
-import ModalConfirmacao from "./components/Modal/confirmacao";
-import ModalMsgConfirmacao from "./components/Modal/mensagemConfirmacao";
-import DatePickerModal from "./components/Modal/datePicker";
-import { Botao } from "../../Components/Botao";
-import { ReservaContext } from "../../Context/reservaContext";
+import React, { useState, useEffect, useContext } from "react"
+import { Modal, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
+import Topo from "./components/Top"
+import { AreaView } from "./style"
+import ModalConfirmacao from "./components/Modal/Confirmacao"
+import ModalMsgConfirmacao from "./components/Modal/MensagemConfirmacao"
+import DatePickerModal from "./components/Modal/DatePicker"
+import { ReservaContext } from "../../Context/reservaContext"
 import { useUser } from "../../Context/dataUserContext"
-import infoEstacionamento from "../../Mocks/infoEstacionamento";
-import Menu from "./components/Menu";
+import Menu from "./components/Menu"
 import ReadApi from "../../Services/readData"
-import api from "../../Services/api";
+import api from "../../Services/api"
+import EscolherVeiculo from "./components/EscolherVeiculo"
+import CadastrarVeiculo from "./components/CadastrarVeiculo"
+import Pagamento from "./components/Pagamento"
+import AdicionaCartao from "./components/AdicionaCartao"
+import EscolherPgto from "./components/EscolherPgto"
+import MaisTempo from "./components/Modal/MaisTempo"
 
 function Dashboard({ navigation }) {
     
-    const { corPrimaria } = theme
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
+
+    const {
+        destination,
+        novaReserva
+    } = useContext(ReservaContext)
 
     const [informacoes, setInformacoes] = useState(true)
     const [escolherVeiculo, setEscolherVeiculo] = useState(false)
@@ -40,467 +36,201 @@ function Dashboard({ navigation }) {
     const [modalConfirma, setModalConfirma] = useState(false)
     const [modalMsgConfirma, setModalMsgConfirma] = useState(false)
     const [modalDatePicker, setModalDatePicker] = useState(false)
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [botaoCarroAtivo, setBotaoCarroAtivo] = useState(false)
-    const [nomeVeiculo, setNomeVeiculo] = useState('')
-    const [placaVeiculo, setPlacaVeiculo] = useState('')
-    const [corVeiculo, setCorVeiculo] = useState('')
-    const [cartaoDeCredito, setCartaoDeCredito] = useState([])
-    const [erro, setErro] = useState(false)
-    const [mensagemErro, setMensagemErro] = useState('')
-
-    const placeholder = [
-        {
-            placeholder: 'Nome do veículo',
-            value: nomeVeiculo,
-            onChange: setNomeVeiculo
-        },
-        {
-            placeholder: 'Placa do veículo',
-            value: placaVeiculo,
-            onChange: setPlacaVeiculo
-        },
-        {
-            placeholder: 'Cor do veículo',
-            value: corVeiculo,
-            onChange: setCorVeiculo
-        },
-    ]
-
-    const { 
-        setVeiculoEscolhido, 
-        veiculoEscolhido, 
-        destination,
-        horaReserva
-    } = useContext(ReservaContext)
-
-    const cliqueBotao = (item) => {
-        setBotaoCarroAtivo(item.id);
-    };
-
-    const renderItem = ({ item }) => {
-        const botaoClicado = botaoCarroAtivo === item.id;
-
-        return (
-            <TouchableOpacity
-                style={(
-                    botaoClicado ? styles.botaoAtivo : styles.botaoDesativado
-                )}
-                onPress={() => {
-                    cliqueBotao(item)
-                    setVeiculoEscolhido({item})
-                }}
-                activeOpacity={1}
-            >
-                <TouchableOpacity
-                    style={{
-                        position: 'absolute',
-                        right: -5,
-                        top: -5,
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                        paddingVertical: 5,
-                        paddingHorizontal: 8,
-                        borderRadius: 25
-                    }}
-                    onPress={() => {
-                        Alert.alert(
-                            "Excluir veículo",
-                            "Tem certeza de que deseja excluir o veículo?",
-                            [
-                                {
-                                    text: 'OK',
-                                    onPress: () => deletarVeiculos(item.id)
-                                },
-                                {
-                                    text: 'Cancelar'
-                                }
-                            ]
-                        )
-                    }}
-                >
-                    <Text>X</Text>
-                </TouchableOpacity>
-                <View style={styles.viewCarro}>
-                    <Ionicons name="car" size={28} color={(botaoClicado ? '#fff' : '#545454')} />
-                    <Text style={(
-                        botaoClicado ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
-                    )}>{item.name}</Text>
-                </View>
-                <Text style={(
-                    botaoClicado ? styles.placaCarroAtivo : styles.placaCarroDesativado
-                )}>{item.license_plate}</Text>
-                <Text style={(
-                    botaoClicado ? styles.corCarroAtivo : styles.corCarroDesativado
-                )}>{item.color}</Text>
-            </TouchableOpacity>
-        )
-    }
-
-    const EmptyListMessage = () => {
-        return (
-            <Text style={styles.veiculosVazio}>
-                Nenhum cartão cadastrado no momento. Clique no "+" para adicionar seu cartão
-            </Text>
-        )
-    }
-
-    async function registerVehicle() {
-        await api.post("/vehicles", {
-            id_costumer: dataUser.id,
-            name_vehicle: nomeVeiculo,
-            color: corVeiculo,
-            license_plate: placaVeiculo
-        })
-        .then(() => {
-            Alert.alert("Veículo cadastrado com sucesso")
-        })
-        .catch(e => {
-            Alert.alert("Erro ao adicionar veículo", e)
-        })
-    }
-
-    async function adicionarVeiculo() {
-        if (nomeVeiculo === "" || placaVeiculo === "" || corVeiculo === "") {
-            setErro(true)
-            setMensagemErro('Preencha todos os campos')
-        } else if (placaVeiculo.length < 7) {
-            setErro(true)
-            setMensagemErro('Placa de veículo inválida')
-        } else {
-            setErro(false)
-            setCadastrarVeiculo(false)
-            setEscolherVeiculo(true)
-            setNomeVeiculo('')
-            setPlacaVeiculo('')
-            setCorVeiculo('')
-            registerVehicle()
-        }
-    }
-
-    async function deletarVeiculos(veiculoId) {
-        await api.delete(`/vehicles/${veiculoId}`)
-        .then(() => {
-            Alert.alert("Veículo excluído")
-        })
-        .catch(e => {
-            Alert.alert("Erro ao deletar veículo", e)
-        })
-    }
+    const [modalMaisTempo, setModalMaisTempo] = useState(false)
+    const [imageLoaded, setImageLoaded] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     async function confirmaReserva() {
-        setModalConfirma(false)
+        setLoading(true)
 
         await api.post("/reservations", {
-            data_entrada: horaReserva,
-            hora_entrada: "",
-            data_saida: "",
-            hora_saida: "",
-            value: 10,
-            id_costumer: dataUser.id,
-            id_vehicle: veiculoEscolhido.item.id,
+            data_entrada: novaReserva.data_entrada, 
+            hora_entrada: novaReserva.hora_entrada, 
+            data_saida: novaReserva.data_saida,
+            hora_saida: novaReserva.hora_saida,
+            value: novaReserva.value,
+            id_costumer: dataUser.id, 
+            status_reservation: 1, 
+            id_vehicle: novaReserva.id_vehicle, 
             id_establishment: destination.id,
-            parko_app: 1
+            parko_app: 1 
         })
         .then(() => {
+            setModalConfirma(false)
             setModalMsgConfirma(true)
         })
         .catch(e => {
             Alert.alert("Erro ao realizar reserva", e)
+            setModalMsgConfirma(false)
+            setInformacoes(true)
+        })
+        .finally(() => {
+            setLoading(false)
         })
     }
-
-    const [selectedDate, setSelectedDate] = useState('')
-
+    
     useEffect(() => {
         loadVehicles(dataUser.id)
     }, [veiculos])
 
+    useEffect(() => {
+        setLoading(!imageLoaded)
+    }, [imageLoaded])
+
     return (
-        <SafeAreaView style={styles.content}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <AreaView>
 
-            <Topo
-                handleImageLoaded={() => setImageLoaded(true)}
-                voltar={() => navigation.navigate('Map')}
-            />
-
-            {(imageLoaded && informacoes) &&
-                <Menu 
-                    setModalDatePicker={setModalDatePicker}
-                    closeModalPrincipal={() => {
-                        setInformacoes(false)
-                        setEscolherVeiculo(true)
-                    }}
-                />
-            }
-
-            {escolherVeiculo &&
-                <View style={[styles.dashContent, styles.escolher]}>
-                    <View style={{ alignItems: 'center' }} >
-                        <Text style={styles.tituloPrincipal} >Qual seu veículo?</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={styles.txtSelecioneVeiculo} >Selecione seu veículo</Text>
-                        <TouchableOpacity>
-                            <Text
-                                style={styles.botaoMais}
-                                onPress={() => {
-                                    setEscolherVeiculo(false)
-                                    setCadastrarVeiculo(true)
-                                }}
-                            >
-                                +
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    <FlatList
-                        contentContainerStyle={styles.itens}
-                        numColumns={2}
-                        ListEmptyComponent={EmptyListMessage}
-                        data={veiculos}
-                        renderItem={renderItem}
-                        keyExtractor={item => item.id}
+                    <Topo
+                        handleImageLoaded={() => setImageLoaded(true)}
+                        voltar={() => navigation.navigate('Map')}
                     />
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }} >
-                        <Botao
-                            children={"Confirmar"}
-                            corDeFundo={(botaoCarroAtivo ? corPrimaria : "rgba(125, 125, 125, 0.4)")}
-                            largura={'100%'}
-                            corDoTexto={'#fff'}
-                            negrito
-                            disabled={(botaoCarroAtivo ? false : true)}
-                            aoPressionar={() => {
+
+                    {(imageLoaded && informacoes) &&
+                        <Menu
+                            setModalDatePicker={setModalDatePicker}
+                            setInformacoes={setInformacoes}
+                            setEscolherVeiculo={setEscolherVeiculo}
+                            setModalMaisTempo={setModalMaisTempo}
+                            setLoading={setLoading}
+                            loading={loading}
+                        />
+                    }
+
+                    {escolherVeiculo &&
+                        <EscolherVeiculo 
+                            states={{
+                                setEscolherVeiculo,
+                                setPagamento,
+                                setCadastrarVeiculo
+                            }}
+                            voltar={() => {
                                 setEscolherVeiculo(false)
+                                setInformacoes(true)
+                            }}
+                        />
+                    }
+
+                    {cadastrarVeiculo &&
+                        <CadastrarVeiculo 
+                            states={{
+                                setEscolherVeiculo,
+                                setCadastrarVeiculo
+                            }}
+                            voltar={() => {
+                                setCadastrarVeiculo(false)
+                                setEscolherVeiculo(true)
+                            }}
+                        />
+                    }
+
+                    {pagamento &&
+                        <Pagamento 
+                            states={{ 
+                                setPagamento, 
+                                setSelecionarPgto, 
+                                setAddCartao, 
+                                setModalConfirma 
+                            }}
+                            voltar={() => {
+                                setPagamento(false)
+                                setEscolherVeiculo(true)
+                            }}
+                        />
+                    }
+
+                    {addCartao &&
+                        <AdicionaCartao 
+                            states={{ 
+                                setAddCartao,
+                                setPagamento
+                            }}
+                            voltar={() => {
+                                setAddCartao(false)
                                 setPagamento(true)
                             }}
                         />
-                    </View>
-                </View>
-            }
+                    }
 
-            {cadastrarVeiculo &&
-                <View style={[styles.dashContent, styles.escolher]} >
-                    <View style={{ alignItems: 'center' }}>
-                        <Text style={styles.tituloPrincipal}>Cadastrar Veículo</Text>
-                    </View>
-                    <View style={styles.formCard}>
-                        {placeholder.map((item, index) => (
-                            <TextInput
-                                key={index}
-                                placeholder={item.placeholder}
-                                style={styles.input}
-                                value={item.value}
-                                onChangeText={item.onChange}
-                                autoCapitalize={item.placeholder == "Placa do veículo" ? 'characters' : 'words'}
-                                maxLength={item.placeholder == "Placa do veículo" ? 7 : undefined}
-                            />
-                        ))}
-
-                        <View>
-                            {erro &&
-                                <Text style={{ color: 'red' }}>{mensagemErro}</Text>
-                            }
-                        </View>
-                    </View>
-                    <View style={{
-                        position: 'absolute',
-                        bottom: 20,
-                        width: '100%',
-                        marginHorizontal: 26
-                    }} >
-                        <Botao
-                            children={"Confirmar"}
-                            corDeFundo={corPrimaria}
-                            largura={'100%'}
-                            corDoTexto={'#fff'}
-                            negrito
-                            aoPressionar={adicionarVeiculo}
-                        />
-                    </View>
-                </View>
-            }
-
-            {pagamento &&
-                <View style={[styles.dashContent, styles.escolher]} >
-                    <View style={{ alignItems: 'center' }} >
-                        <Text style={styles.tituloPrincipal} >Pagamento</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={styles.txtSelecioneCartao} >Selecione seu cartão de crédito</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.botaoMais} onPress={() => {
-                                setPagamento(false)
-                                setAddCartao(true)
-                            }}>+</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <FlatList
-                        style={{ marginTop: 10, marginBottom: 46, paddingTop: 10 }}
-                        horizontal
-                        data={cartaoDeCredito}
-                        renderItem={renderItem}
-                        keyExtractor={item => item.id}
-                        ListEmptyComponent={EmptyListMessage}
-                    />
-                    <View style={{ justifyContent: 'center' }} >
-                        <TouchableOpacity onPress={() => {
-                            setPagamento(false)
-                            setSelecionarPgto(true)
-                        }} >
-                            <Text style={styles.escolherFormaPgto}>Escolher outra forma de pagamento</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.itemTotal}>
-                        <Text style={styles.total}>TOTAL</Text>
-                        <Text style={styles.total}>
-                            {infoEstacionamento.horarios[0].preco}
-                        </Text>
-                    </View>
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }} >
-                        <Botao
-                            children={"Confirmar"}
-                            corDeFundo={corPrimaria}
-                            largura={'100%'}
-                            corDoTexto={'#fff'}
-                            negrito
-                            aoPressionar={() => {
-                                setPagamento(false)
-                                setModalConfirma(true)
+                    {selecionarPgto &&
+                        <EscolherPgto 
+                            states={{ 
+                                setSelecionarPgto,
+                                setAddCartao
+                            }}
+                            voltar={() => {
+                                setSelecionarPgto(false)
+                                setPagamento(true)
                             }}
                         />
-                    </View>
-                </View>
-            }
+                    }
 
-            {addCartao &&
-                <View style={[styles.dashContent, styles.escolher, { alignItems: 'center' }]}>
-                    <View>
-                        <Text style={styles.tituloPrincipal}>Adicionar Cartão</Text>
-                    </View>
-                    <View>
-                        <Image
-                            source={require('../../../assets/image-card.png')}
-                            style={styles.imagemCartao}
+                    <Modal
+                        visible={modalMaisTempo}
+                        animationType="fade"
+                        onRequestClose={() => {}}
+                        transparent={true}
+                    >
+                        <MaisTempo 
+                            setModalMaisTempo={setModalMaisTempo} 
+                            idDestination={destination?.id}
                         />
-                    </View>
-                    <View style={styles.formAddCard}>
-                        <TextInput
-                            autoCapitalize="words"
-                            placeholder="Nome Completo"
-                            placeholderTextColor={'#7d7d7d'}
-                            style={styles.input}
+                    </Modal>
+
+                    <Modal
+                        visible={modalConfirma}
+                        transparent={true}
+                        onRequestClose={() => {}}
+                        animationType="fade"
+                    >
+                        <ModalConfirmacao
+                            handleClose={() => {
+                                setModalConfirma(false)
+                                setInformacoes(true)
+                            }}
+                            confirmaReserva={confirmaReserva}
+                            loading={loading}
+                            setLoading={setLoading}
                         />
-                        <TextInput
-                            placeholder="Número do cartão"
-                            placeholderTextColor={'#7d7d7d'}
-                            maxLength={16}
-                            keyboardType='numeric'
-                            style={styles.input}
+                    </Modal>
+
+                    <Modal
+                        visible={modalMsgConfirma}
+                        transparent={true}
+                        onRequestClose={() => {}}
+                        animationType="fade"
+                    >
+                        <ModalMsgConfirmacao
+                            modalAtivo={modalMsgConfirma}
+                            handleClose={() => {
+                                setModalMsgConfirma(false)
+                            }}
                         />
-                        <View style={styles.flexCvc}>
-                            <TextInput
-                                placeholder="Data de validade"
-                                keyboardType='numeric'
-                                placeholderTextColor={'#7d7d7d'}
-                                style={styles.inputInferior}
-                            />
-                            <TextInput
-                                placeholder="CVC"
-                                placeholderTextColor={'#7d7d7d'}
-                                style={styles.inputInferior}
-                                maxLength={3}
-                            />
-                        </View>
-                    </View>
-                    <Botao
-                        children={"Confirmar"}
-                        corDeFundo={corPrimaria}
-                        largura={'100%'}
-                        corDoTexto={'#fff'}
-                        negrito
-                        aoPressionar={() => {
-                            setAddCartao(false)
-                            setPagamento(true)
-                        }}
-                    />
-                </View>
-            }
+                    </Modal>
 
-            {selecionarPgto &&
-                <View style={[styles.dashContent, styles.escolher]}>
-                    <View style={{ alignItems: 'center' }} >
-                        <Text style={styles.tituloPrincipal}>Pagamento</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={styles.txtSelecioneCartao} >Cartão de crédito</Text>
-                        <TouchableOpacity onPress={() => {
-                            setSelecionarPgto(false)
-                            setAddCartao(true)
-                        }}>
-                            <Text style={styles.botaoMais}>+</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={styles.txtSelecioneCartao} >Cartão de débito</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.botaoMais}>+</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-                        <Text style={styles.txtSelecioneCartao} >Pix</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.botaoMais}>+</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            }
-
-            <Modal
-                visible={modalConfirma}
-                transparent={true}
-                onRequestClose={() => { }}
-                animationType="fade"
-            >
-                <ModalConfirmacao
-                    handleClose={() => {
-                        setModalConfirma(false)
-                        setInformacoes(true)
-                    }}
-                    mensagemConfirmacao={confirmaReserva}
-                />
-            </Modal>
-
-            <Modal
-                visible={modalMsgConfirma}
-                transparent={true}
-                onRequestClose={() => { }}
-                animationType="fade"
-            >
-                <ModalMsgConfirmacao
-                    modalAtivo={modalMsgConfirma}
-                    handleClose={() => {
-                        setModalMsgConfirma(false)
-                    }}
-                />
-            </Modal>
-
-            <Modal
-                visible={modalDatePicker}
-                transparent={true}
-                onRequestClose={() => { }}
-                animationType="fade"
-            >
-                <DatePickerModal
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
-                    setModalConfirma={() => {
-                        setModalDatePicker(false)
-                        setInformacoes(false)
-                        setEscolherVeiculo(true)
-                    }}
-                />
-            </Modal>
-        </SafeAreaView>
+                    <Modal
+                        visible={modalDatePicker}
+                        transparent={true}
+                        onRequestClose={() => setModalDatePicker(false)}
+                        animationType="fade"
+                    >
+                        <DatePickerModal
+                            setModalConfirma={() => {
+                                setModalDatePicker(false)
+                                setInformacoes(false)
+                                setEscolherVeiculo(true)
+                            }}
+                            setModalDatePicker={setModalDatePicker}
+                        />
+                    </Modal>
+                </AreaView>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
-export default Dashboard;
+export default Dashboard

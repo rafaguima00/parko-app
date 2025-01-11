@@ -19,25 +19,25 @@ const infoEstacionamento = {
     horarios: [
         {
             id: 1,
-            tempoPermanencia: "1 hora",
-            preco: "R$ 10,00"
+            tempoPermanencia: 1,
+            preco: 10
         },
         {
             id: 2,
-            tempoPermanencia: "2 horas",
-            preco: "R$ 12,00"
+            tempoPermanencia: 2,
+            preco: 12
         },
         {
             id: 3,
-            tempoPermanencia: "3 horas",
-            preco: "R$ 14,00"
+            tempoPermanencia: 3,
+            preco: 14
         },
         {
             id: 4,
-            tempoPermanencia: "4 horas",
-            preco: "R$ 16,00"
+            tempoPermanencia: 4,
+            preco: 16
         }
     ]
 }
 
-export default infoEstacionamento;
+export default infoEstacionamento

@@ -1,76 +1,167 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react"
 import { 
     View, 
     Image, 
-    TouchableOpacity, 
-    Text 
-} from 'react-native';
+    TouchableOpacity,
+    Dimensions,
+    Modal,
+    ActivityIndicator,
+    StyleSheet,
+    ImageBackground
+} from 'react-native'
 import { 
     Feather, 
     MaterialIcons, 
     FontAwesome, 
     Ionicons, 
     MaterialCommunityIcons 
-} from 'react-native-vector-icons';
-import { Dimensions } from "react-native";
-import { ReservaContext } from "../../../../Context/reservaContext";
-import { styles } from "./style";
+} from 'react-native-vector-icons'
+import { ReservaContext } from "../../../../Context/reservaContext"
+import { useUser } from "../../../../Context/dataUserContext"
+import { BotoesSuperiores, InfoEstacionamento, Nome, Local, Endereco, Icons, TextIcon } from "./style"
+import api from "../../../../Services/api"
+import { addFavorite, removeFavorite } from "../../../../Mocks/errorOrRejected"
+import { addFavoriteConfirmed } from "../../../../Mocks/confirmed"
+
+const { width, height } = Dimensions.get('window')
 
 function Topo({ handleImageLoaded, voltar }) {
 
-    const { width } = Dimensions.get('screen')
-
     const [favoritoAtivado, setFavoritoAtivado] = useState(false)
+    const [loading, setLoading] = useState(false)
 
+    const { dataUser } = useUser()
     const { destination, distance } = useContext(ReservaContext)
-    const { image, name, end, vagas, avaliacao, vagas_ocupadas } = destination;
+    const { id, image, name, end, vagas, avaliacao, vagas_ocupadas } = destination
+
+    async function adicionarAosFavoritos() {
+        setLoading(true)
+
+        if(favoritoAtivado === false) {
+            await api.post("/favorites", { 
+                id_user: dataUser.id, 
+                id_establishment: id
+            })
+            .then(() => {
+                setFavoritoAtivado(true)
+                alert(addFavoriteConfirmed)
+            })
+            .catch(() => {
+                alert(addFavorite)
+            })
+
+        } else {
+            await api.delete("/favorites", { 
+                data: {
+                    id_user: dataUser.id, 
+                    id_establishment: id
+                }
+            })
+            .then(res => {
+                setFavoritoAtivado(false)
+                alert(res.data.message)
+            })
+            .catch(() => {
+                alert(removeFavorite)
+            })
+        }
+
+        setLoading(false)
+    }
+
+    async function retornarFavorito() {
+        await api.get(`/favorites/${dataUser.id}`)
+        .then(res => {
+            const result = res.data
+            const filterResult = result.find(item => item.parking_id == destination.id)
+            
+            if(filterResult) {
+                setFavoritoAtivado(true)
+            }
+        })
+        .catch(() => {
+            console.log("Erro ao verificar estacionamento favorito")
+        })
+    }
+
+    useEffect(() => {
+        retornarFavorito()
+    }, [])
 
     return(
-        <View style={{width: "100%"}}>
+        <View>
             <View>
-                <Image 
+                <ImageBackground
                     source={require("../../../../../assets/image_shop.png")} 
-                    style={{width: width, height: 220}} 
+                    style={estilo.imageBackground} 
                     onLoad={handleImageLoaded} 
                 />  
             </View>
-            <View 
-                style={styles.botoesSuperiores}
-            >
+            <View style={estilo.overlay}></View>
+            <BotoesSuperiores>
                 <TouchableOpacity onPress={voltar} >
-                    <Feather name="arrow-left" size={32} color="#fff" style={{padding: 30}} />
+                    <Feather name="arrow-left" size={32} color="#fff" style={{ padding: 30 }} />
                 </TouchableOpacity>
                 <TouchableOpacity 
                     activeOpacity={0.9} 
-                    onPress={() => setFavoritoAtivado(!favoritoAtivado)}
+                    onPress={adicionarAosFavoritos}
                 >
                     <MaterialIcons 
                         name={(favoritoAtivado ? "favorite" : "favorite-border")} 
                         size={28} 
                         color={(favoritoAtivado ? 'red' : '#fff')} 
-                        style={{padding: 30}}
+                        style={{ padding: 30 }}
                     />
                 </TouchableOpacity>
-            </View>
-            <View style={styles.infoEstacionamento}>
-                <Text style={styles.nomeEstacionamento}>{name}</Text>
-                <View style={styles.viewLocalEstacionamento}>
+            </BotoesSuperiores>
+            <InfoEstacionamento>
+                <Nome>{name}</Nome>
+                <Local>
                     <MaterialCommunityIcons name="map-marker" size={14} color="#f4f4f4" />
-                    <Text style={styles.localEstacionamento}>{end}</Text>
-                </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Endereco>{end}</Endereco>
+                </Local>
+                <Icons>
                     <FontAwesome name="arrows-h" size={16} color="#0097b9" />
-                    <Text style={styles.distanciaVagaEstrela}>{distance ? distance.toFixed(1) : '-'} km</Text>
+                    <TextIcon>{distance ? `${distance.toFixed(1)} km` : ""}</TextIcon>
 
                     <Ionicons name="car" size={20} color="#0097b9" />
-                    <Text style={styles.distanciaVagaEstrela}>{parseInt(vagas) - parseInt(vagas_ocupadas)} vagas</Text>
+                    <TextIcon>{parseInt(vagas) - parseInt(vagas_ocupadas)} vagas</TextIcon>
 
                     <Feather name="star" size={20} color="#0097b9" />
-                    <Text style={styles.distanciaVagaEstrela}>{avaliacao ? avaliacao : 'n/a'}</Text>
+                    <TextIcon>{avaliacao ? avaliacao : 'n/a'}</TextIcon>
+                </Icons>
+            </InfoEstacionamento>
+            <Modal
+                visible={loading}
+                transparent={true}
+                onRequestClose={() => {}}
+                animationType='fade'
+            >
+                <View
+                    style={{
+                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <ActivityIndicator size={'small'} color={'#fff'} />
                 </View>
-            </View>
+            </Modal> 
         </View>
     )
 }
 
-export default Topo;
+const estilo = StyleSheet.create({
+    imageBackground: { 
+        width: width, 
+        height: height * 0.28
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject, // preenche todo o espaço do ImageBackground
+        backgroundColor: '#000',
+        opacity: 0.4, // ajusta o escurecimento
+    }
+})
+
+export default Topo

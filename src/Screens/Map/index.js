@@ -30,6 +30,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { jwtDecode } from "jwt-decode"
 import ReadApi from "../../Services/readData"
 import { formatCurrency } from "../../Services/formatCurrency"
+import LoadingModal from "../../Components/Loading"
+import { latitudeDelta, longitudeDelta } from "../../Mocks/location"
+import { getFavoriteList } from "../../Mocks/errorOrRejected"
+import api from "../../Services/api"
+import axios from "axios"
 
 export default function MapaPrincipal({ navigation }) {
 
@@ -41,22 +46,53 @@ export default function MapaPrincipal({ navigation }) {
     const [textoDigitado, setTextoDigitado] = useState("")
     const [itensFiltrados, setItensFiltrados] = useState([])
     const [loading, setLoading] = useState(true)
+    const [destinationSelected, setDestinationSelected] = useState({})
 
     const mapEl = useRef(null)
 
     const { 
-        distance, 
-        setDistance, 
-        destination, 
-        setDestination, 
-        veiculoEscolhido,
+        distance,
+        setDistance,
+        destination,
+        setDestination,
         reservaFeita,
-        horaReserva,
-        reservations
+        reservations,
+        setDistanceMatrix,
+        setReservaFeita
     } = useContext(ReservaContext)
 
-    const { setDataUser, estacionamentos, priceTable, dataUser } = useUser()
+    const { 
+        setDataUser, 
+        estacionamentos, 
+        priceTable, 
+        dataUser, 
+        setFavorites
+    } = useUser()
+
     const { corFonteSecundaria, corPrimaria } = theme
+    
+    async function getDistanceMatrix() {
+        axios.get(`
+            https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination.latitude},%20${destination.longitude}&origins=${location.latitude},%20${location.longitude}&mode=driving&key=AIzaSyCIvlZb4r63Z8UI0Rr8kcbIiwQNR0i5XGQ
+        `)
+        .then(res => {
+            setDistanceMatrix(res.data.rows[0].elements[0].duration.value)
+        })
+        .catch(e => {
+            setDistanceMatrix(`Error`)
+        })
+    }
+
+    async function returnFavorites() {
+        await api.get(`/favorites/${dataUser.id}`)
+        .then(res => {
+            setFavorites(res.data)
+        })
+        .catch(e => {
+            setFavorites("Erro ao retornar favoritos")
+            alert(getFavoriteList)
+        })
+    }
 
     const filtrarItens = (text) => {
         if (text) {
@@ -68,24 +104,19 @@ export default function MapaPrincipal({ navigation }) {
         setTextoDigitado(text)
     }
 
-    const findReservation = reservations.filter(
-        item => item.id_costumer == dataUser.id && 
-        (item.status == "Pendente" || item.status == "Confirmado")
-    )
-
     useEffect(() => {
         (async () => {
-
             try {
                 
                 let { status } = await Location.requestForegroundPermissionsAsync()
 
                 let location = await Location.getCurrentPositionAsync({})
+
                 setLocation({
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,
-                    latitudeDelta: 0.0143,
-                    longitudeDelta: 0.0134
+                    latitudeDelta: latitudeDelta,
+                    longitudeDelta: longitudeDelta
                 })
 
                 if (status !== 'granted') {
@@ -112,51 +143,82 @@ export default function MapaPrincipal({ navigation }) {
 
         loadParkings()
         loadReservations()
-    }, [])
+        returnFavorites()
+    }, [dataUser.id])
+
+    const findReservation = reservations.filter(
+        item => item.id_costumer == dataUser?.id && 
+        (item.status == "Confirmado" || item.status == "Recusado")
+    )
 
     useEffect(() => {
-        if(findReservation) {
-            // in case of reservation in progress show the info of reservation
+        if(findReservation[0]) {
+            setReservaFeita(true)
         }
 
         setLoading(false)
-    }, [reservations])
+    }, [reservations, dataUser?.id])
+
+    useEffect(() => {
+        getDistanceMatrix()
+    }, [destination])
 
     const retornarCoordenadas = ({ item }) => {
-
+        setLoading(true)
         loadPriceTable(item.id)
 
+        if(priceTable) {
+            parkDestination(item)
+        }
+    }
+
+    const parkDestination = (item) => {
         setDestination({
             id: item.id,
-            latitude: item.latitude,
-            longitude: item.longitude,
+            latitude: 37.390712577762294, // item.latitude
+            longitude: -122.0829578353622, // item.longitude
             latitudeDelta: 0.0143,
             longitudeDelta: 0.0134,
             end: item.end,
             image: item.image,
             name: item.name,
-            price: priceTable.valor_hora,
+            price: priceTable?.valor_hora,
             vagas: item.numero_vagas,
             vagas_ocupadas: item.vagas_ocupadas,
             avaliacao: item.rate,
-            tempo_tolerancia: priceTable.tempo_tolerancia
+            tempo_tolerancia: priceTable?.tempo_tolerancia
         })
+        setLoading(false)
     }
 
-    if (!location || loading) {
+    function calcularDiferencaHoras(dataHoraInicial, dataHoraFinal) {
+        // Converter as strings para objetos Date
+        const [dataInicial, horaInicial] = dataHoraInicial.split(' ');
+        const [dia1, mes1, ano1] = dataInicial.split('/').map(Number);
+        const [h1, m1, s1] = horaInicial.split(':').map(Number);
+      
+        const [dataFinal, horaFinal] = dataHoraFinal.split(' ');
+        const [dia2, mes2, ano2] = dataFinal.split('/').map(Number);
+        const [h2, m2, s2] = horaFinal.split(':').map(Number);
+      
+        const inicio = new Date(ano1, mes1 - 1, dia1, h1, m1, s1);
+        const fim = new Date(ano2, mes2 - 1, dia2, h2, m2, s2);
+      
+        // Calcular a diferença em milissegundos e converter para horas
+        const diferencaMs = fim - inicio;
+        const diferencaHoras = diferencaMs / (1000 * 60 * 60);
+      
+        if(Math.ceil(diferencaHoras) > 1) {
+            return `${Math.ceil(diferencaHoras)} horas`
+        }
+
+        return `${Math.ceil(diferencaHoras)} hora`
+    }
+
+    if (!location) {
         return (
-            <View 
-                style={[
-                    styles.container, 
-                    { 
-                        alignItems: 'center', 
-                        justifyContent: 'center' 
-                    }
-                ]}
-            >
-                <Text>Carregando...</Text>
-            </View>
-        );
+            <LoadingModal loading={loading} />
+        )
     }
 
     return <>
@@ -184,7 +246,7 @@ export default function MapaPrincipal({ navigation }) {
                             latitude: item.latitude,
                             longitude: item.longitude,
                         }}
-                        title={`R$ 10,00`}
+                        title={priceTable?.valor_hora}
                         onPress={() => retornarCoordenadas({ item })}
                     >
                         <Content />
@@ -194,10 +256,14 @@ export default function MapaPrincipal({ navigation }) {
                 {destination &&
                     <MapViewDirections
                         origin={location}
-                        destination={destination}
+                        destination={{
+                            latitude: destination.latitude, 
+                            longitude: destination.longitude
+                        }}
                         apikey={GOOGLE_API_KEY}
                         strokeWidth={3}
                         strokeColor="#523499"
+                        onError={errorMessage => alert('Directions Error:', errorMessage)}
                         onReady={result => {
                             setDistance(result.distance)
                             mapEl.current.fitToCoordinates(
@@ -217,28 +283,35 @@ export default function MapaPrincipal({ navigation }) {
             </MapView>
             
             <View style={styles.componentesMapa}>
-                <TouchableOpacity
-                    style={styles.icone}
-                    onPress={() => navigation.openDrawer()}
+                <View 
+                    style={[
+                        styles.primeiraColuna, 
+                        { left: (destination && !reservaFeita) ? 75 : 0 }
+                    ]}
                 >
-                    <Feather name="menu" size={28} />
-                </TouchableOpacity >
+                    <TouchableOpacity
+                        style={styles.icone}
+                        onPress={() => navigation.openDrawer()}
+                    >
+                        <Feather name="menu" size={28} />
+                    </TouchableOpacity >
 
-                <TouchableOpacity
-                    style={styles.icone}
-                    onPress={() => navigation.navigate('Veiculos')}
-                >
-                    <Ionicons name="car-outline" size={28} />
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.icone}
+                        onPress={() => navigation.navigate('Veiculos')}
+                    >
+                        <Ionicons name="car-outline" size={28} />
+                    </TouchableOpacity>
+                </View>
 
                 {(destination && !reservaFeita) &&
                     <TouchableOpacity
-                        style={[styles.icone, { position: "absolute", right: 0 }]}
+                        style={[styles.icone, { position: "absolute", left: 0 }]}
                         onPress={() => {
                             setDestination(null)
                         }}
                     >
-                        <Feather name="arrow-left" size={32} />
+                        <Feather name="arrow-left" size={28} />
                     </TouchableOpacity>
                 }
             </View>
@@ -283,8 +356,10 @@ export default function MapaPrincipal({ navigation }) {
             >
                 <Searching 
                     state={{ 
+                        setDestinationSelected,
                         setModalPesquisar, 
                         setTextoDigitado, 
+                        setItensFiltrados,
                         itensFiltrados,
                         textoDigitado
                     }} 
@@ -330,50 +405,61 @@ export default function MapaPrincipal({ navigation }) {
                             aoPressionar={() => {
                                 navigation.navigate('Dashboard')
                             }}
+                            opacidade={0.7}
                         />
                     </View>
                 </View>
             }
 
-            {/* {!findReservation &&
-                <View style={styles.itemLista}>
-                    <ActivityIndicator size="large" />
-                </View>
-            } */}
-
-            {(reservaFeita && findReservation) &&
+            {(reservaFeita && findReservation[0]) &&
                 <View style={styles.itemLista}>
                     <View style={styles.viewEstacionamento}>
                         <Image 
                             style={{ width: 45, height: 45, borderRadius: 50, borderWidth: 2, borderColor: corPrimaria }}
-                            source={{ uri: destination.image }} 
+                            source={{ uri: findReservation[0].image_url_establishment }} 
                         />
-                        <Text style={styles.nomeEstacionamento}>{destination.name}</Text>
+                        <Text style={styles.nomeEstacionamento}>{findReservation[0].establishment}</Text>
                     </View>
                     <View style={styles.viewReservation}>
                         <View style={styles.infoVeiculo}>
                             <Text style={styles.textoInicio}>Veículo</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItemCarro}>{veiculoEscolhido.item.name}</Text>
-                                <Text style={styles.infoItemPlaca}>{veiculoEscolhido.item.license_plate}</Text>
-                                <Text style={styles.infoItemCor}>{veiculoEscolhido.item.color}</Text>
+                                <Text style={styles.infoItemCarro}>{findReservation[0].name_vehicle}</Text>
+                                <Text style={styles.infoItemPlaca}>{findReservation[0].license_plate}</Text>
+                                <Text style={styles.infoItemCor}>{findReservation[0].color}</Text>
                             </View>
                         </View>
                         <View style={styles.infoVeiculo}>
                             <Text style={styles.textoInicio}>Duração</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItem}>1 hora</Text>
-                                <Text style={styles.infoItem}>{horaReserva}</Text>
+                                <Text style={styles.infoItem}>
+                                    {
+                                        calcularDiferencaHoras(
+                                            `${findReservation[0].data_entrada} ${findReservation[0].hora_entrada}`, 
+                                            `${findReservation[0].data_saida} ${findReservation[0].hora_saida}`
+                                        )
+                                    }
+                                </Text>
+                                <Text style={styles.infoItem}>
+                                    {`${findReservation[0].data_entrada}\n ${findReservation[0].hora_entrada}`}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.infoVeiculo}>
                             <Text style={styles.textoInicio}>Valor</Text>
                             <View style={styles.textoVeiculo}>
-                                <Text style={styles.infoItem}>{formatCurrency(10)}</Text>
+                                <Text style={styles.infoItem}>{formatCurrency(findReservation[0].value)}</Text>
                             </View>
                         </View>
                     </View>
-                    <TouchableOpacity style={styles.botaoReserva} onPress={() => { navigation.navigate('Tempo de Espera') }}>
+                    <TouchableOpacity 
+                        style={styles.botaoReserva} 
+                        onPress={() => { 
+                            navigation.navigate('Tempo de Espera', {
+                                idDestination: findReservation[0].id_establishment,
+                                idReservation: findReservation[0].id
+                            })
+                        }}>
                         <Text style={styles.textoBotao}>Acompanhar reserva</Text>
                     </TouchableOpacity>
                 </View>

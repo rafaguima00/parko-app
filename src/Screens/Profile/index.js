@@ -7,10 +7,9 @@ import {
     TextInput,
     KeyboardAvoidingView,
     Platform,
-    Modal,
-    ActivityIndicator,
     Alert
 } from "react-native"
+import { DivButton } from "./style"
 import { Octicons, Feather } from "react-native-vector-icons"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import IconeEditarPerfil from "../../Components/IconEdit"
@@ -23,6 +22,7 @@ import api from "../../Services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useUser } from "../../Context/dataUserContext"
 import { jwtDecode } from "jwt-decode"
+import LoadingModal from "../../Components/Loading"
 
 export default function Profile({ navigation, route }) {
 
@@ -32,14 +32,16 @@ export default function Profile({ navigation, route }) {
     const [dados, setDados] = useState({})
 
     const { dataUser, setDataUser } = useUser()
-    const { email, password, name, sobrenome, cpf, tel, register } = route.params
+    const { name } = dataUser
+    const { register } = route.params
 
     function sobreNome() {
         const segundoNome = name.split(' ')
-        setDados({ ...dados, sobrenome: segundoNome[1] })
         
-        if(dados.sobrenome) {
-            carregarDados("name", segundoNome[0])
+        carregarDados("name", segundoNome[0])
+
+        if(segundoNome.length > 1) {
+            carregarDados("sobrenome", segundoNome[1])
         }
     }
 
@@ -54,22 +56,23 @@ export default function Profile({ navigation, route }) {
             dados.tel === '' ||
             dados.cpf === ''
         ) {
-            Alert.alert('Aviso', 'Preencha os campos vazios')
-        } else {
-            Alert.alert(
-                '',
-                'Deseja salvar os dados?',
-                [
-                    {
-                        text: 'Sim',
-                        onPress: () => criarUsuario(dataUser.id)
-                    },
-                    {
-                        text: 'Não'
-                    }
-                ]
-            )
-        }
+            return Alert.alert('Aviso', 'Preencha os campos vazios')
+        } 
+
+        Alert.alert(
+            '',
+            'Deseja salvar os dados?',
+            [
+                {
+                    text: 'Sim',
+                    onPress: () => criarUsuario(dataUser.id)
+                },
+                {
+                    text: 'Não'
+                }
+            ]
+        )
+        
     }
 
     async function criarUsuario(id) {
@@ -82,18 +85,20 @@ export default function Profile({ navigation, route }) {
         })
         .then(() => {
             if(register) Alert.alert(`Bem-vindo(a) ${dados.name}!`)
-            navigation.navigate("Map")
+            navigation.replace("Map")
         })
         .catch(e => {
-            setCarregando(false)
             Alert.alert(e.response.data.message)
+        })
+        .finally(() => {
+            setCarregando(false)
         })
     }
 
     const alertWarning = (id) => {
         Alert.alert(
             "Desativar conta",
-            "Você tem certeza que deseja desativar sua conta? Você irá perder todos os dados do seu cartão de crédito, veículos... tudo que você tem direito",
+            "Você tem certeza que deseja desativar sua conta? Esta ação excluirá todos os seus dados.",
             [
                 {
                     text: 'Sim',
@@ -107,6 +112,8 @@ export default function Profile({ navigation, route }) {
     }
 
     const deleteAccount = async (id) => {
+        setCarregando(true)
+
         await api.delete(`/users/${id}`)
         .then(() => {
             Alert.alert("Sua conta foi desativada")
@@ -114,6 +121,9 @@ export default function Profile({ navigation, route }) {
         })
         .catch(e => {
             Alert.alert("Erro ao deletar conta", e.message)
+        })
+        .finally(() => {
+            setCarregando(false)
         })
     }
 
@@ -142,7 +152,7 @@ export default function Profile({ navigation, route }) {
             <ScrollView contentContainerStyle={styles.content}>
                 <View>
                     <TouchableOpacity
-                        onPress={salvarDados}
+                        onPress={() => navigation.replace("Map")}
                         style={{ marginHorizontal: 36, marginTop: 38 }}
                         activeOpacity={0.9}
                     >
@@ -163,8 +173,8 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu nome"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.name || name}
-                            onChangeText={text => setDados({ ...dados, name: text })}
+                            value={dados.name}
+                            onChangeText={text => carregarDados("name", text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
@@ -175,8 +185,8 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu sobrenome"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.sobrenome || sobrenome}
-                            onChangeText={text => setDados({ ...dados, sobrenome: text })}
+                            value={dados.sobrenome}
+                            onChangeText={text => carregarDados("sobrenome", text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
@@ -188,13 +198,13 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite o número do celular"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.tel || tel}
-                            onChangeText={text => setDados({ ...dados, tel: text })}
+                            value={dados.tel}
+                            onChangeText={text => carregarDados("tel", text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
 
-                    <Text style={styles.nome}>E-mail</Text>
+                    {/* <Text style={styles.nome}>E-mail</Text>
                     <TouchableOpacity disabled style={styles.displayUsuario}>
                         <TextInput
                             placeholder="Email"
@@ -217,7 +227,7 @@ export default function Profile({ navigation, route }) {
                             maxLength={12}
                         />
                         <IconeEditarPerfil />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <Text style={styles.nome}>CPF</Text>
                     <TouchableOpacity style={styles.displayUsuario}>
@@ -226,36 +236,29 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu CPF"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.cpf || cpf}
-                            onChangeText={text => setDados({ ...dados, cpf: text })}
+                            value={dados.cpf}
+                            onChangeText={text => carregarDados("cpf", text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
-                    <Botao
-                        children={"Desativar conta"}
-                        corDeFundo={corVermelha}
-                        negrito
-                        corDoTexto={'#fff'}
-                        aoPressionar={() => alertWarning(dataUser.id)}
-                    />
+                    <DivButton>
+                        <Botao
+                            children={"Desativar conta"}
+                            corDeFundo={corVermelha}
+                            negrito
+                            corDoTexto={'#fff'}
+                            aoPressionar={() => alertWarning(dataUser.id)}
+                        />
+                        <Botao
+                            children={"Salvar"}
+                            corDeFundo={corPrimaria}
+                            negrito
+                            corDoTexto={'#fff'}
+                            aoPressionar={salvarDados}
+                        />
+                    </DivButton>
                 </View>
-                <Modal
-                    visible={carregando}
-                    transparent={true}
-                    onRequestClose={() => { }}
-                    animationType='fade'
-                >
-                    <View
-                        style={{
-                            backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <ActivityIndicator size={'small'} color={'#fff'} />
-                    </View>
-                </Modal> 
+                <LoadingModal loading={carregando} />
             </ScrollView>
         </KeyboardAvoidingView>
     )

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Feather, FontAwesome } from "react-native-vector-icons"
 import {
     View,
@@ -8,30 +8,71 @@ import {
     Image,
     Alert
 } from "react-native"
-import { styles } from "./style"
+import { ImageParking, Separator, styles } from "./style"
+import { emptyFavorite } from "../../Mocks/emptyList"
+import { useUser } from "../../Context/dataUserContext"
+import api from "../../Services/api"
+import parking from "../../../assets/image_shop.png"
+import { getFavoriteList, removeFavorite } from "../../Mocks/errorOrRejected"
 
 export default function Favorites({ navigation }) {
+
+    const { favorites, setFavorites, dataUser } = useUser()
+
+    async function returnFavorites() {
+        await api.get(`/favorites/${dataUser.id}`)
+        .then(res => {
+            setFavorites(res.data)
+        })
+        .catch(e => {
+            console.log(e)
+            alert(getFavoriteList)
+        })
+    }
+
+    async function removerFavorito(parkingId) {
+        await api.delete("/favorites", { 
+            data: {
+                id_user: dataUser.id, 
+                id_establishment: parkingId
+            }
+        })
+        .then(res => {
+            alert(res.data.message)
+
+            setFavorites(prevFavorites => 
+                prevFavorites.filter(item => item.parking_id !== parkingId)
+            )
+        })
+        .catch(() => {
+            alert(removeFavorite)
+        })
+    }
+
+    useEffect(() => {
+        returnFavorites()
+    }, [])
 
     const renderItem = ({ item }) => {
         return (
             <View style={styles.dados}>
                 <View style={styles.itens}>
-                    <Image source={item.imagem} />
-                    <Text style={styles.nome}>{item.nome}</Text>
+                    <ImageParking source={parking} />
+                    <Text style={styles.nome}>{item.name}</Text>
                 </View>
                 <TouchableOpacity onPress={() => {
                     Alert.alert(
                         "Remover da lista",
-                        `Deseja remover o estacionamento ${item.nome} dos seus favoritos?`,
+                        `Deseja remover o estacionamento ${item.name} dos seus favoritos?`,
                         [
                             {
                                 text: 'OK',
-                                onPress: () => { console.log("Botão 'OK' pressionado") },
+                                onPress: () => { removerFavorito(item.parking_id) },
                                 style: styles.botaoOk
                             },
                             {
                                 text: 'Cancelar',
-                                onPress: () => { console.log("Botão 'Cancelar' pressionado") }
+                                onPress: () => {}
                             }
                         ]
                     )
@@ -44,7 +85,7 @@ export default function Favorites({ navigation }) {
 
     const EmptyListMessage = () => {
         return (
-            <Text style={styles.mensagemVazio}>Lista de favoritos vazia</Text>
+            <Text style={styles.mensagemVazio}>{emptyFavorite}</Text>
         )
     }
 
@@ -56,10 +97,11 @@ export default function Favorites({ navigation }) {
             <Text style={styles.topoFavoritos}>Favoritos</Text>
         </View>
         <FlatList
-            data={{}}
+            data={favorites}
             renderItem={renderItem}
-            keyExtractor={item => item.nome}
+            keyExtractor={item => item.id}
             ListEmptyComponent={EmptyListMessage}
+            ItemSeparatorComponent={() => <Separator />}
         />
     </View>
 }

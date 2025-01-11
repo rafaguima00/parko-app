@@ -1,30 +1,30 @@
 import 'react-native-gesture-handler'
-import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
-import StackNavigator from './src/Navigation/stackNavigator';
-import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
-import * as SplashScreen from 'expo-splash-screen';
-import { useCallback } from 'react';
-import { DataUserProvider } from './src/Context/dataUserContext';
-import { ReservaProvider } from './src/Context/reservaContext';
+import { StatusBar } from 'expo-status-bar'
+import { View } from 'react-native'
+import StackNavigator from './src/Navigation/stackNavigator'
+import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto'
+import * as SplashScreen from 'expo-splash-screen'
+import { useCallback } from 'react'
+import { DataUserProvider } from './src/Context/dataUserContext'
+import { ReservaProvider } from './src/Context/reservaContext'
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function App() {
 
   const [fontsLoaded] = useFonts({
     Roboto_400Regular, 
     Roboto_700Bold
-  });
+  })
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      await SplashScreen.hideAsync()
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded])
 
   if (!fontsLoaded) {
-    return null;
+    return null
   }
 
   return (
@@ -39,5 +39,5 @@ export default function App() {
         </View>
       </ReservaProvider>
     </DataUserProvider>
-  );
+  )
 }

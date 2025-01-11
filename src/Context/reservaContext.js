@@ -1,38 +1,59 @@
 import { createContext, useState } from 'react'
 
-export const ReservaContext = createContext({});
+export const ReservaContext = createContext({})
 
 export function ReservaProvider({ children }) {
 
     const [distance, setDistance] = useState(null)
     const [destination, setDestination] = useState(null)
-    const [veiculoEscolhido, setVeiculoEscolhido] = useState({})
     const [reservaFeita, setReservaFeita] = useState(false)
-    const [tempoTotal, setTempoTotal] = useState(0)
-    const [running, setRunning] = useState(false)
     const [reservations, setReservations] = useState([])
     const [vagaReservada, setVagaReservada] = useState({})
-    const [horaReserva, setHoraReserva] = useState("")
+    const [novaReserva, setNovaReserva] = useState(null)
+    const [personalizado, setPersonalizado] = useState(false)
+    const [tabelaFixa, setTabelaFixa] = useState([])
+    const [priceTable, setPriceTable] = useState({})
+    const [horaFuncionamento, setHoraFuncionamento] = useState([])
+    const [itemPreSelecionado, setItemPreSelecionado] = useState({})
+    const [valorPreSelecionado, setValorPreSelecionado] = useState(null)
+    const [distanceMatrix, setDistanceMatrix] = useState([])
+    const [tipoReserva, setTipoReserva] = useState("")
+    const [code, setCode] = useState([])
+    const [expiresAt, setExpiresAt] = useState("")
 
     const value = {
         distance, 
         setDistance, 
         destination, 
         setDestination,
-        veiculoEscolhido,
-        setVeiculoEscolhido,
         reservaFeita,
         setReservaFeita,
-        tempoTotal,
-        setTempoTotal,
-        running,
-        setRunning,
         vagaReservada,
         setVagaReservada,
-        horaReserva, 
-        setHoraReserva,
+        novaReserva, 
+        setNovaReserva,
         reservations,
-        setReservations
+        setReservations,
+        personalizado,
+        setPersonalizado,
+        tabelaFixa,
+        setTabelaFixa,
+        priceTable, 
+        setPriceTable,
+        horaFuncionamento, 
+        setHoraFuncionamento,
+        itemPreSelecionado, 
+        setItemPreSelecionado,
+        valorPreSelecionado, 
+        setValorPreSelecionado,
+        distanceMatrix, 
+        setDistanceMatrix,
+        tipoReserva, 
+        setTipoReserva,
+        code, 
+        setCode,
+        expiresAt,
+        setExpiresAt
     }
 
     return (

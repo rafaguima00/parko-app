@@ -1,21 +1,33 @@
-import React from "react";
+import React from "react"
 import { 
     Text, 
     View, 
     StyleSheet,
     Image, 
     TextInput 
-} from 'react-native';
-import { theme } from "../../../Theme";
-import { Botao } from "../../../Components/Botao";
-import { styles } from "../style";
+} from 'react-native'
+import { theme } from "../../../Theme"
+import { Botao } from "../../../Components/Botao"
+import { BotaoFechar, BotaoVoltar, styles, TopoBotao } from "../style"
+import { Feather } from "react-native-vector-icons"
 
 const { fonteNegrito, corPrimaria } = theme
 
-export default function AddCard({ openModalPagamento }) {
+export default function AddCard({ 
+    openModalPagamento,
+    setModalAddCartao
+}) {
     return (
         <View style={styles.modalContainer}>
-            <View style={[styles.dashContent, estilos.escolher, {alignItems: 'center'}]}>
+            <View style={[styles.dashContent, estilos.escolher, { alignItems: 'center' }]}>
+                <TopoBotao espacamento={32}>
+                    <BotaoVoltar activeOpacity={0.7} onPress={openModalPagamento}>
+                        <Feather name="arrow-left" size={32} color="#444" />
+                    </BotaoVoltar>
+                    <BotaoFechar activeOpacity={0.7} onPress={() => setModalAddCartao(false)}>
+                        <Feather name="x" size={32} color="#444" />
+                    </BotaoFechar>
+                </TopoBotao>
                 <View>
                     <Text style={estilos.tituloPrincipal}>Adicionar Cartão</Text>
                 </View>

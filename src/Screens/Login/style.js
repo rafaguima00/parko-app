@@ -4,12 +4,13 @@ const { width } = Dimensions.get('screen')
 
 export const styles = StyleSheet.create({
     displayTela: {
+        height: "100%",
         alignItems: "center",
-        marginVertical: 48,
+        justifyContent: "center",
         width: width
     },
     imagem: {
-        marginVertical: 40,
+        marginVertical: 32,
         paddingHorizontal: 32
     },
     esqueciASenha: {

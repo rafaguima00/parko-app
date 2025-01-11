@@ -4,5 +4,7 @@ export const theme = {
     corVermelha: "#FF4A4A",
     fonteRegular: "Roboto_400Regular",
     fonteNegrito: "Roboto_700Bold",
-    corDeFundoAzul: "#0097b9"
+    corDeFundoAzul: "#0097b9",
+    corNeutra: "#545454",
+    corRoxa: "#523499"
 }
