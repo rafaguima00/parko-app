@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { useCallback } from 'react'
 import { DataUserProvider } from './src/Context/dataUserContext'
 import { ReservaProvider } from './src/Context/reservaContext'
+import { PaymentProvider } from './src/Context/paymentContext'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -30,13 +31,15 @@ export default function App() {
   return (
     <DataUserProvider>
       <ReservaProvider>
-        <View 
-          style={{ flex: 1 }} 
-          onLayout={onLayoutRootView}
-        >
-          <StackNavigator />
-          <StatusBar style="auto" />
-        </View>
+        <PaymentProvider>
+          <View 
+            style={{ flex: 1 }} 
+            onLayout={onLayoutRootView}
+          >
+            <StackNavigator />
+            <StatusBar style="auto" />
+          </View>
+        </PaymentProvider>
       </ReservaProvider>
     </DataUserProvider>
   )

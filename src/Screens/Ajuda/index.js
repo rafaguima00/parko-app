@@ -2,41 +2,31 @@ import React, { useEffect, useState } from "react"
 import { 
     SafeAreaView, 
     StatusBar, 
-    Text, 
-    StyleSheet, 
-    Platform,
-    TouchableOpacity,
-    View,
     FlatList
 } from "react-native"
 import { 
-    ButtonPlus,
-    Cabecalho, 
     Faq, 
-    ItemList, 
     ListView, 
-    Plus, 
     Separator, 
-    TextAjuda, 
     TextInputArea, 
-    TextSubject, 
-    ViewHeader 
+    ViewHeader, 
+    styles
 } from "./style"
-import { Feather } from "react-native-vector-icons"
 import { TextInput } from "react-native-paper"
 import { theme } from "../../Theme"
 import api from "../../Services/api"
 import { useUser } from "../../Context/dataUserContext"
 import LoadingModal from "../../Components/Loading"
+import TopArrowLeft from "../../Components/TopArrowLeft"
+import FaqList from "./components/faqList"
 
-const Ajuda = ({ navigation }) => {
+const Ajuda = () => {
 
     const { corFonteSecundaria, corPrimaria } = theme
     const { setFaq, faq } = useUser()
 
     const [textoDigitado, setTextoDigitado] = useState("")
     const [faqFiltrado, setFaqFiltrado] = useState([])
-    const [faqId, setFaqId] = useState([])
     const [loading, setLoading] = useState(true)
 
     const filtrarItens = text => {
@@ -65,36 +55,6 @@ const Ajuda = ({ navigation }) => {
         })
     }
 
-    function showAnswer(id) {
-
-        if (faqId.includes(id)) {
-            setFaqId(faqId.filter(item => item !== id))
-        } else {
-            setFaqId([...faqId, id])
-        }
-    }
-
-    const renderItem = ({ item }) => {
-        return <>
-            <View>
-                <ItemList>
-                    <TextSubject>{item.pergunta}</TextSubject>
-                    <ButtonPlus
-                        onPress={() => showAnswer(item.id)}
-                        activeOpacity={0.7}
-                    >
-                        <Plus>
-                            {faqId.includes(item.id) ? "-" : "+"}
-                        </Plus>
-                    </ButtonPlus>
-                </ItemList>
-                {faqId.includes(item.id) && (
-                    <Text style={{ color: "#7d7d7d" }}>{item.resposta}</Text>
-                )}
-            </View>
-        </>
-    }
-
     const renderHeader = () => (
         <ViewHeader>
             <Faq>FAQ</Faq>
@@ -118,16 +78,7 @@ const Ajuda = ({ navigation }) => {
             translucent 
         />
         <SafeAreaView style={styles.container}>
-            <Cabecalho>
-                <TouchableOpacity 
-                    onPress={() => {
-                        navigation.goBack()
-                    }}
-                >
-                    <Feather name="arrow-left" size={32} />
-                </TouchableOpacity>
-                <TextAjuda>Ajuda</TextAjuda>
-            </Cabecalho>
+            <TopArrowLeft children={"Ajuda"} />
             <TextInputArea>
                 <TextInput
                     placeholder="Procurar ajuda"
@@ -148,7 +99,7 @@ const Ajuda = ({ navigation }) => {
                 <FlatList 
                     data={faqFiltrado}
                     keyExtractor={item => item.id}
-                    renderItem={renderItem}
+                    renderItem={item => <FaqList {...item} />}
                     showsVerticalScrollIndicator={false}
                     ItemSeparatorComponent={Separator}
                     ListHeaderComponent={renderHeader}
@@ -158,12 +109,5 @@ const Ajuda = ({ navigation }) => {
         <LoadingModal loading={loading} />
     </>
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
-    }
-})
 
 export default Ajuda

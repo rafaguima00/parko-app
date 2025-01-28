@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import { theme } from '../../Theme';
+import { theme } from '../../Theme'
 
 export const Content = () => {
 

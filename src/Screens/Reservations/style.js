@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
         marginTop: 32,
         marginBottom: 130,
         width: width,
-        paddingHorizontal: 40,
+        paddingHorizontal: 20,
         backgroundColor: "#f4f4f4"
     },
 

@@ -16,15 +16,18 @@ import Pagamento from "./components/Pagamento"
 import AdicionaCartao from "./components/AdicionaCartao"
 import EscolherPgto from "./components/EscolherPgto"
 import MaisTempo from "./components/Modal/MaisTempo"
+import { usePayment } from "../../Context/paymentContext"
 
 function Dashboard({ navigation }) {
     
+    const { tokenCard, cartaoSelecionado } = usePayment()
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
 
     const {
         destination,
-        novaReserva
+        novaReserva,
+        setNovaReserva
     } = useContext(ReservaContext)
 
     const [informacoes, setInformacoes] = useState(true)
@@ -40,8 +43,28 @@ function Dashboard({ navigation }) {
     const [imageLoaded, setImageLoaded] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    async function confirmaReserva() {
+    // Requisição para processar o pagamento
+    async function pagamentoReserva() {
         setLoading(true)
+
+        await api.post("/create_payment", {
+            token: tokenCard, 
+            transaction_amount: novaReserva.value, 
+            customer_id: cartaoSelecionado.customer_id, 
+            description: `Parking: ${destination.name}`,
+            payment_method_id: cartaoSelecionado.payment_method.id,
+            issuer_id: cartaoSelecionado.issuer.id
+        })
+        .then(res => {
+            confirmaReserva()
+        })
+        .catch(e => {
+            console.log("Erro: " + JSON.stringify(e.response.data))
+            setLoading(false)
+        })
+    }
+
+    async function confirmaReserva() {
 
         await api.post("/reservations", {
             data_entrada: novaReserva.data_entrada, 
@@ -68,6 +91,10 @@ function Dashboard({ navigation }) {
             setLoading(false)
         })
     }
+
+    useEffect(() => {
+        console.log(novaReserva)
+    }, [novaReserva])
     
     useEffect(() => {
         loadVehicles(dataUser.id)
@@ -191,8 +218,9 @@ function Dashboard({ navigation }) {
                             handleClose={() => {
                                 setModalConfirma(false)
                                 setInformacoes(true)
+                                setNovaReserva({})
                             }}
-                            confirmaReserva={confirmaReserva}
+                            pagamentoReserva={pagamentoReserva}
                             loading={loading}
                             setLoading={setLoading}
                         />

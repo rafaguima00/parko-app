@@ -1,14 +1,13 @@
-import { StyleSheet, Dimensions } from "react-native";
-import { theme } from "../../Theme";
+import { StyleSheet } from "react-native"
+import { theme } from "../../Theme"
 
-const width = Dimensions.get('screen').width
-const { fonteNegrito } = theme;
+const { fonteNegrito } = theme
 
 export const styles = StyleSheet.create({
     areaContent: {
         flex: 1,
-        width: width,
-        marginVertical: 52
+        marginTop: 32,
+        marginHorizontal: 20,
     },
 
     container: {

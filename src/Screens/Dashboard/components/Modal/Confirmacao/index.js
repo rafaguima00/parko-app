@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { theme } from "../../../../../Theme"
 import { Botao } from "../../../../../Components/Botao"
@@ -10,7 +10,7 @@ const { fonteNegrito, corPrimaria } = theme
 
 function ModalConfirmacao({ 
     handleClose, 
-    confirmaReserva,
+    pagamentoReserva,
     loading
 }) {
 
@@ -77,7 +77,7 @@ function ModalConfirmacao({
 
     useEffect(() => {
         if(novaReserva.value) {
-            confirmaReserva()
+            pagamentoReserva()
         }
     }, [novaReserva.value])
 
@@ -94,6 +94,7 @@ function ModalConfirmacao({
                 <View style={{ alignItems: 'center', gap: 12 }}>
                     <Botao 
                         children="Concordo"
+                        opacidade={0.7}
                         corDeFundo={corPrimaria}
                         largura={'100%'}
                         corDoTexto={'#fff'}
@@ -102,6 +103,7 @@ function ModalConfirmacao({
                     />
                     <Botao 
                         children="Não concordo"
+                        opacidade={0.7}
                         corDeFundo={'#ff4a4a'}
                         largura={'100%'}
                         negrito

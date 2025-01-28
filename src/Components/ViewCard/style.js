@@ -1,3 +1,4 @@
+import styled from "styled-components"
 import { StyleSheet } from "react-native"
 import { theme } from "../../Theme"
 
@@ -6,8 +7,8 @@ const { corPrimaria, fonteNegrito } = theme
 export const styles = StyleSheet.create({
     areaContent: {
         flex: 1,
-        marginTop: 32,
-        marginHorizontal: 20,
+        justifyContent: "center",
+        marginBottom: 32
     },
 
     container: {

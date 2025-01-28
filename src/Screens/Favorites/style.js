@@ -1,9 +1,8 @@
-import { StyleSheet, Dimensions } from "react-native"
+import { StyleSheet } from "react-native"
 import { theme } from "../../Theme"
 import styled from "styled-components"
 
 const { fonteNegrito, corNeutra } = theme
-const { width } = Dimensions.get('screen')
 
 export const ImageParking = styled.Image`
     width: 50px;
@@ -20,8 +19,7 @@ export const Separator = styled.View`
 export const styles = StyleSheet.create({
     areaContent: {
         marginTop: 32,
-        width: width,
-        paddingHorizontal: 40
+        marginHorizontal: 20
     },
 
     cabecalho: {

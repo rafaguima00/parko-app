@@ -1,82 +1,53 @@
-import React, { useState } from "react"
-import { Feather } from "react-native-vector-icons"
+import React, { useEffect, useState } from "react"
 import { 
     Text, 
     View, 
     Image, 
-    TouchableOpacity, 
-    FlatList, 
-    Alert, 
-    Modal, 
-    ActivityIndicator 
+    FlatList,
+    SafeAreaView
 } from "react-native"
 import cartao from "../../../assets/image_money.png"
 import { theme } from "../../Theme"
 import { styles } from "./style"
 import { Botao } from "../../Components/Botao"
 import { emptyCard } from "../../Mocks/emptyList"
-
-const { corPrimaria } = theme
+import axios from "axios"
+import { ACCESS_TOKEN } from "@env"
+import { useUser } from "../../Context/dataUserContext"
+import { usePayment } from "../../Context/paymentContext"
+import LoadingModal from "../../Components/Loading"
+import CardList from "../../Components/CardList"
+import TopArrowLeft from "../../Components/TopArrowLeft"
 
 export default function Payments({ navigation }) {
 
-    const [cartaoAtivo, setCartaoAtivo] = useState(false)
-    const [cartaoDeCredito, setCartaoDeCredito] = useState([])
-    const [carregandoCartoes, setCarregandoCartoes] = useState(false)
+    const [loading, setLoading] = useState(true)
 
-    async function deletarCartoes(idCard) {
-        console.log(`Cartão ${idCard} deletado`)
-    }
+    const { dataUser } = useUser()
+    const { setCard, card } = usePayment()
+    const { corPrimaria } = theme
 
-    const renderItem = ({ item }) => {
-
-        const botaoClicado = cartaoAtivo === item.numero
-
-        return (
-            <TouchableOpacity
-                activeOpacity={1}
-                style={(botaoClicado ? styles.viewCardAtivo : styles.viewCard)}
-                onPress={() => setCartaoAtivo(item.numero)}
-            >
-                <TouchableOpacity
-                    style={{
-                        position: 'absolute',
-                        right: -5,
-                        top: -5,
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                        paddingVertical: 5,
-                        paddingHorizontal: 8,
-                        borderRadius: 25
-                    }}
-                    onPress={() => {
-                        Alert.alert(
-                            "Excluir cartão de crédito",
-                            `Tem certeza de que deseja excluir este cartão?`,
-                            [
-                                {
-                                    text: 'OK',
-                                    onPress: () => deletarCartoes(item.id)
-                                },
-                                {
-                                    text: 'Cancelar'
-                                }
-                            ]
-                        )
-                    }}
-                >
-                    <Text>X</Text>
-                </TouchableOpacity>
-                <View style={{ gap: 12, justifyContent: 'flex-start' }}>
-                    <Text style={styles.dadosCard}>{item.nome}</Text>
-                    <Text style={styles.dadosCard}>{item.numero}</Text>
-                    <View style={{ flexDirection: 'row', gap: 20, marginTop: 10 }}>
-                        <Text style={[styles.dadosCard, { fontSize: 15 }]}>{item.data_validade}</Text>
-                        <Text style={[styles.dadosCard, { fontSize: 15 }]}>{item.cvc}</Text>
-                    </View>
-                </View>
-                <Image source={{}} style={{ width: 54, height: 34 }} />
-            </TouchableOpacity>
-        )
+    async function getCostumerCard(email) {
+        try {
+            const searchResponse = await axios.get(
+                `https://api.mercadopago.com/v1/customers/search?email=${email}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    }
+                }
+            )
+        
+            const cards = searchResponse.data.results[0].cards
+        
+            if (cards) {
+                setCard(cards)
+            }
+        } catch (err) {
+            console.log('Erro ao buscar cliente:', err.response?.data || err.message)
+        }
+        
+        setLoading(false)
     }
 
     const EmptyListMessage = () => {
@@ -87,14 +58,13 @@ export default function Payments({ navigation }) {
         )
     }
 
-    return (
-        <View style={styles.areaContent}>
-            <View style={styles.cabecalho}>
-                <TouchableOpacity onPress={() => navigation.goBack()} >
-                    <Feather name="arrow-left" size={32} />
-                </TouchableOpacity>
-                <Text style={styles.telaPagamento}>Pagamento</Text>
-            </View>
+    useEffect(() => {
+        getCostumerCard(dataUser.email)
+    }, [])
+
+    return <>
+        <SafeAreaView style={styles.areaContent}>
+            <TopArrowLeft children={"Pagamento"} />
             <View style={styles.circuloAzul}>
                 <Image source={cartao} style={styles.imagemCard} />
             </View>
@@ -102,36 +72,21 @@ export default function Payments({ navigation }) {
             <FlatList
                 style={{ marginTop: 10, marginBottom: 46, paddingTop: 10 }}
                 horizontal
-                data={cartaoDeCredito}
-                renderItem={renderItem}
+                data={card}
+                renderItem={item => <CardList {...item} />}
                 keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
+                showsHorizontalScrollIndicator={false}
             />
             <Botao
                 children={"Adicionar"}
-                largura={'100%'}
+                largura={"100%"}
                 corDeFundo={corPrimaria}
                 negrito
-                corDoTexto={'#fff'}
-                aoPressionar={() => navigation.navigate('Cadastrar Cartao')}
+                corDoTexto={"#fff"}
+                aoPressionar={() => navigation.navigate("Cadastrar Cartao")}
             />
-            <Modal
-                visible={carregandoCartoes}
-                transparent={true}
-                onRequestClose={() => {}}
-                animationType='fade'
-            >
-                <View
-                    style={{
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <ActivityIndicator size={'small'} color={'#fff'} />
-                </View>
-            </Modal>
-        </View>
-    )
+            <LoadingModal loading={loading} />
+        </SafeAreaView>
+    </>
 }

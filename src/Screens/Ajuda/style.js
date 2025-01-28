@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import { theme } from "../../Theme"
+import { Platform, StatusBar, StyleSheet } from "react-native"
 
 const { corPrimaria, corNeutra } = theme
 
@@ -51,7 +52,7 @@ export const ViewHeader = styled.View`
 
 export const TextSubject = styled.Text`
     color: ${corNeutra};
-    max-width: 320px;
+    max-width: 290px;
 `
 
 export const ButtonPlus = styled.TouchableOpacity`
@@ -65,3 +66,11 @@ export const Plus = styled.Text`
     font-size: 26px;
     font-weight: 700;
 `
+
+export const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        marginHorizontal: 20,
+    }
+})

@@ -7,6 +7,12 @@ import { emptyCard } from "../../../../Mocks/emptyList"
 import { formatCurrency } from "../../../../Services/formatCurrency"
 import { Feather } from "react-native-vector-icons"
 import { ReservaContext } from "../../../../Context/reservaContext"
+import { usePayment } from "../../../../Context/paymentContext"
+import CardList from "../../../../Components/CardList"
+import { useUser } from "../../../../Context/dataUserContext"
+import axios from "axios"
+import { ACCESS_TOKEN } from "@env"
+import LoadingModal from "../../../../Components/Loading"
 
 const { corPrimaria } = theme
 
@@ -20,8 +26,10 @@ const Pagamento = (props) => {
         setItemPreSelecionado,
         valorPreSelecionado
     } = useContext(ReservaContext)
+    const { card, setCard, cartaoSelecionado } = usePayment()
+    const { dataUser } = useUser()
 
-    const [cartaoDeCredito, setCartaoDeCredito] = useState([])
+    const [loading, setLoading] = useState(true)
 
     let reserva = valorPreSelecionado * 0.95
     let taxaAdicional = (reserva * 0.1) + 0.06
@@ -33,9 +41,27 @@ const Pagamento = (props) => {
         setModalConfirma(true)
     }
 
-    const renderItem = ({ item }) => {
-        return <>
-        </>
+    async function getCostumerCard(email) {
+        try {
+            const searchResponse = await axios.get(
+                `https://api.mercadopago.com/v1/customers/search?email=${email}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    }
+                }
+            )
+        
+            const cards = searchResponse.data.results[0].cards
+        
+            if (cards) {
+                setCard(cards)
+            }
+        } catch (err) {
+            console.log('Erro ao buscar cliente:', err.response?.data || err.message)
+        }
+        
+        setLoading(false)
     }
 
     const EmptyListMessage = () => {
@@ -47,6 +73,10 @@ const Pagamento = (props) => {
             </View>
         </>
     }
+
+    useEffect(() => {
+        getCostumerCard(dataUser.email)
+    }, [])
 
     return <>
         <View style={[styles.dashContent, styles.escolher]} >
@@ -71,11 +101,12 @@ const Pagamento = (props) => {
             </View>
             <FlatList
                 style={{ marginTop: 10, marginBottom: 46, paddingTop: 10 }}
-                horizontal={cartaoDeCredito.length > 0 ? true : false}
-                data={cartaoDeCredito}
-                renderItem={renderItem}
+                horizontal={card.length > 0 ? true : false}
+                data={card}
+                renderItem={item => <CardList {...item} />}
                 keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
+                showsHorizontalScrollIndicator={false}
             />
             <View style={{ justifyContent: 'center' }} >
                 <TouchableOpacity onPress={() => {
@@ -104,15 +135,17 @@ const Pagamento = (props) => {
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <Botao
                     children={"Confirmar"}
-                    corDeFundo={corPrimaria}
+                    corDeFundo={cartaoSelecionado ? corPrimaria : "rgba(125, 125, 125, 0.4)"}
                     largura={'100%'}
                     corDoTexto={'#fff'}
                     negrito
                     aoPressionar={confirmarPgto}
                     opacidade={0.7}
+                    disabled={cartaoSelecionado ? false : true}
                 />
             </View>
         </View>
+        <LoadingModal loading={loading} />
     </>
 }
 

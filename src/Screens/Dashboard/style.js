@@ -31,10 +31,6 @@ export const TituloPrincipal = styled.Text`
     font-weight: 700;
 `
 
-export const ViewCard = styled.View`
-    margin-top: 12px;
-`
-
 export const FundoCinza = styled.View`
     display: flex;
     flex-direction: row;

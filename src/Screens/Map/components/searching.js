@@ -14,7 +14,6 @@ import { useUser } from "../../../Context/dataUserContext"
 const Searching = (props) => {
 
     const { 
-        setDestinationSelected,
         setModalPesquisar, 
         setTextoDigitado, 
         setItensFiltrados,
@@ -85,7 +84,6 @@ const Searching = (props) => {
                             paddingBottom: 8
                         }}
                         onPress={() => {
-                            setDestinationSelected(item)
                             setModalPesquisar(false)
                             retornarCoordenadas({ item })
                         }}

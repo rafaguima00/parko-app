@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useContext } from "react"
 import {
+    SafeAreaView,
     View,
     Text,
     KeyboardAvoidingView,
     Platform,
     TouchableOpacity,
     Image,
-    Modal
+    Modal,
+    Alert
 } from "react-native"
 import { Content } from "../../Components/Marker"
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
@@ -32,9 +34,9 @@ import ReadApi from "../../Services/readData"
 import { formatCurrency } from "../../Services/formatCurrency"
 import LoadingModal from "../../Components/Loading"
 import { latitudeDelta, longitudeDelta } from "../../Mocks/location"
-import { getFavoriteList } from "../../Mocks/errorOrRejected"
 import api from "../../Services/api"
 import axios from "axios"
+import { getFavoriteList } from "../../Mocks/errorOrRejected"
 
 export default function MapaPrincipal({ navigation }) {
 
@@ -46,7 +48,6 @@ export default function MapaPrincipal({ navigation }) {
     const [textoDigitado, setTextoDigitado] = useState("")
     const [itensFiltrados, setItensFiltrados] = useState([])
     const [loading, setLoading] = useState(true)
-    const [destinationSelected, setDestinationSelected] = useState({})
 
     const mapEl = useRef(null)
 
@@ -89,7 +90,7 @@ export default function MapaPrincipal({ navigation }) {
             setFavorites(res.data)
         })
         .catch(e => {
-            setFavorites("Erro ao retornar favoritos")
+            setFavorites(getFavoriteList)
         })
     }
 
@@ -101,6 +102,77 @@ export default function MapaPrincipal({ navigation }) {
             setItensFiltrados(resultadoPesquisa)
         }
         setTextoDigitado(text)
+    }
+
+    function directionsError(errorMsg) {
+        Alert.alert("Erro de indicação de direção do mapa", errorMsg)
+        setDestination(null)
+    }
+
+    const findReservation = reservations.filter(
+        item => item.id_costumer == dataUser?.id && 
+        (item.status == "Confirmado" || item.status == "Recusado")
+    )
+
+    const retornarCoordenadas = ({ item }) => {
+        setLoading(true)
+        loadPriceTable(item.id)
+
+        if(priceTable) {
+            parkDestination(item)
+        }
+    }
+
+    const parkDestination = (item) => {
+        setDestination({
+            id: item.id,
+            latitude: 37.41432133059576, 
+            longitude: -122.07805902049654,
+            latitudeDelta: 0.0143,
+            longitudeDelta: 0.0134,
+            end: item.end,
+            image: item.image,
+            name: item.name,
+            price: priceTable?.valor_hora,
+            vagas: item.numero_vagas,
+            vagas_ocupadas: item.vagas_ocupadas,
+            avaliacao: item.rate,
+            tempo_tolerancia: priceTable?.tempo_tolerancia
+        })
+        setLoading(false)
+    }
+
+    function calcularDiferencaHoras(dataHoraInicial, dataHoraFinal) {
+        // Converter as strings para objetos Date
+        const [dataInicial, horaInicial] = dataHoraInicial.split(' ')
+        const [dia1, mes1, ano1] = dataInicial.split('/').map(Number)
+        const [h1, m1, s1] = horaInicial.split(':').map(Number)
+      
+        const [dataFinal, horaFinal] = dataHoraFinal.split(' ')
+        const [dia2, mes2, ano2] = dataFinal.split('/').map(Number)
+        const [h2, m2, s2] = horaFinal.split(':').map(Number)
+      
+        const inicio = new Date(ano1, mes1 - 1, dia1, h1, m1, s1)
+        const fim = new Date(ano2, mes2 - 1, dia2, h2, m2, s2)
+      
+        // Calcular a diferença em milissegundos e converter para horas
+        const diferencaMs = fim - inicio
+        const diferencaHoras = diferencaMs / (1000 * 60 * 60)
+      
+        if(Math.ceil(diferencaHoras) > 1) {
+            return `${Math.ceil(diferencaHoras)} horas`
+        }
+
+        return `${Math.ceil(diferencaHoras)} hora`
+    }
+
+    function dashboardNavigation() {
+        if(!location?.latitude || !location?.longitude) {
+            setErrorMsg("Erro ao calcular localização ou direção do usuário")
+            return
+        }
+
+        return navigation.navigate('Dashboard')
     }
 
     useEffect(() => {
@@ -145,11 +217,6 @@ export default function MapaPrincipal({ navigation }) {
         returnFavorites()
     }, [dataUser.id])
 
-    const findReservation = reservations.filter(
-        item => item.id_costumer == dataUser?.id && 
-        (item.status == "Confirmado" || item.status == "Recusado")
-    )
-
     useEffect(() => {
         if(findReservation[0]) {
             setReservaFeita(true)
@@ -162,58 +229,6 @@ export default function MapaPrincipal({ navigation }) {
         getDistanceMatrix()
     }, [destination])
 
-    const retornarCoordenadas = ({ item }) => {
-        setLoading(true)
-        loadPriceTable(item.id)
-
-        if(priceTable) {
-            parkDestination(item)
-        }
-    }
-
-    const parkDestination = (item) => {
-        setDestination({
-            id: item.id,
-            latitude: item.latitude,
-            longitude: item.longitude, 
-            latitudeDelta: 0.0143,
-            longitudeDelta: 0.0134,
-            end: item.end,
-            image: item.image,
-            name: item.name,
-            price: priceTable?.valor_hora,
-            vagas: item.numero_vagas,
-            vagas_ocupadas: item.vagas_ocupadas,
-            avaliacao: item.rate,
-            tempo_tolerancia: priceTable?.tempo_tolerancia
-        })
-        setLoading(false)
-    }
-
-    function calcularDiferencaHoras(dataHoraInicial, dataHoraFinal) {
-        // Converter as strings para objetos Date
-        const [dataInicial, horaInicial] = dataHoraInicial.split(' ')
-        const [dia1, mes1, ano1] = dataInicial.split('/').map(Number)
-        const [h1, m1, s1] = horaInicial.split(':').map(Number)
-      
-        const [dataFinal, horaFinal] = dataHoraFinal.split(' ')
-        const [dia2, mes2, ano2] = dataFinal.split('/').map(Number)
-        const [h2, m2, s2] = horaFinal.split(':').map(Number)
-      
-        const inicio = new Date(ano1, mes1 - 1, dia1, h1, m1, s1)
-        const fim = new Date(ano2, mes2 - 1, dia2, h2, m2, s2)
-      
-        // Calcular a diferença em milissegundos e converter para horas
-        const diferencaMs = fim - inicio
-        const diferencaHoras = diferencaMs / (1000 * 60 * 60)
-      
-        if(Math.ceil(diferencaHoras) > 1) {
-            return `${Math.ceil(diferencaHoras)} horas`
-        }
-
-        return `${Math.ceil(diferencaHoras)} hora`
-    }
-
     if (!location) {
         return (
             <LoadingModal loading={loading} />
@@ -221,7 +236,7 @@ export default function MapaPrincipal({ navigation }) {
     }
 
     return <>
-        <View
+        <SafeAreaView
             style={[
                 styles.container,
                 {
@@ -262,7 +277,7 @@ export default function MapaPrincipal({ navigation }) {
                         apikey={GOOGLE_API_KEY}
                         strokeWidth={3}
                         strokeColor="#523499"
-                        onError={errorMessage => alert('Directions Error:', errorMessage)}
+                        onError={errorMessage => directionsError(errorMessage)}
                         onReady={result => {
                             setDistance(result.distance)
                             mapEl.current.fitToCoordinates(
@@ -354,8 +369,7 @@ export default function MapaPrincipal({ navigation }) {
                 animationType='slide'
             >
                 <Searching 
-                    state={{ 
-                        setDestinationSelected,
+                    state={{
                         setModalPesquisar, 
                         setTextoDigitado, 
                         setItensFiltrados,
@@ -401,9 +415,7 @@ export default function MapaPrincipal({ navigation }) {
                             largura={110}
                             corDoTexto={'#fff'}
                             negrito
-                            aoPressionar={() => {
-                                navigation.navigate('Dashboard')
-                            }}
+                            aoPressionar={dashboardNavigation}
                             opacidade={0.7}
                         />
                     </View>
@@ -463,6 +475,6 @@ export default function MapaPrincipal({ navigation }) {
                     </TouchableOpacity>
                 </View>
             }
-        </View>
+        </SafeAreaView>
     </>
 }

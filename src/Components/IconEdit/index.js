@@ -1,6 +1,6 @@
-import React from "react";
-import { Octicons } from "react-native-vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import React from "react"
+import { Octicons } from "react-native-vector-icons"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export default function IconeEditarPerfil() {
     return <TouchableOpacity onPress={() => {}}>

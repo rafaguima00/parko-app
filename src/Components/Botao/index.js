@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, Text } from "react-native"
 
 export const Botao = ({
     estilo,

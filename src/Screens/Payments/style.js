@@ -1,15 +1,13 @@
-import { StyleSheet, Dimensions } from "react-native"
+import { StyleSheet } from "react-native"
 import { theme } from "../../Theme"
 
 const { fonteNegrito } = theme
-const width = Dimensions.get('screen').width
 
 export const styles = StyleSheet.create({
     areaContent: {
         marginTop: 32,
-        width: width,
-        paddingHorizontal: 32,
-        justifyContent: "center",
+        marginHorizontal: 20,
+        justifyContent: "center"
     },
 
     cabecalho: {
@@ -71,7 +69,7 @@ export const styles = StyleSheet.create({
         color: '#f4f4f4'
     },
     viewCard: {
-        width: 310,
+        width: 280,
         height: 180,
         backgroundColor: 'rgba(104, 178, 186, 0.6)',
         borderRadius: 25,
@@ -82,7 +80,7 @@ export const styles = StyleSheet.create({
         marginRight: 15
     },
     viewCardAtivo: {
-        width: 330,
+        width: 310,
         height: 200,
         backgroundColor: 'rgba(104, 178, 186, 0.6)',
         borderRadius: 25,

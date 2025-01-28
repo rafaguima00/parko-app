@@ -3,11 +3,9 @@ import {
     SafeAreaView,
     View,
     TouchableOpacity,
-    Alert,
     Modal,
     KeyboardAvoidingView,
-    ScrollView,
-    Text
+    ScrollView
 } from 'react-native'
 import { Feather } from 'react-native-vector-icons'
 import EstenderHorario from "./Modal/estenderHorario"
@@ -59,7 +57,6 @@ function TempoEspera({ navigation, route }) {
     const { dataUser } = useUser()
     const { 
         setReservaFeita, 
-        setDestination,
         reservations,
         setCode,
         code,
