@@ -1,15 +1,13 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Alert, Text, View, Image } from "react-native"
 import { BotaoExcluir, DadosCartao, ViewCard } from "./style"
 import { useUser } from "../../Context/dataUserContext"
 import DeleteCard from "../../Services/DeleteCard"
 import { usePayment } from "../../Context/paymentContext"
-import { ACCESS_TOKEN } from "@env"
-import axios from "axios"
 
 const CardList = ({ item }) => {
 
-    const { cartaoSelecionado, setCartaoSelecionado, setTokenCard, tokenCard } = usePayment()
+    const { cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { dataUser } = useUser()
     const { deletarCartoes } = DeleteCard()
 
@@ -22,41 +20,6 @@ const CardList = ({ item }) => {
     function handleCardPress(id) {
         setCartaoSelecionado((prevState) => (prevState === id ? null : id))
     }
-    
-    async function gerarTokenCard(card_id) {
-        try {
-            const response = await axios.post(
-                "https://api.mercadopago.com/v1/card_tokens",
-                { card_id },
-                {
-                    headers: {
-                        Authorization: `Bearer ${ACCESS_TOKEN}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            )
-            
-            console.log(response.data.id)
-            setTokenCard(response.data.id)
-            return response.data.id
-        } catch (error) {
-            console.error("Erro ao gerar token do cartão:", error.response?.data || error.message)
-            throw new Error("Não foi possível gerar o token do cartão.")
-        }
-    }
-    
-    useEffect(() => {
-        if(cartaoSelecionado) {
-            gerarTokenCard(cartaoSelecionado.id)
-            console.log(cartaoSelecionado)
-        }
-    }, [cartaoSelecionado])
-
-    useEffect(() => {
-        if(tokenCard) {
-            console.log(tokenCard)
-        }
-    }, [tokenCard])
 
     return <>
         <ViewCard

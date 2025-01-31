@@ -20,7 +20,7 @@ import { usePayment } from "../../Context/paymentContext"
 
 function Dashboard({ navigation }) {
     
-    const { tokenCard, cartaoSelecionado } = usePayment()
+    const { tokenCard, cartaoSelecionado, setTokenCard } = usePayment()
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
 
@@ -55,11 +55,13 @@ function Dashboard({ navigation }) {
             payment_method_id: cartaoSelecionado.payment_method.id,
             issuer_id: cartaoSelecionado.issuer.id
         })
-        .then(() => {
-            confirmaReserva()
+        .then(res => {
+            if(res.data.status == "approved") {
+                confirmaReserva()
+                setTokenCard("")
+            }
         })
         .catch(e => {
-            console.log("Erro: " + JSON.stringify(e.response.data))
             Alert.alert("Erro ao realizar reserva")
             setModalConfirma(false)
             setInformacoes(true)
@@ -82,6 +84,7 @@ function Dashboard({ navigation }) {
             parko_app: 1 
         })
         .then(() => {
+            setTokenCard("")
             setModalConfirma(false)
             setModalMsgConfirma(true)
         })

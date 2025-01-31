@@ -3,7 +3,7 @@ import { TextInput, Text, Alert, View } from 'react-native'
 import { CardForm, FlexCVC, styles } from './style'
 import { usePayment } from '../../Context/paymentContext'
 import { theme } from '../../Theme'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import LoadingModal from '../Loading'
 import { Botao } from '../Botao'
 import axios from 'axios'
@@ -41,13 +41,9 @@ const FormCard = () => {
             `https://api.mercadopago.com/v1/card_tokens?public_key=${PUBLIC_KEY}`,
             {
                 card_number: cardData.card_number.replace(/\s/g, ''),
-                cardholder: {
-                    name: cardData.name,
-                    identification: {
-                        type: "CPF",
-                        number: cardData.cpf.replace(/\D/g, ''), 
-                    }
-                },
+                cardholder_name: cardData.name,
+                doc_type: 'CPF',
+                doc_number: cardData.cpf.replace(/\D/g, ''), 
                 expiration_month: cardData.date_time.split('/')[0],
                 expiration_year: `20${cardData.date_time.split('/')[1]}`,
                 security_code: cardData.cvc
@@ -116,14 +112,6 @@ const FormCard = () => {
             return response.data
         } catch (error) {
             console.error('Erro ao salvar cartão:', error.response?.data || error.message)
-        } finally {
-            setCardData({
-                name: "",
-                card_number: "",
-                date_time: "",
-                cvc: "",
-                cpf: ""
-            })
         }
     }
 
@@ -136,8 +124,16 @@ const FormCard = () => {
             const newCard = await saveCard(customer.id, cardToken)
 
             setCard([ ...card, newCard ])
+            setCardData({
+                name: "",
+                card_number: "",
+                date_time: "",
+                cvc: "",
+                cpf: ""
+            })
             Alert.alert('Cartão salvo com sucesso')
 
+            
             return newCard
         } catch (error) {
             Alert.alert('Erro ao salvar o cartão para o cliente', error)

@@ -67,3 +67,12 @@ export const MsgConfirmacao = styled.Text`
     color: ${corNeutra};
     font-weight: ${props => props.negrito ? 700 : 400};
 `
+
+export const Header = styled.View`
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    height: 40px;
+    width: 200px;
+`

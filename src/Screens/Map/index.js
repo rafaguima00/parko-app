@@ -423,7 +423,7 @@ export default function MapaPrincipal({ navigation }) {
                             children={"Abrir"}
                             corDeFundo={corPrimaria}
                             largura={110}
-                            corDoTexto={'#fff'}
+                            corDoTexto={"#fff"}
                             negrito
                             aoPressionar={dashboardNavigation}
                             opacidade={0.7}

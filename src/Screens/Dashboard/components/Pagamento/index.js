@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { FlatList, View, Text, TouchableOpacity } from "react-native"
+import { FlatList, View, Text, TouchableOpacity, Modal } from "react-native"
 import { Botao } from "../../../../Components/Botao"
 import { styles, TituloPrincipal, TopModal, VoltarTelaAnterior, FundoCinza, Taxas, LeftText, RightText } from "../../style"
 import { theme } from "../../../../Theme"
@@ -13,6 +13,7 @@ import { useUser } from "../../../../Context/dataUserContext"
 import axios from "axios"
 import { ACCESS_TOKEN } from "@env"
 import LoadingModal from "../../../../Components/Loading"
+import InsertCvv from "../Modal/InsertCvv"
 
 const { corPrimaria } = theme
 
@@ -30,15 +31,14 @@ const Pagamento = (props) => {
     const { dataUser } = useUser()
 
     const [loading, setLoading] = useState(true)
+    const [modalCvv, setModalCvv] = useState(false)
 
     let reserva = valorPreSelecionado * 0.95
     let taxaAdicional = (reserva * 0.1) + 0.06
     let total = reserva + taxaAdicional
 
     function confirmarPgto() {
-        setItemPreSelecionado({ ...itemPreSelecionado, value: total })
-        setPagamento(false)
-        setModalConfirma(true)
+        setModalCvv(true)
     }
 
     async function getCostumerCard(email) {
@@ -132,12 +132,12 @@ const Pagamento = (props) => {
                     <RightText>{formatCurrency(taxaAdicional)}</RightText>
                 </FundoCinza>
             </Taxas>
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <Botao
                     children={"Confirmar"}
                     corDeFundo={cartaoSelecionado ? corPrimaria : "rgba(125, 125, 125, 0.4)"}
-                    largura={'100%'}
-                    corDoTexto={'#fff'}
+                    largura={"100%"}
+                    corDoTexto={"#fff"}
                     negrito
                     aoPressionar={confirmarPgto}
                     opacidade={0.7}
@@ -145,6 +145,19 @@ const Pagamento = (props) => {
                 />
             </View>
         </View>
+        <Modal
+            visible={modalCvv}
+            animationType="fade"
+            onRequestClose={() => {}}
+            transparent
+        >
+            <InsertCvv 
+                states={{ setModalCvv }} 
+                setPagamento={setPagamento}
+                setModalConfirma={setModalConfirma}
+                total={total}
+            />
+        </Modal>
         <LoadingModal loading={loading} />
     </>
 }

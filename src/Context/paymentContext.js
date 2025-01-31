@@ -13,6 +13,7 @@ export function PaymentProvider({ children }) {
         cpf: ""
     })
     const [tokenCard, setTokenCard] = useState("")
+    const [cvv, setCvv] = useState("")
 
     const value = {
         card, 
@@ -22,7 +23,9 @@ export function PaymentProvider({ children }) {
         cardData, 
         setCardData,
         tokenCard, 
-        setTokenCard
+        setTokenCard,
+        cvv, 
+        setCvv
     }
 
     return (
