@@ -28,7 +28,7 @@ export default function ModalAguardarNovaFinalizacao(props) {
                     </View>
                     <Text style={estilos.tituloConfirmacao}>Aguarde um pouco!</Text>
                     <Text style={estilos.mensagemConfirmacao}>
-                        A finalização da reserva já foi solicitada. Apresente o código de confirmação ao operador
+                        A finalização da reserva já foi solicitada. Aguarde até que o operador confirme sua saída
                     </Text>
                 </View>
             </View>

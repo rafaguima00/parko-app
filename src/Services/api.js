@@ -1,8 +1,8 @@
 import axios from "axios"
-import { LOCAL_API } from "@env"
+import { URL_API } from "@env"
 
 const api = axios.create({
-    baseURL: "https://parko-server-production.up.railway.app/api/"
+    baseURL: URL_API
 })
 
 export default api

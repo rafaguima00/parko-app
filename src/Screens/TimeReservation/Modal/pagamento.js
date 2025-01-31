@@ -1,12 +1,28 @@
-import React, { useContext, useEffect } from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import React, { useContext, useEffect, useState } from "react"
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
 import { theme } from "../../../Theme"
 import { Botao } from "../../../Components/Botao"
-import { BotaoFechar, BotaoVoltar, FundoCinza, ItemTotal, LeftText, RightText, styles, Taxas, TopoBotao } from "../style"
+import { 
+    BotaoFechar, 
+    BotaoVoltar, 
+    FundoCinza, 
+    ItemTotal, 
+    LeftText, 
+    RightText, 
+    styles, 
+    Taxas, 
+    TopoBotao 
+} from "../style"
 import { Feather } from "react-native-vector-icons"
 import { emptyCard } from "../../../Mocks/emptyList"
 import { formatCurrency } from "../../../Services/formatCurrency"
 import { ReservaContext } from "../../../Context/reservaContext"
+import { usePayment } from "../../../Context/paymentContext"
+import CardList from "../../../Components/CardList"
+import { useUser } from "../../../Context/dataUserContext"
+import axios from "axios"
+import { ACCESS_TOKEN } from "@env"
+import LoadingModal from "../../../Components/Loading"
 
 const { fonteNegrito, corPrimaria } = theme
 
@@ -18,15 +34,43 @@ export default function ModalPagamento({
     setModalConfirma
 }) {
 
+    const [loading, setLoading] = useState(false)
+
     const { 
         valorPreSelecionado,
         setItemPreSelecionado,
         itemPreSelecionado
     } = useContext(ReservaContext)
+    
+    const { setCard, card, cartaoSelecionado } = usePayment()
+    const { dataUser } = useUser()
 
     let reserva = valorPreSelecionado * 0.95
     let taxaAdicional = (reserva * 0.1) + 0.06
     let total = reserva + taxaAdicional
+
+    async function getCostumerCard(email) {
+        try {
+            const searchResponse = await axios.get(
+                `https://api.mercadopago.com/v1/customers/search?email=${email}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    }
+                }
+            )
+        
+            const cards = searchResponse.data.results[0].cards
+        
+            if (cards) {
+                setCard(cards)
+            }
+        } catch (err) {
+            console.log('Erro ao buscar cliente:', err.response?.data || err.message)
+        }
+        
+        setLoading(false)
+    }
 
     function pagamentoConfirmado() {
         setItemPreSelecionado({ ...itemPreSelecionado, value: total })
@@ -34,7 +78,19 @@ export default function ModalPagamento({
         setModalConfirma(true)
     }
 
-    return (
+    const EmptyListMessage = () => {
+        return (
+            <Text style={styles.avisoCartao}>
+                {emptyCard}
+            </Text>
+        )
+    }
+
+    useEffect(() => {
+        getCostumerCard(dataUser.email)
+    }, [])
+
+    return <>
         <View style={styles.modalContainer}>
             <View style={[styles.dashContent, estilos.escolher]}>
                 <TopoBotao espacamento={16}>
@@ -67,9 +123,15 @@ export default function ModalPagamento({
                         <Text style={estilos.botaoMais}>+</Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={estilos.avisoCartao}>
-                    { emptyCard }
-                </Text>
+                <FlatList
+                    style={{ marginLeft: 20, marginBottom: 32, paddingTop: 10 }}
+                    horizontal={card.length > 0 ? true : false}
+                    data={card}
+                    renderItem={item => <CardList {...item} />}
+                    keyExtractor={item => item.id}
+                    ListEmptyComponent={EmptyListMessage}
+                    showsHorizontalScrollIndicator={false}
+                />
                 <View style={{justifyContent: 'center'}} >
                     <TouchableOpacity onPress={openModalSelecionarPgto} >
                         <Text style={estilos.escolherFormaPgto}>Escolher outra forma de pagamento</Text>
@@ -91,19 +153,22 @@ export default function ModalPagamento({
                         <RightText>{formatCurrency(taxaAdicional)}</RightText>
                     </FundoCinza>
                 </Taxas>
-                <View style={{alignItems: 'center', width: '100%'}} >
-                    <Botao 
+                <View style={{alignItems: 'center', justifyContent: "center", width: '100%' }} >
+                    <Botao
                         children={"Confirmar"}
-                        corDeFundo={corPrimaria}
+                        corDeFundo={cartaoSelecionado ? corPrimaria : "rgba(125, 125, 125, 0.4)"}
                         largura={'85%'}
-                        corDoTexto={"#fff"}
+                        corDoTexto={'#fff'}
                         negrito
                         aoPressionar={pagamentoConfirmado}
+                        opacidade={0.7}
+                        disabled={cartaoSelecionado ? false : true}
                     />
                 </View>
             </View>
         </View>
-    )
+        <LoadingModal loading={loading} />
+    </>
 }
 
 const estilos = StyleSheet.create({

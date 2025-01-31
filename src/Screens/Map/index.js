@@ -126,10 +126,10 @@ export default function MapaPrincipal({ navigation }) {
     const parkDestination = (item) => {
         setDestination({
             id: item.id,
-            latitude: 37.41432133059576, 
-            longitude: -122.07805902049654,
-            latitudeDelta: 0.0143,
-            longitudeDelta: 0.0134,
+            latitude: item.latitude, 
+            longitude: item.longitude,
+            latitudeDelta: latitudeDelta,
+            longitudeDelta: longitudeDelta,
             end: item.end,
             image: item.image,
             name: item.name,
@@ -201,6 +201,13 @@ export default function MapaPrincipal({ navigation }) {
     }, [])
 
     useEffect(() => {
+        loadReservations()
+        const intervalo = setInterval(loadReservations, 5000)
+
+        return () => clearInterval(intervalo)
+    }, [])
+
+    useEffect(() => {
         (async () => {
             const token = await AsyncStorage.getItem("token")
     
@@ -213,13 +220,16 @@ export default function MapaPrincipal({ navigation }) {
         })()
 
         loadParkings()
-        loadReservations()
         returnFavorites()
     }, [dataUser.id])
 
     useEffect(() => {
+
         if(findReservation[0]) {
-            setReservaFeita(true)
+            const [dia1, mes1, ano1] = findReservation[0].data_saida.split('/').map(Number)
+            const dataSaida = new Date(`${ano1}-${mes1 > 10 ? mes1 : "0"+mes1}-${dia1 > 10 ? dia1 : "0"+dia1} ${findReservation[0].hora_saida}`)
+            
+            if(dataSaida > new Date()) setReservaFeita(true)
         }
 
         setLoading(false)

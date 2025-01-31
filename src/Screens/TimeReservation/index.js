@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext, useRef } from "react"
 import {
     SafeAreaView,
     View,
     TouchableOpacity,
     Modal,
     KeyboardAvoidingView,
-    ScrollView
+    ScrollView,
+    Alert
 } from 'react-native'
 import { Feather } from 'react-native-vector-icons'
 import EstenderHorario from "./Modal/estenderHorario"
@@ -51,7 +52,10 @@ function TempoEspera({ navigation, route }) {
     const [modalSaidaPendente, setModalSaidaPendente] = useState(false)
     const [modalSaidaAprovada, setModalSaidaAprovada] = useState(false)
     const [modalNovaFinalizacao, setModalNovaFinalizacao] = useState(false)
+    const [intervalo, setIntervalo] = useState(true)
     const [tempo, setTempo] = useState("00:00:00")
+
+    const codigoGeradoRef = useRef(false)
 
     const { loadReservations, loadTabelaFixa } = ReadApi()
     const { dataUser } = useUser()
@@ -97,13 +101,54 @@ function TempoEspera({ navigation, route }) {
         setModalSelecionarPgto(true)
     }
 
-    function botaoFinalizar() {
-        if(new Date().getTime() < new Date(expiresAt).getTime()) {
+    function filterRequest(data) {
+        const request = data.filter(item => item.id_reservation == idReservation)
+        
+        if(request.length > 0) {
             setModalNovaFinalizacao(true)
             return
         }
 
+        setIntervalo(true)
         setModalFinalizarReserva(true)
+    }
+
+    async function botaoFinalizar() {
+        await api.get(`/request_end/${findReservation[0].id_establishment}`)
+        .then(res => {
+            filterRequest(res.data)
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
+
+    function filterReservation(data) {
+        const reservation = data.map(item => item.status_reservation)
+
+        if(reservation[0] == 3) {
+            verificarReservaRecusada()
+            return
+        }
+
+        if(reservation[0] == 4) {
+            setCode([])
+            setIntervalo(false)
+            setTempo("00:00:00")
+            setReservaFeita(false)
+            setModalSaidaAprovada(true)
+            return
+        }
+    }
+
+    async function getReservations() {
+        await api.get(`/reservations/${idReservation}`)
+        .then(res => {
+            filterReservation(res.data)
+        })
+        .catch(e => {
+            console.log(e)
+        })
     }
 
     async function estenderTempo(novaReserva) {
@@ -131,12 +176,16 @@ function TempoEspera({ navigation, route }) {
 
     function converter() {
         if(!findReservation[0]) {
+            setReservaFeita(false)
             setTempo("00:00:00")
             return
         }
 
         if(findReservation[0]?.status === "Finalizado") {
+            setCode([])
+            setIntervalo(false)
             setTempo("00:00:00")
+            setReservaFeita(false)
             setModalSaidaAprovada(true)
             return
         }
@@ -165,6 +214,7 @@ function TempoEspera({ navigation, route }) {
         if (isNaN(diferenca)) return
 
         if(tempoAtual > converterHora) {
+            setReservaFeita(false)
             setTempo("00:00:00")
             return
         }
@@ -195,36 +245,30 @@ function TempoEspera({ navigation, route }) {
     }
 
     async function verificarReservaRecusada() {
-        if(code.length > 0 || new Date().getTime() < new Date(expiresAt).getTime()) {
-            return null
+        if (codigoGeradoRef.current || code.length > 0 || new Date().getTime() < new Date(expiresAt).getTime()) {
+            return
         }
-
-        if(findReservation[0]?.status === "Recusado") {
-            await api.post("/generate-code", {
-                id_reservation: idReservation
-            })
-            .then(res => {
-                setModalSaidaPendente(true)
-
-                const dataGenerated = res.data[0]
-                setCode(dataGenerated.code.toString().split(""))
-                setExpiresAt(dataGenerated.expires_at)
-            })
-            .catch(() => {
-                console.log("Erro ao gerar código")
-            })
-        }
-
-        if(findReservation[0]?.status === "Finalizado") {
-            setModalSaidaAprovada(true)
-        }
+    
+        codigoGeradoRef.current = true
+    
+        await api.post("/generate-code", {
+            id_reservation: idReservation
+        })
+        .then(res => {
+            setModalSaidaPendente(true)
+    
+            const dataGenerated = res.data[0]
+            setCode(dataGenerated.code.toString().split(""))
+            setExpiresAt(dataGenerated.expires_at)
+        })
+        .catch(() => {
+            console.log("Erro ao gerar código")
+        })
     }
 
     useEffect(() => {
-        if(findReservation[0]) {
-            verificarReservaRecusada()
-        }
-    }, [findReservation[0]])
+        codigoGeradoRef.current = false
+    }, [])
 
     useEffect(() => {
         loadReservations()
@@ -241,6 +285,17 @@ function TempoEspera({ navigation, route }) {
             return () => clearInterval(intervalo)
         }
     }, [reservations])
+
+    useEffect(() => {
+        let tempo
+
+        if(intervalo === true) {
+            getReservations()
+            tempo = setInterval(getReservations, 1500)
+
+            return () => clearInterval(tempo)
+        }
+    }, [intervalo])
 
     return (
 
@@ -273,15 +328,15 @@ function TempoEspera({ navigation, route }) {
                     </ConfirmationCode>}
                     <View style={styles.buttonContainer}>
                         <Botao
-                            children={'Finalizar reserva'}
+                            children={"Finalizar reserva"}
                             estilo={styles.btFinalizarReserva}
-                            corDoTexto={'#fff'}
+                            corDoTexto={"#fff"}
                             negrito
                             aoPressionar={botaoFinalizar}
                         />
                         <Botao
-                            children={'Estender tempo'}
-                            corDeFundo={'#f4f4f4'}
+                            children={"Estender tempo"}
+                            corDeFundo={"#f4f4f4"}
                             corDoTexto={"#7d7d7d"}
                             negrito
                             aoPressionar={abreModalEstendeHora}
@@ -372,6 +427,7 @@ function TempoEspera({ navigation, route }) {
                         animationType="fade"
                     >
                         <FinalizarReserva  
+                            findReservation={findReservation[0]}
                             states={{
                                 setModalFinalizarReserva,
                                 setModalAguardar

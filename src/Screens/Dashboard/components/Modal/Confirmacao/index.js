@@ -55,7 +55,7 @@ function ModalConfirmacao({
             let dataHoraDeEntrada = dataHoraEntrada.replace(",", "").split(" ") // Separar data e hora de entrada
 
             // Converter dd/mm/yyyy para yyyy-mm-dd
-            const [day, month, year] = dataHoraDeEntrada[0].split('/') 
+            const [day, month, year] = dataHoraDeEntrada[0].split('/')
 
             // Após a conversão de data e cálculo do tempo de chegada, converter o resultado para o formato correto
             const horaAtualEmMilissegundos = new Date(`${year}-${month}-${day} ${dataHoraDeEntrada[1]}`).getTime()

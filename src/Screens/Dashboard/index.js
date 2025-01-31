@@ -55,11 +55,14 @@ function Dashboard({ navigation }) {
             payment_method_id: cartaoSelecionado.payment_method.id,
             issuer_id: cartaoSelecionado.issuer.id
         })
-        .then(res => {
+        .then(() => {
             confirmaReserva()
         })
         .catch(e => {
             console.log("Erro: " + JSON.stringify(e.response.data))
+            Alert.alert("Erro ao realizar reserva")
+            setModalConfirma(false)
+            setInformacoes(true)
             setLoading(false)
         })
     }
@@ -91,10 +94,6 @@ function Dashboard({ navigation }) {
             setLoading(false)
         })
     }
-
-    useEffect(() => {
-        console.log(novaReserva)
-    }, [novaReserva])
     
     useEffect(() => {
         loadVehicles(dataUser.id)

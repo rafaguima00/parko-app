@@ -2,16 +2,15 @@ import React from "react"
 import { 
     Text, 
     View, 
-    StyleSheet,
-    Image, 
-    TextInput 
+    StyleSheet
 } from 'react-native'
 import { theme } from "../../../Theme"
-import { Botao } from "../../../Components/Botao"
 import { BotaoFechar, BotaoVoltar, styles, TopoBotao } from "../style"
 import { Feather } from "react-native-vector-icons"
+import ViewCard from "../../../Components/ViewCard"
+import FormCard from "../../../Components/FormCard"
 
-const { fonteNegrito, corPrimaria } = theme
+const { fonteNegrito } = theme
 
 export default function AddCard({ 
     openModalPagamento,
@@ -31,52 +30,8 @@ export default function AddCard({
                 <View>
                     <Text style={estilos.tituloPrincipal}>Adicionar Cartão</Text>
                 </View>
-                <View>
-                    <Image source={require('../../../../assets/image-card.png')} style={estilos.imagemCartao} />
-                </View>
-                <View style={estilos.formCard}>
-                    <TextInput 
-                        autoCapitalize="words"
-                        placeholder="Nome Completo" 
-                        placeholderTextColor={'#7d7d7d'} 
-                        style={estilos.input}
-                    />
-                    <TextInput 
-                        placeholder="Número do cartão" 
-                        placeholderTextColor={'#7d7d7d'} 
-                        maxLength={16}
-                        keyboardType='numeric'
-                        style={estilos.input}
-                    />
-                    <View style={estilos.flexCvc}>
-                        <TextInput 
-                            placeholder="Data de validade" 
-                            placeholderTextColor={'#7d7d7d'}
-                            keyboardType='numeric' 
-                            style={estilos.inputInferior}
-                        />
-                        <TextInput 
-                            placeholder="CVC" 
-                            placeholderTextColor={'#7d7d7d'} 
-                            style={estilos.inputInferior}
-                            maxLength={3}
-                        />
-                    </View>
-                </View>
-                {/* <TouchableOpacity 
-                    style={[estilo.botao, {width: '84%'}]}
-                    onPress={openModalPagamento}
-                >
-                    <Text style={estilo.textoBotao}>Confirmar</Text>
-                </TouchableOpacity> */}
-                <Botao 
-                    children={"Confirmar"}
-                    corDeFundo={corPrimaria}
-                    largura={'85%'}
-                    corDoTexto={'#fff'}
-                    negrito
-                    aoPressionar={openModalPagamento}
-                />
+                <ViewCard />
+                <FormCard />
             </View>
         </View>
     )

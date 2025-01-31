@@ -19,8 +19,8 @@ export const Botao = ({
                 estilo,
                 {
                     backgroundColor: corDeFundo,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center",
                     width: largura,
                     height: altura,
                     padding: 12,
@@ -36,7 +36,7 @@ export const Botao = ({
                     color: corDoTexto,
                     fontFamily: (negrito ? "Roboto_700Bold" : "Roboto_400Regular"),
                     fontSize: 17,
-                    textAlign: 'center'
+                    textAlign: "center"
                 }}
             >
                 {children}

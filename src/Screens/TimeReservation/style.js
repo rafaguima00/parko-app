@@ -130,6 +130,7 @@ export const Taxas = styled.View`
     display: flex;
     flex-direction: column;
     gap: 1px;
+    margin: 0 26px;
 `
 
 export const LeftText = styled.Text`
@@ -203,6 +204,15 @@ export const Number = styled.Text`
 `
 
 export const styles = StyleSheet.create({
+    avisoCartao: {
+        textAlign: 'center',
+        marginVertical: 80,
+        marginHorizontal: 20,
+        color: '#7d7d7d',
+        fontFamily: 'Roboto_400Regular',
+        lineHeight: 19,
+        fontSize: 16,
+    },
     areaContent: {
         flex: 1,
         justifyContent: "center",

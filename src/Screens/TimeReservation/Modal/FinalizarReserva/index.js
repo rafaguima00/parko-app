@@ -1,28 +1,41 @@
 import { Text, View, Image, StyleSheet } from "react-native"
-import React, { useContext, useEffect } from "react"
+import React from "react"
 import { theme } from "../../../../Theme"
 import { Botao } from "../../../../Components/Botao"
+import api from "../../../../Services/api"
 
 const { fonteNegrito, corPrimaria } = theme
 
 const FinalizarReserva = (props) => {
 
     const { setModalFinalizarReserva, setModalAguardar } = props.states
+    const { findReservation } = props
 
     function denyExit() {
         setModalFinalizarReserva(false)
     }
 
-    function confirm() {
-        setModalFinalizarReserva(false)
-        setModalAguardar(true)
+    async function confirm() {
+        await api.post("/request_end", {
+            id_customer: findReservation.id_costumer,
+            id_reservation: findReservation.id,
+            id_establishment: findReservation.id_establishment,
+            id_vehicle: findReservation.id_vehicle
+        })
+        .then(() => {
+            setModalFinalizarReserva(false)
+            setModalAguardar(true)
+        })
+        .catch(e => {
+            Alert.alert("Erro. Tente novamente", e)
+        })
     }
 
     return <>
         <View style={estilos.modalContainer}>
             <View style={estilos.modalContent}>
                 <View style={estilos.confirmacao} >
-                    <Image source={require('../../../..//../assets/checked.png')} />
+                    <Image source={require('../../../../../assets/checked.png')} />
                     <Text style={estilos.tituloConfirmacao} >Confirmação</Text>
                     <Text style={estilos.mensagemConfirmacao}>
                         Você confirma que já está de saída do estacionamento?
