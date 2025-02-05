@@ -195,7 +195,7 @@ export default function MapaPrincipal({ navigation }) {
                     return
                 }
             } catch (error) {
-                console.log(error)
+                alert("Erro de localização: ", error)
             }
         })()
     }, [])

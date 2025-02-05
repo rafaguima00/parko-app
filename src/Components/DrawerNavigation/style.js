@@ -1,7 +1,7 @@
-import { StyleSheet } from 'react-native';
-import { theme } from '../../Theme';
+import { StyleSheet } from 'react-native'
+import { theme } from '../../Theme'
 
-const { corPrimaria, fonteNegrito } = theme;
+const { corPrimaria, fonteNegrito } = theme
 
 export const styles = StyleSheet.create({
     menuLateral: {

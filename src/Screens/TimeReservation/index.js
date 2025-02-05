@@ -5,8 +5,7 @@ import {
     TouchableOpacity,
     Modal,
     KeyboardAvoidingView,
-    ScrollView,
-    Alert
+    ScrollView
 } from 'react-native'
 import { Feather } from 'react-native-vector-icons'
 import EstenderHorario from "./Modal/estenderHorario"
@@ -490,7 +489,6 @@ function TempoEspera({ navigation, route }) {
                             }}
                         />
                     </Modal>
-
                 </SafeAreaView>
             </ScrollView>
         </KeyboardAvoidingView>
