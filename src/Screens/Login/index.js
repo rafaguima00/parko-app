@@ -86,7 +86,11 @@ const Login = () => {
 
     return (
         <SafeAreaView style={styles.displayTela} >
-            <Image source={logo} style={styles.imagem} />
+            <Image 
+                source={logo} 
+                style={styles.imagem} 
+                resizeMode="contain"
+            />
             <InputLogin
                 statusError={statusError}
                 setStatusError={setStatusError}

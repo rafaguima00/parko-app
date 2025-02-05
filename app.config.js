@@ -20,6 +20,10 @@ export default () => {
         bundleIdentifier: "com.rafaelgsm.parkoapp",
         config: {
           googleMapsApiKey: "AIzaSyC53Ez6WTCSavpYro9G15-vYCXmjNU1Bwk"
+        },
+        infoPlist: {
+          NSLocationWhenInUseUsageDescription: "Precisamos da sua localização para mostrar estacionamentos próximos.",
+          NSLocationAlwaysAndWhenInUseUsageDescription: "Precisamos da sua localização para navegação em tempo real."
         }
       },
       android: {

@@ -181,7 +181,15 @@ export default function MapaPrincipal({ navigation }) {
                 
                 let { status } = await Location.requestForegroundPermissionsAsync()
 
-                let location = await Location.getCurrentPositionAsync({})
+                if (status !== 'granted') {
+                    setErrorMsg('Permissão de localização negada')
+                    return
+                }
+
+                let location = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.High,
+                    timeout: 5000
+                })
 
                 setLocation({
                     latitude: location.coords.latitude,
@@ -189,11 +197,6 @@ export default function MapaPrincipal({ navigation }) {
                     latitudeDelta: latitudeDelta,
                     longitudeDelta: longitudeDelta
                 })
-
-                if (status !== 'granted') {
-                    setErrorMsg('Permissão de localização negada')
-                    return
-                }
             } catch (error) {
                 alert("Erro de localização: ", error)
             }
@@ -211,16 +214,25 @@ export default function MapaPrincipal({ navigation }) {
         (async () => {
             const token = await AsyncStorage.getItem("token")
     
-            if(token) {
-                const decoded = jwtDecode(token)
-                setDataUser(decoded.user)
-            } else {
-                return navigation.replace("Login")
+            if (!token) return navigation.replace("Login")
+
+            if (token) {
+                try {
+                    const decoded = jwtDecode(token)
+                    setDataUser(decoded.user)
+                } catch (error) {
+                    alert('Erro ao efetuar login:', error)
+                    return navigation.replace("Login")
+                }
             }
         })()
+    }, [])
 
-        loadParkings()
-        returnFavorites()
+    useEffect(() => {
+        if(dataUser?.id) {
+            loadParkings()
+            returnFavorites()
+        }
     }, [dataUser.id])
 
     useEffect(() => {
