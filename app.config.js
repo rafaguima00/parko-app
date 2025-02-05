@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.11",
+      version: "1.1.12",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
