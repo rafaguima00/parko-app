@@ -3,11 +3,9 @@ import { Alert, Text, View, Image } from "react-native"
 import { BotaoExcluir, DadosCartao, ViewCard } from "./style"
 import { useUser } from "../../Context/dataUserContext"
 import DeleteCard from "../../Services/DeleteCard"
-import { usePayment } from "../../Context/paymentContext"
 
-const CardList = ({ item }) => {
+const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
 
-    const { cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { dataUser } = useUser()
     const { deletarCartoes } = DeleteCard()
 
@@ -18,7 +16,7 @@ const CardList = ({ item }) => {
     }
 
     function handleCardPress(id) {
-        setCartaoSelecionado((prevState) => (prevState === id ? null : id))
+        setCartaoSelecionado(id)
     }
 
     return <>

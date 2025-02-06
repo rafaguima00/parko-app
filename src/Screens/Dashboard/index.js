@@ -62,7 +62,7 @@ function Dashboard({ navigation }) {
             }
         })
         .catch(e => {
-            Alert.alert("Erro ao realizar reserva")
+            Alert.alert("Erro ao realizar pagamento", e)
             setModalConfirma(false)
             setInformacoes(true)
             setLoading(false)

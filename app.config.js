@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.12",
+      version: "1.1.14",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
@@ -54,7 +54,8 @@ export default () => {
         URL_API: process.env.URL_API,
         GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
         PUBLIC_KEY: process.env.PUBLIC_KEY,
-        ACCESS_TOKEN: process.env.ACCESS_TOKEN
+        ACCESS_TOKEN: process.env.ACCESS_TOKEN,
+        STATUS_APP: process.env.STATUS_APP
       },
       newArchEnabled: true
     }

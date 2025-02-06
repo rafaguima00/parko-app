@@ -4,7 +4,7 @@ import {
     View,
     Image,
     FlatList,
-    SafeAreaView,
+    ScrollView,
     Alert
 } from "react-native"
 import veiculo from "../../../assets/image_vehicle.png"
@@ -22,6 +22,7 @@ import VehiclesList from "../../Components/VehiclesList"
 export default function Vehicles({ navigation }) {
 
     const [loading, setLoading] = useState(false)
+    const [botaoClicado, setBotaoClicado] = useState(null)
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
 
@@ -53,7 +54,7 @@ export default function Vehicles({ navigation }) {
     }, [veiculos])
 
     return (
-        <SafeAreaView style={styles.areaContent}>
+        <ScrollView contentContainerStyle={styles.areaContent}>
             <TopArrowLeft children={"Veículos"} />
             <View style={styles.circuloVerde}>
                 <Image source={veiculo} style={styles.imagemVeiculo} />
@@ -63,7 +64,14 @@ export default function Vehicles({ navigation }) {
                 style={{ marginTop: 20, marginBottom: 46 }}
                 horizontal
                 data={veiculos}
-                renderItem={item => <VehiclesList {...item} deletarVeiculos={deletarVeiculos} />}
+                renderItem={item => (
+                    <VehiclesList 
+                        {...item} 
+                        deletarVeiculos={deletarVeiculos} 
+                        botaoClicado={botaoClicado}
+                        setBotaoClicado={setBotaoClicado}
+                    />
+                )}
                 keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
@@ -77,6 +85,6 @@ export default function Vehicles({ navigation }) {
                 aoPressionar={() => navigation.navigate('Register Vehicle')}
             />
             <LoadingModal loading={loading} />
-        </SafeAreaView>
+        </ScrollView>
     )
 }

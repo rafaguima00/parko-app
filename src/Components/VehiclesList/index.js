@@ -1,17 +1,18 @@
-import { useState } from "react"
 import { BotaoExcluir, Color, LicensePlate, NameVehicle, SelecionarVeiculo, ViewVehicle } from "./style"
 import { Ionicons } from "react-native-vector-icons"
 import { Alert, Text } from "react-native"
 
-const VehiclesList = ({ item, deletarVeiculos }) => {
-
-    const [botaoClicado, setBotaoClicado] = useState(null)
+const VehiclesList = ({ item, deletarVeiculos, botaoClicado, setBotaoClicado }) => {
+    
+    function handleVehiclePress(id) {
+        setBotaoClicado(id)
+    }
 
     return <>
         <SelecionarVeiculo
             activeOpacity={0.9}
             ativo={botaoClicado == item.id ? true : false}
-            onPress={() => setBotaoClicado(item.id)}
+            onPress={() => handleVehiclePress(item.id)}
         >
             <BotaoExcluir
                 onPress={() => {

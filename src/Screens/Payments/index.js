@@ -4,7 +4,7 @@ import {
     View, 
     Image,
     FlatList,
-    SafeAreaView
+    ScrollView
 } from "react-native"
 import cartao from "../../../assets/image_money.png"
 import { theme } from "../../Theme"
@@ -24,7 +24,7 @@ export default function Payments({ navigation }) {
     const [loading, setLoading] = useState(true)
 
     const { dataUser } = useUser()
-    const { setCard, card } = usePayment()
+    const { setCard, card, cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { corPrimaria } = theme
 
     async function getCostumerCard(email) {
@@ -63,7 +63,7 @@ export default function Payments({ navigation }) {
     }, [])
 
     return <>
-        <SafeAreaView style={styles.areaContent}>
+        <ScrollView contentContainerStyle={styles.areaContent}>
             <TopArrowLeft children={"Pagamento"} />
             <View style={styles.circuloAzul}>
                 <Image source={cartao} style={styles.imagemCard} />
@@ -73,7 +73,13 @@ export default function Payments({ navigation }) {
                 style={{ marginTop: 10, marginBottom: 46, paddingTop: 10 }}
                 horizontal
                 data={card}
-                renderItem={item => <CardList {...item} />}
+                renderItem={item => (
+                    <CardList 
+                        {...item} 
+                        cartaoSelecionado={cartaoSelecionado}
+                        setCartaoSelecionado={setCartaoSelecionado}
+                    />
+                )}
                 keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
@@ -87,6 +93,6 @@ export default function Payments({ navigation }) {
                 aoPressionar={() => navigation.navigate("Cadastrar Cartao")}
             />
             <LoadingModal loading={loading} />
-        </SafeAreaView>
+        </ScrollView>
     </>
 }

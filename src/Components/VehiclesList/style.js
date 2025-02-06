@@ -16,12 +16,12 @@ export const SelecionarVeiculo = styled.TouchableOpacity`
     box-shadow: 5px 10px #000;
     margin-top: 10px;
     margin-right: 20px;
-    border: 2px solid ${props => props.ativo ? corPrimaria : "#f3f6ff"};
+    border: 2px solid ${props => props.ativo == true ? corPrimaria : "#f3f6ff"};
     border-radius: 12px;
     padding: 14px;
     width: 180px;
     height: 130px;
-    background-color: ${props => props.ativo ? corPrimaria : "#f3f6ff"};
+    background-color: ${props => props.ativo == true ? corPrimaria : "#f3f6ff"};
 `
 
 export const ViewVehicle = styled.View`
@@ -38,14 +38,14 @@ export const NameVehicle = styled.Text`
     font-family: "Roboto";
     font-size: 22px;
     margin-right: 18px;
-    color: ${props => props.ativo ? "#fff" : "#545454"};
+    color: ${props => props.ativo == true ? "#fff" : "#545454"};
 `
 
 export const LicensePlate = styled.Text`
     margin-bottom: 8px;
-    color: ${props => props.ativo ? "rgba(245, 248, 255, 0.56)" : "rgba(0, 0, 0, 0.25)"};
+    color: ${props => props.ativo == true ? "rgba(245, 248, 255, 0.56)" : "rgba(0, 0, 0, 0.25)"};
 `
 
 export const Color = styled.Text`
-    color: ${props => props.ativo ? "rgba(245, 248, 255, 0.56)" : "rgba(0, 0, 0, 0.25)"};
+    color: ${props => props.ativo == true ? "rgba(245, 248, 255, 0.56)" : "rgba(0, 0, 0, 0.25)"};
 `
