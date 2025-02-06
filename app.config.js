@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.14",
+      version: "1.1.15",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
@@ -27,7 +27,7 @@ export default () => {
         }
       },
       android: {
-        versionCode: 15,
+        versionCode: 17,
         adaptiveIcon: {
           foregroundImage: "./assets/icon_parko.png",
           backgroundColor: "#ffffff"
