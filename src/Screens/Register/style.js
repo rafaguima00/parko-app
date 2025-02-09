@@ -1,13 +1,18 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet, Dimensions } from "react-native"
+
+const { width } = Dimensions.get('screen')
 
 export const styles = StyleSheet.create({
     displayTela: {
+        flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        height: "100%"
+        width: width
     },
     imagem: {
-        marginVertical: 32,
+        width: width * 0.6, 
+        height: (width * 0.6) * 0.5,
+        marginVertical: 8,
         paddingHorizontal: 32
     },
     esqueciASenha: {

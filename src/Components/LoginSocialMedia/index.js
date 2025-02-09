@@ -1,10 +1,8 @@
 import { styles } from "./style"
-import { useNavigation } from "@react-navigation/native"
 import { View, TouchableOpacity, Text } from "react-native"
 import { FontAwesome } from "react-native-vector-icons"
 
 export default function BotaoLogin() {
-    const navigation = useNavigation()
 
     return <>
     <View style={styles.loginSecundario}>

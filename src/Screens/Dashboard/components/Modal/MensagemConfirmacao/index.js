@@ -10,10 +10,7 @@ const { fonteNegrito } = theme
 
 function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
 
-    const { 
-        setReservaFeita, 
-        novaReserva
-    } = useContext(ReservaContext)
+    const { novaReserva } = useContext(ReservaContext)
 
     const navigation = useNavigation()
     

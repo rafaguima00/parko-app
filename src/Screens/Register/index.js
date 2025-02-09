@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { styles } from "./style"
 import { 
-    ScrollView, 
     TouchableOpacity, 
     Image, 
-    Text, 
-    Alert, 
-    Modal, 
-    View, 
-    ActivityIndicator 
+    Alert,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
+    Text
 } from "react-native"
 import { Feather } from "react-native-vector-icons"
 import logo from "../../../assets/logo-parko.png"
@@ -17,8 +16,12 @@ import Login from "./components/loginBotao"
 import BotaoLogin from "../../Components/LoginSocialMedia"
 import api from "../../Services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import LoadingModal from "../../Components/Loading"
+import { useNavigation } from "@react-navigation/native"
 
-const Register = ({ navigation }) => {
+const Register = () => {
+
+    const navigation = useNavigation()
 
     const [dados, setDados] = useState({
         email: '',
@@ -40,12 +43,16 @@ const Register = ({ navigation }) => {
     let register = true
 
     function realizarCadastro() {
+        setCarregando(true)
+
         if (dados.email === "" || dados.password === "" || dados.confirmaSenha === "") {
             setStatusError(true)
             setMensagemErro("Preencha o campo vazio")
+            setCarregando(false)
         } else if (dados.password != dados.confirmaSenha) {
             setStatusError(true)
             setMensagemErro('As senhas não conferem')
+            setCarregando(false)
         } else {
             registrarUsuario()
         }
@@ -67,6 +74,7 @@ const Register = ({ navigation }) => {
         .catch(e => {
             setStatusError(true)
             setMensagemErro(e.response.data.message)
+            setCarregando(false)
         })
     }
 
@@ -91,54 +99,49 @@ const Register = ({ navigation }) => {
             setStatusError(true)
             setMensagemErro(e.response.data.message)
         })
+        .finally(() => {
+            setCarregando(false)
+        })
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.displayTela}>
-            <TouchableOpacity 
-                style={{ position: "absolute", left: 38, top: 64 }} 
-                onPress={() => navigation.goBack()}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+            <ScrollView 
+                contentContainerStyle={styles.displayTela}
             >
-                <Feather name="arrow-left" size={32} />
-            </TouchableOpacity>
-            <Image source={logo} style={styles.imagem} />
-            <Inputs
-                statusError={statusError}
-                setStatusError={setStatusError}
-                mensagemErro={mensagemErro}
-                error
-                messageError
-                email={dados.email}
-                password={dados.password}
-                confirmaSenha={dados.confirmaSenha}
-                setEmail={valor => alteraDados('email', valor)}
-                setSenha={valor => alteraDados('password', valor)}
-                setConfirmaSenha={valor => alteraDados('confirmaSenha', valor)}
-                secureTextEntry
-            />
-            <Login realizarCadastro={realizarCadastro} />
-            {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
-            <BotaoLogin /> */}
-
-            <Modal
-                visible={carregando}
-                transparent={true}
-                onRequestClose={() => { }}
-                animationType='fade'
-            >
-                <View
-                    style={{
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
+                <TouchableOpacity 
+                    style={{ position: "absolute", left: 38, top: 64 }} 
+                    onPress={() => navigation.goBack()}
                 >
-                    <ActivityIndicator size={'small'} color={'#fff'} />
-                </View>
-            </Modal> 
-        </ScrollView>
+                    <Feather name="arrow-left" size={32} />
+                </TouchableOpacity>
+                <Image 
+                    source={logo} 
+                    style={styles.imagem} 
+                    resizeMode="contain"
+                />
+                <Inputs
+                    statusError={statusError}
+                    setStatusError={setStatusError}
+                    mensagemErro={mensagemErro}
+                    email={dados.email}
+                    password={dados.password}
+                    confirmaSenha={dados.confirmaSenha}
+                    setEmail={valor => alteraDados('email', valor)}
+                    setSenha={valor => alteraDados('password', valor)}
+                    setConfirmaSenha={valor => alteraDados('confirmaSenha', valor)}
+                    secureTextEntry
+                />
+                <Login realizarCadastro={realizarCadastro} />
+                {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
+                <BotaoLogin /> */}
+                <LoadingModal loading={carregando} />
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
-export default Register;
+export default Register

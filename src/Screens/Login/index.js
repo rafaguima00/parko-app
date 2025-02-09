@@ -2,18 +2,16 @@ import React, { useEffect, useState } from "react"
 import {
     Image,
     Text,
-    SafeAreaView,
-    Modal, 
-    ActivityIndicator,
-    View
+    KeyboardAvoidingView,
+    Platform,
+    TouchableOpacity,
+    ScrollView
 } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import { useNavigation } from "@react-navigation/native"
 import logo from '../../../assets/logo-parko.png'
 import { styles } from "./style"
 import InputLogin from "./components/inputLogin"
 import BotaoLoginCadastro from "./components/loginCadastro"
-import BotaoLogin from "../../Components/LoginSocialMedia"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import api from "../../Services/api"
 import LoadingModal from "../../Components/Loading"
@@ -85,32 +83,39 @@ const Login = () => {
     }, [navigation])
 
     return (
-        <SafeAreaView style={styles.displayTela} >
-            <Image 
-                source={logo} 
-                style={styles.imagem} 
-                resizeMode="contain"
-            />
-            <InputLogin
-                statusError={statusError}
-                setStatusError={setStatusError}
-                mensagemErro={mensagemErro}
-                email={dados.email}
-                senha={dados.senha}
-                setEmail={valor => alteraDados('email', valor)}
-                setSenha={valor => alteraDados('senha', valor)}
-                secureTextEntry
-            />
-            <BotaoLoginCadastro realizarLogin={realizarLogin} />
-            <TouchableOpacity activeOpacity={0.5}>
-                <Text style={styles.esqueciASenha}>Esqueci a senha</Text>
-            </TouchableOpacity>
-            {/* 
-                <Text style={styles.separacao}> ──────────  ou  ────────── </Text>
-                <BotaoLogin /> 
-            */}
-            <LoadingModal loading={carregando} />
-        </SafeAreaView>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+            <ScrollView 
+                contentContainerStyle={styles.displayTela}
+            >
+                <Image 
+                    source={logo} 
+                    style={styles.imagem} 
+                    resizeMode="contain"
+                />
+                <InputLogin
+                    statusError={statusError}
+                    setStatusError={setStatusError}
+                    mensagemErro={mensagemErro}
+                    email={dados.email}
+                    senha={dados.senha}
+                    setEmail={valor => alteraDados('email', valor)}
+                    setSenha={valor => alteraDados('senha', valor)}
+                    secureTextEntry
+                />
+                <BotaoLoginCadastro realizarLogin={realizarLogin} />
+                {/* <TouchableOpacity activeOpacity={0.5} disabled>
+                    <Text style={styles.esqueciASenha}>Esqueci a senha</Text>
+                </TouchableOpacity> */}
+                {/* 
+                    <Text style={styles.separacao}> ──────────  ou  ────────── </Text>
+                    <BotaoLogin /> 
+                */}
+                <LoadingModal loading={carregando} />
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 

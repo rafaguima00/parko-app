@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
 import { View } from 'react-native'
-import { TextInput, HelperText } from 'react-native-paper'
-import { Alerta } from "../../../Components/SnackBar"
+import { TextInput } from 'react-native-paper'
+import Alerta from "../../../Components/SnackBar"
 import { styles } from "../style"
 
 const Inputs = ({
     statusError,
     setStatusError,
     mensagemErro,
-    error,
     email,
     password,
     confirmaSenha,

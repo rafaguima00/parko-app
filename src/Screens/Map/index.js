@@ -186,10 +186,7 @@ export default function MapaPrincipal({ navigation }) {
                     return
                 }
 
-                let location = await Location.getCurrentPositionAsync({
-                    accuracy: Location.Accuracy.High,
-                    timeout: 5000
-                })
+                let location = await Location.getCurrentPositionAsync({})
 
                 setLocation({
                     latitude: location.coords.latitude,
@@ -241,10 +238,9 @@ export default function MapaPrincipal({ navigation }) {
             const [dia1, mes1, ano1] = findReservation[0].data_saida.split('/').map(Number)
             const dataSaida = new Date(`${ano1}-${mes1 > 10 ? mes1 : "0"+mes1}-${dia1 > 10 ? dia1 : "0"+dia1} ${findReservation[0].hora_saida}`)
             
-            if(dataSaida > new Date()) setReservaFeita(true)
+            if(dataSaida > new Date()) setReservaFeita(true) 
+            setLoading(false)
         }
-
-        setLoading(false)
     }, [reservations, dataUser?.id])
 
     useEffect(() => {
@@ -252,9 +248,10 @@ export default function MapaPrincipal({ navigation }) {
     }, [destination])
 
     if (!location) {
-        return (
+        return <>
             <LoadingModal loading={loading} />
-        )
+        </>
+        
     }
 
     return <>

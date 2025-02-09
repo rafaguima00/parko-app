@@ -42,7 +42,7 @@ export default function ModalPagamento({
         itemPreSelecionado
     } = useContext(ReservaContext)
     
-    const { setCard, card, cartaoSelecionado } = usePayment()
+    const { setCard, card, cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { dataUser } = useUser()
 
     let reserva = valorPreSelecionado * 0.95
@@ -127,7 +127,13 @@ export default function ModalPagamento({
                     style={{ marginLeft: 20, marginBottom: 32, paddingTop: 10 }}
                     horizontal={card.length > 0 ? true : false}
                     data={card}
-                    renderItem={item => <CardList {...item} />}
+                    renderItem={item => (
+                        <CardList 
+                            {...item} 
+                            cartaoSelecionado={cartaoSelecionado}
+                            setCartaoSelecionado={setCartaoSelecionado}
+                        />
+                    )}
                     keyExtractor={item => item.id}
                     ListEmptyComponent={EmptyListMessage}
                     showsHorizontalScrollIndicator={false}

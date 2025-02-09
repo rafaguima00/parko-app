@@ -12,4 +12,4 @@ const Login = ({ realizarCadastro }) => {
     )
 }
 
-export default Login;
+export default Login

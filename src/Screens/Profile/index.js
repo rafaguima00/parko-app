@@ -29,11 +29,11 @@ export default function Profile({ navigation, route }) {
     const { corVermelha, corPrimaria } = theme
 
     const [carregando, setCarregando] = useState(false)
-    const [dados, setDados] = useState({})
+    const [data, setData] = useState({})
 
     const { dataUser, setDataUser } = useUser()
     const { name } = dataUser
-    const { register } = route.params
+    const { dados, register } = route.params
 
     function sobreNome() {
         const segundoNome = name.split(' ')
@@ -46,15 +46,15 @@ export default function Profile({ navigation, route }) {
     }
 
     function carregarDados(variavel, valor) {
-        setDados({ ...dados, [variavel]: valor })
+        setData({ ...data, [variavel]: valor })
     }
 
     function salvarDados() {
 
         if (
-            dados.name === '' ||
-            dados.tel === '' ||
-            dados.cpf === ''
+            data.name === '' ||
+            data.tel === '' ||
+            data.cpf === ''
         ) {
             return Alert.alert('Aviso', 'Preencha os campos vazios')
         } 
@@ -79,12 +79,12 @@ export default function Profile({ navigation, route }) {
         setCarregando(true)
 
         await api.put(`/users/${id}`, { 
-            name: `${dados.name} ${dados.sobrenome}`, 
-            cpf: dados.cpf,
-            tel: dados.tel
+            name: `${data.name} ${data.sobrenome}`, 
+            cpf: data.cpf,
+            tel: data.tel
         })
         .then(() => {
-            if(register) Alert.alert(`Bem-vindo(a) ${dados.name}!`)
+            if(register) Alert.alert(`Bem-vindo(a) ${data.name}!`)
             navigation.replace("Map")
         })
         .catch(e => {
@@ -139,7 +139,7 @@ export default function Profile({ navigation, route }) {
                 const decode = jwtDecode(token)
                 setDataUser(decode.user)
             } else {
-                setDados(dataUser)
+                setData(dataUser)
             }
         }
         )()
@@ -173,7 +173,7 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu nome"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.name}
+                            value={data.name}
                             onChangeText={text => carregarDados("name", text)}
                         />
                         <IconeEditarPerfil />
@@ -185,7 +185,7 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu sobrenome"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.sobrenome}
+                            value={data.sobrenome}
                             onChangeText={text => carregarDados("sobrenome", text)}
                         />
                         <IconeEditarPerfil />
@@ -198,7 +198,7 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite o número do celular"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.tel}
+                            value={data.tel}
                             onChangeText={text => carregarDados("tel", text)}
                         />
                         <IconeEditarPerfil />
@@ -236,7 +236,7 @@ export default function Profile({ navigation, route }) {
                             placeholder="Digite seu CPF"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={dados.cpf}
+                            value={data.cpf}
                             onChangeText={text => carregarDados("cpf", text)}
                         />
                         <IconeEditarPerfil />

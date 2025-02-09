@@ -22,12 +22,8 @@ const Pagamento = (props) => {
     const { setPagamento, setSelecionarPgto, setAddCartao, setModalConfirma } = props.states
     const { voltar } = props
 
-    const { 
-        itemPreSelecionado, 
-        setItemPreSelecionado,
-        valorPreSelecionado
-    } = useContext(ReservaContext)
-    const { card, setCard, cartaoSelecionado } = usePayment()
+    const { valorPreSelecionado } = useContext(ReservaContext)
+    const { card, setCard, cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { dataUser } = useUser()
 
     const [loading, setLoading] = useState(true)
@@ -103,7 +99,13 @@ const Pagamento = (props) => {
                 style={{ marginTop: 10, marginBottom: 46, paddingTop: 10 }}
                 horizontal={card.length > 0 ? true : false}
                 data={card}
-                renderItem={item => <CardList {...item} />}
+                renderItem={item => (
+                    <CardList 
+                        {...item} 
+                        cartaoSelecionado={cartaoSelecionado}
+                        setCartaoSelecionado={setCartaoSelecionado}
+                    />
+                )}
                 keyExtractor={item => item.id}
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}

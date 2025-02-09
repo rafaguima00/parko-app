@@ -20,7 +20,7 @@ import { usePayment } from "../../Context/paymentContext"
 
 function Dashboard({ navigation }) {
     
-    const { tokenCard, cartaoSelecionado, setTokenCard } = usePayment()
+    const { tokenCard, cartaoSelecionado, setTokenCard, setCartaoSelecionado } = usePayment()
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
 
@@ -46,28 +46,58 @@ function Dashboard({ navigation }) {
     // Requisição para processar o pagamento
     async function pagamentoReserva() {
         setLoading(true)
-
-        await api.post("/create_payment", {
-            token: tokenCard, 
-            transaction_amount: novaReserva.value, 
-            customer_id: cartaoSelecionado.customer_id, 
-            description: `Parking: ${destination.name}`,
-            payment_method_id: cartaoSelecionado.payment_method.id,
-            issuer_id: cartaoSelecionado.issuer.id
-        })
-        .then(res => {
-            if(res.data.status == "approved") {
+    
+        try {
+            const response = await api.post("/create_payment", {
+                token: tokenCard,
+                transaction_amount: novaReserva.value,
+                customer_id: cartaoSelecionado.customer_id,
+                description: `Parking: ${destination.name}`,
+                payment_method_id: cartaoSelecionado.payment_method.id,
+                issuer_id: cartaoSelecionado.issuer.id
+            })
+    
+            const status = response.data.status
+    
+            if (status === "approved") {
                 confirmaReserva()
                 setTokenCard("")
-            }
-        })
-        .catch(e => {
-            Alert.alert("Erro ao realizar pagamento", e)
+                setCartaoSelecionado(null)
+                return
+            } 
+            
+            if (status === "rejected") {
+                Alert.alert(
+                    "Pagamento Rejeitado",
+                    "O pagamento foi rejeitado. Por favor, verifique seu cartão ou tente novamente."
+                )
+                setTokenCard("")
+                setCartaoSelecionado(null)
+                setLoading(false)
+                return
+            } 
+            
+            Alert.alert(
+                "Pagamento Pendente",
+                "Seu pagamento está em análise. Você será notificado assim que for aprovado."
+            )
+            setTokenCard("")
+            setLoading(false)
+            
+    
+        } catch (e) {
+            const errorMessage = e.response?.data?.error.message || "Erro inesperado. Tente novamente mais tarde."
+            Alert.alert("Erro ao realizar pagamento", errorMessage)
             setModalConfirma(false)
             setInformacoes(true)
+            setNovaReserva({})
+            setTokenCard("")
+        } finally {
             setLoading(false)
-        })
+            setCartaoSelecionado(null)
+        }
     }
+    
 
     async function confirmaReserva() {
 
@@ -92,6 +122,7 @@ function Dashboard({ navigation }) {
             Alert.alert("Erro ao realizar reserva", e)
             setModalMsgConfirma(false)
             setInformacoes(true)
+            setNovaReserva({})
         })
         .finally(() => {
             setLoading(false)
@@ -237,6 +268,7 @@ function Dashboard({ navigation }) {
                         <ModalMsgConfirmacao
                             modalAtivo={modalMsgConfirma}
                             handleClose={() => {
+                                setNovaReserva({})
                                 setModalMsgConfirma(false)
                             }}
                         />
