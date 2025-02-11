@@ -13,7 +13,7 @@ export const BotaoExcluir = styled.TouchableOpacity`
 `
 
 export const SelecionarVeiculo = styled.TouchableOpacity`
-    box-shadow: 5px 10px #000;
+    box-shadow: 1px 5px 4px #888;
     margin-top: 10px;
     margin-right: 20px;
     border: 2px solid ${props => props.ativo == true ? corPrimaria : "#f3f6ff"};

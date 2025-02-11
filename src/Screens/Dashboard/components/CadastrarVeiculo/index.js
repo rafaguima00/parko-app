@@ -100,7 +100,8 @@ const CadastrarVeiculo = (props) => {
                 position: 'absolute',
                 bottom: 20,
                 width: '100%',
-                marginHorizontal: 26
+                marginHorizontal: 26,
+                marginBottom: 32
             }}>
                 <Botao
                     children={"Confirmar"}

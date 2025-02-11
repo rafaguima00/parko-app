@@ -10,9 +10,10 @@ export const SelecionarVeiculo = styled.TouchableOpacity`
 
 export const styles = StyleSheet.create({
     areaContent: {
-        marginTop: 32,
+        marginVertical: 32,
         marginHorizontal: 20,
-        justifyContent: "center"
+        justifyContent: "center",
+        alignItems: "center"
     },
     cabecalho: {
         gap: 24,

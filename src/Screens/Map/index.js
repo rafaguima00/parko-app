@@ -233,13 +233,10 @@ export default function MapaPrincipal({ navigation }) {
     }, [dataUser.id])
 
     useEffect(() => {
-
-        if(findReservation[0]) {
-            const [dia1, mes1, ano1] = findReservation[0].data_saida.split('/').map(Number)
-            const dataSaida = new Date(`${ano1}-${mes1 > 10 ? mes1 : "0"+mes1}-${dia1 > 10 ? dia1 : "0"+dia1} ${findReservation[0].hora_saida}`)
-            
-            if(dataSaida > new Date()) setReservaFeita(true) 
-            setLoading(false)
+        if(findReservation.length > 0) {
+            setReservaFeita(true) 
+        } else {
+            setReservaFeita(false)
         }
     }, [reservations, dataUser?.id])
 

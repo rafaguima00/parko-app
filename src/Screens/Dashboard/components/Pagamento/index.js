@@ -134,7 +134,7 @@ const Pagamento = (props) => {
                     <RightText>{formatCurrency(taxaAdicional)}</RightText>
                 </FundoCinza>
             </Taxas>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={{ marginBottom: 32, marginTop: 16 }}>
                 <Botao
                     children={"Confirmar"}
                     corDeFundo={cartaoSelecionado ? corPrimaria : "rgba(125, 125, 125, 0.4)"}

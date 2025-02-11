@@ -207,7 +207,7 @@ export default function EstenderHorario(props) {
                         <Text style={{color: '#0097b9', textDecorationLine: 'underline', lineHeight: 36, fontSize: 15}}> Clica aqui</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{width: '85%', alignItems: 'center'}}>
+                <View style={{width: '85%', alignItems: 'center', marginBottom: 32}}>
                     <Botao 
                         children={"Estender"}
                         corDeFundo={corPrimaria}

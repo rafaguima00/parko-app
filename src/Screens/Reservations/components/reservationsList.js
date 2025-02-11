@@ -81,10 +81,18 @@ const ReservationsList = ({ item, setLoading, userReservations }) => {
 
     return <>
         {(item.status == "Confirmado" || item.status == "Recusado") &&
-            <View>Reserva em Andamento</View>
+            <View>
+                <Text>
+                    Reserva em Andamento
+                </Text>
+            </View>
         }
         {item.status == "Pendente" &&
-            <View>Reserva Agendada</View>
+            <View>
+                <Text>
+                    Reserva Agendada
+                </Text>
+            </View>
         }
         {item.status == "Finalizado" &&
             <View>
