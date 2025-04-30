@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react"
-import { StyleSheet, TextInput } from "react-native"
+import { StyleSheet, TouchableOpacity } from "react-native"
 import { AreaView, BotaoFechar, BotaoSalvar, CampoDeTexto, Quantity, TextBotao } from "../style"
 import RNPickerSelect from 'react-native-picker-select'
 import { theme } from "../../../../../Theme"
 import { ReservaContext } from "../../../../../Context/reservaContext"
 import { preenchaValorPersonalizado } from "../../../../../Mocks/warnings"
+import { Feather } from "react-native-vector-icons"
 
 const { corPrimaria } = theme
 
@@ -74,7 +75,6 @@ const MaisTempo = (props) => {
     }
 
     function handleText(text) {
-
         // Filtra apenas números inteiros
         const sanitizedText = text.replace(/[^0-9]/g, "")
         setQuantity(Number(sanitizedText))
@@ -86,17 +86,20 @@ const MaisTempo = (props) => {
 
     return <>
         <AreaView>
-            <BotaoFechar 
-                onPress={() => setModalMaisTempo(false)}
-            >
-                <TextBotao>X</TextBotao>
+            <BotaoFechar>
+                <TouchableOpacity 
+                    onPress={() => setModalMaisTempo(false)}
+                    activeOpacity={0.7}
+                >
+                    <Feather name="x" color="#fff" size={30} />
+                </TouchableOpacity>
             </BotaoFechar>
 
             <CampoDeTexto>
                 <Quantity
                     value={quantity}
                     onChangeText={text => handleText(text)}
-                    placeholder="Digite quanto tempo a mais..."
+                    placeholder="Digite quanto tempo a mais"
                     keyboardType="numeric"
                 />
                 <RNPickerSelect
@@ -105,8 +108,11 @@ const MaisTempo = (props) => {
                     items={items}
                     style={pickerSelectStyles}
                     placeholder={{
-                        label: "Selecione um item..."
+                        label: "Selecione um item"
                     }}
+                    useNativeAndroidPickerStyle={false} // adicionado na atualização 1.1.27
+                    fixAndroidTouchableBug={true}
+                    disabled={false}
                 />
             </CampoDeTexto>
 
@@ -140,7 +146,6 @@ const pickerSelectStyles = StyleSheet.create({
         borderRadius: 40,
         color: "black",
         paddingRight: 30, // Alinha o ícone
-        marginHorizontal: 36
     },
     placeholder: {
         // Estilo para o placeholder

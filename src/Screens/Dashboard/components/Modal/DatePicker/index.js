@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react"
-import { Alert } from 'react-native'
+import { Alert, TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-modern-datepicker'
 import { theme } from "../../../../../Theme"
 import { ReservaContext } from "../../../../../Context/reservaContext"
 import { AreaView, BotaoFechar, BotaoSalvar, TextBotao } from "../style"
+import { Feather } from "react-native-vector-icons"
 
 const DatePickerModal = (props) => {
 
@@ -43,10 +44,13 @@ const DatePickerModal = (props) => {
 
     return (
         <AreaView>
-            <BotaoFechar 
-                onPress={() => setModalDatePicker(false)}
-            >
-                <TextBotao>X</TextBotao>
+            <BotaoFechar>
+                <TouchableOpacity
+                    onPress={() => setModalDatePicker(false)}
+                    activeOpacity={0.7}
+                >
+                    <Feather name="x" color="#fff" size={30} />
+                </TouchableOpacity>
             </BotaoFechar>
 
             {/* 

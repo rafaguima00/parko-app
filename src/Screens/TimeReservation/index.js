@@ -5,7 +5,8 @@ import {
     TouchableOpacity,
     Modal,
     KeyboardAvoidingView,
-    ScrollView
+    ScrollView,
+    Platform
 } from 'react-native'
 import { Feather } from 'react-native-vector-icons'
 import EstenderHorario from "./Modal/estenderHorario"
@@ -31,7 +32,6 @@ import {
 import api from "../../Services/api"
 import ReadApi from "../../Services/readData"
 import { useUser } from "../../Context/dataUserContext"
-import { Platform } from "react-native"
 import FinalizarReserva from "./Modal/FinalizarReserva"
 import ModalAguardar from "./Modal/Aguardar"
 import SaidaPendente from "./Modal/SaidaPendente"

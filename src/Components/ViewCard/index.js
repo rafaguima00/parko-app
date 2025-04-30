@@ -17,7 +17,6 @@ const ViewCard = () => {
                         <Text style={[styles.dadosCard, { fontSize: 15 }]}>{cardData.cvc}</Text>
                     </View>
                 </View>
-                <Image source={{}} style={{ width: 54, height: 34 }} />
             </View>
         </View>
     </>

@@ -1,14 +1,16 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
 
 const { fonteNegrito } = theme
+const width = Dimensions.get('screen').width
 
 export const styles = StyleSheet.create({
     areaContent: {
-        marginVertical: 32,
-        marginHorizontal: 20,
-        justifyContent: "center",
-        alignItems: "center"
+        marginTop: 32,
+        marginBottom: 130,
+        width: width,
+        paddingHorizontal: 20,
+        backgroundColor: "#f4f4f4"
     },
 
     cabecalho: {

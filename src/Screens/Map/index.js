@@ -114,12 +114,15 @@ export default function MapaPrincipal({ navigation }) {
         (item.status == "Confirmado" || item.status == "Recusado")
     )
 
-    const retornarCoordenadas = ({ item }) => {
-        setLoading(true)
-        loadPriceTable(item.id)
-
-        if(priceTable) {
+    const retornarCoordenadas = async ({ item }) => {
+        try {
+            setLoading(true)
+            await loadPriceTable(item.id)
             parkDestination(item)
+        } catch (error) {
+            Alert.alert("Erro ao carregar tabela de preço:", error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -186,7 +189,7 @@ export default function MapaPrincipal({ navigation }) {
                     return
                 }
 
-                let location = await Location.getCurrentPositionAsync({})
+                let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest })
 
                 setLocation({
                     latitude: location.coords.latitude,
@@ -195,16 +198,9 @@ export default function MapaPrincipal({ navigation }) {
                     longitudeDelta: longitudeDelta
                 })
             } catch (error) {
-                alert("Erro de localização: ", error)
+                alert(error)
             }
         })()
-    }, [])
-
-    useEffect(() => {
-        loadReservations()
-        const intervalo = setInterval(loadReservations, 5000)
-
-        return () => clearInterval(intervalo)
     }, [])
 
     useEffect(() => {
@@ -226,29 +222,44 @@ export default function MapaPrincipal({ navigation }) {
     }, [])
 
     useEffect(() => {
-        if(dataUser?.id) {
+        loadReservations()
+        const intervalo = setInterval(loadReservations, 5000)
+
+        return () => clearInterval(intervalo)
+    }, [])
+
+    useEffect(() => {
+        if(dataUser.id) {
             loadParkings()
             returnFavorites()
         }
     }, [dataUser.id])
 
     useEffect(() => {
-        if(findReservation.length > 0) {
-            setReservaFeita(true) 
+        if(destination) {
+            getDistanceMatrix()
+        }
+    }, [destination])
+
+    useEffect(() => {
+        if(location) {
+            setLoading(false)
+        }
+    }, [location])
+
+    // Edição no código (ainda não testado) - 19/03/2025 16:00:00
+    useEffect(() => {
+        if(findReservation[0]) {
+            setReservaFeita(true)
         } else {
             setReservaFeita(false)
         }
-    }, [reservations, dataUser?.id])
-
-    useEffect(() => {
-        getDistanceMatrix()
-    }, [destination])
+    }, [reservations])
 
     if (!location) {
         return <>
             <LoadingModal loading={loading} />
         </>
-        
     }
 
     return <>
@@ -298,18 +309,17 @@ export default function MapaPrincipal({ navigation }) {
                             setDistance(result.distance)
                             mapEl.current.fitToCoordinates(
                                 result.coordinates, {
-                                edgePadding: {
-                                    top: 50,
-                                    bottom: 50,
-                                    right: 50,
-                                    left: 50
+                                    edgePadding: {
+                                        top: 50,
+                                        bottom: 50,
+                                        right: 50,
+                                        left: 50
+                                    }
                                 }
-                            }
                             )
                         }}
                     />
                 }
-
             </MapView>
             
             <View style={styles.componentesMapa}>
@@ -444,6 +454,7 @@ export default function MapaPrincipal({ navigation }) {
                         <Image 
                             style={{ width: 45, height: 45, borderRadius: 50, borderWidth: 2, borderColor: corPrimaria }}
                             source={{ uri: findReservation[0].image_url_establishment }} 
+                            resizeMode="contain"
                         />
                         <Text style={styles.nomeEstacionamento}>{findReservation[0].establishment}</Text>
                     </View>

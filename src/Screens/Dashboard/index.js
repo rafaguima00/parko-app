@@ -73,6 +73,8 @@ function Dashboard({ navigation }) {
                 )
                 setTokenCard("")
                 setCartaoSelecionado(null)
+                setPagamento(true)
+                setModalConfirma(false)
                 setLoading(false)
                 return
             } 
@@ -133,10 +135,6 @@ function Dashboard({ navigation }) {
         loadVehicles(dataUser.id)
     }, [veiculos])
 
-    useEffect(() => {
-        setLoading(!imageLoaded)
-    }, [imageLoaded])
-
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -156,8 +154,8 @@ function Dashboard({ navigation }) {
                             setInformacoes={setInformacoes}
                             setEscolherVeiculo={setEscolherVeiculo}
                             setModalMaisTempo={setModalMaisTempo}
-                            setLoading={setLoading}
                             loading={loading}
+                            setLoading={setLoading}
                         />
                     }
 

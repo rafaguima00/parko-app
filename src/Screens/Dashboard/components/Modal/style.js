@@ -1,7 +1,9 @@
 import styled from "styled-components"
 import { theme } from "../../../../Theme"
+import { Dimensions } from "react-native"
 
 const { corPrimaria, corNeutra } = theme
+const width = Dimensions.get('screen').width
 
 export const AreaView = styled.View`
     background-color: rgba(84, 84, 84, 0.9);
@@ -13,15 +15,13 @@ export const AreaView = styled.View`
     padding: 0 32px;
 `
 
-export const BotaoFechar = styled.TouchableOpacity`
-    position: absolute;
-    right: 36px;
-    top: 32px;
+export const BotaoFechar = styled.View`
     padding: 12px;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
+    width: 100%;
 `
 
 export const TextBotao = styled.Text`
@@ -56,15 +56,15 @@ export const CampoDeTexto = styled.View`
 export const Quantity = styled.TextInput`
     border: 2px solid ${corPrimaria};
     border-radius: 25px;
-    padding: 6px 10px;
-    width: 80%;
+    padding: 2px 10px;
+    width: 56%;
 `
 
 export const MsgConfirmacao = styled.Text`
     text-align: center;
     font-family: 'Roboto';
     font-size: 14px;
-    color: ${corNeutra};
+    color: ${props => props.textcolor ? props.textcolor : corNeutra};
     font-weight: ${props => props.negrito ? 700 : 400};
 `
 
@@ -73,6 +73,6 @@ export const Header = styled.View`
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    height: 40px;
+    min-height: 40px;
     width: 200px;
 `

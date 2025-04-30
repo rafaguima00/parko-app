@@ -26,7 +26,8 @@ const Menu = ({
     setInformacoes,
     setEscolherVeiculo,
     setModalMaisTempo,
-    loading
+    loading,
+    setLoading
 }) => {
 
     const [botaoAtivo, setBotaoAtivo] = useState(null)
@@ -204,14 +205,21 @@ const Menu = ({
     }
 
     useEffect(() => {
+        setLoading(true)
         retornarTabelaFixaDePreco()
         retornarTabelaDePreco()
         retornarHorarioDeFuncionamento()
     }, [])
 
+    useEffect(() => {
+        if(horaFuncionamento.length > 0 && priceTable && tabelaFixa.length > 0) {
+            setLoading(false)
+        }
+    }, [horaFuncionamento, priceTable, tabelaFixa])
+
     return (
         <ScrollView contentContainerStyle={styles.dashContent} >
-            <View style={{ flexDirection: "row", gap: 12, justifyContent: "center" }}>
+            {/* <View style={{ flexDirection: "row", gap: 12, justifyContent: "center" }}>
                 <TouchableOpacity style={styles.botaoLigar} activeOpacity={0.7}>
                     <Ionicons name="call" size={14} color="#0097b9" />
                     <Text style={{ fontFamily: "Roboto_400Regular", color: "#0097b9" }}>Ligar</Text>
@@ -224,7 +232,7 @@ const Menu = ({
                     <Ionicons name="share-social" size={14} color="#f4f4f4" />
                     <Text style={{ fontFamily: "Roboto_400Regular", color: "#f4f4f4" }}>Compartilhar</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
 
             <View style={styles.informacoes}>
                 <Text style={styles.textoInformacoes}>Informações</Text>
@@ -293,21 +301,21 @@ const Menu = ({
                     estilo={(botaoAtivo ? styles.botaoIrAgora : styles.botaoIrAgoraInativo)}
                     aoPressionar={irAgora}
                     disabled={(botaoAtivo ? false : true)}
-                    largura={'47%'}
+                    largura={"47%"}
                     negrito
                     corDoTexto={(botaoAtivo ? corPrimaria : "rgba(125, 125, 125, 0.5)")}
                 />
 
                 {/* 
-                    Botão "Agendar": verificar se tem vagas disponíveis para a hora selecionada e confirmar a vaga. Se não tiver
+                    Botão "Agendar": verificar se tem vagas disponíveis para a hora selecionada e confirmar a vaga. Se não tiver,
                     retornar um aviso indicando para escolher outro horário e sugerir um horário que esteja mais livre
                 */}
                 <Botao
                     children={"Agendar"}
                     estilo={styles.botaoAgendar}
-                    corDeFundo={botaoAtivo ? corPrimaria : '#7d7d7d'}
-                    corDoTexto={'#fff'}
-                    largura={'47%'}
+                    corDeFundo={botaoAtivo ? corPrimaria : "#7d7d7d"}
+                    corDoTexto={"#fff"}
+                    largura={"47%"}
                     negrito
                     aoPressionar={agendar}
                     disabled={botaoAtivo ? false : true}

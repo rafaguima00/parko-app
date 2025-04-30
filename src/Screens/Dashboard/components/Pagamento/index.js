@@ -30,7 +30,7 @@ const Pagamento = (props) => {
     const [modalCvv, setModalCvv] = useState(false)
 
     let reserva = valorPreSelecionado * 0.95
-    let taxaAdicional = (reserva * 0.1) + 0.06
+    let taxaAdicional = (reserva * 0.1) + 0.06 + 0.12
     let total = reserva + taxaAdicional
 
     function confirmarPgto() {
@@ -110,6 +110,8 @@ const Pagamento = (props) => {
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
             />
+            {/* 
+            Provisoriamente fora do escopo
             <View style={{ justifyContent: 'center' }} >
                 <TouchableOpacity onPress={() => {
                     setPagamento(false)
@@ -117,7 +119,7 @@ const Pagamento = (props) => {
                 }}>
                     <Text style={styles.escolherFormaPgto}>Escolher outra forma de pagamento</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
             <Taxas>
                 <View style={styles.itemTotal}>
                     <LeftText>TOTAL</LeftText>

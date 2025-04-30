@@ -1,8 +1,11 @@
 import React from "react"
-import { Alert, Text, View, Image } from "react-native"
+import { Alert, View, Image } from "react-native"
 import { BotaoExcluir, DadosCartao, ViewCard } from "./style"
 import { useUser } from "../../Context/dataUserContext"
 import DeleteCard from "../../Services/DeleteCard"
+import { Feather } from "react-native-vector-icons"
+import master from "../../../assets/Group-90.png"
+import visa from "../../../assets/Group-85.png"
 
 const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
 
@@ -42,7 +45,7 @@ const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
                     )
                 }}
             >
-                <Text>X</Text>
+                <Feather name="x" color="#000" size={15} />
             </BotaoExcluir>
             <View style={{ gap: 12, justifyContent: 'flex-start' }}>
                 <DadosCartao>{item.cardholder.name}</DadosCartao>
@@ -52,8 +55,9 @@ const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
                 </View>
             </View>
             <Image 
-                source={{ uri: item.payment_method.secure_thumbnail }}
-                style={{ width: 88, height: 28 }}
+                source={{ uri: item.payment_method.thumbnail }}
+                style={{ width: 45, height: 45 }}
+                resizeMode="contain"
             />
         </ViewCard>
     </>

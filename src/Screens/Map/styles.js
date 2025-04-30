@@ -15,7 +15,7 @@ export const TextFavorites = styled.Text`
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: width
+        width: width,
     },
     map: {
         flex: 1
@@ -142,7 +142,7 @@ export const styles = StyleSheet.create({
     },
     itemLista: {
         position: 'absolute',
-        bottom: 0,
+        bottom: 48,
         backgroundColor: "#f4f4f4",
         width: "84%",
         height: "33%",
@@ -150,7 +150,6 @@ export const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 22,
         marginHorizontal: 32,
-        marginBottom: 32,
         justifyContent: "space-between"
     },
 

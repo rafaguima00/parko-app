@@ -1,8 +1,9 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet, Dimensions } from "react-native"
 import { theme } from "../../Theme"
 import styled from "styled-components"
 
 const { corPrimaria, fonteNegrito } = theme
+const width = Dimensions.get('screen').width
 
 export const SelecionarVeiculo = styled.TouchableOpacity`
     box-shadow: 5px 10px #000;
@@ -10,10 +11,11 @@ export const SelecionarVeiculo = styled.TouchableOpacity`
 
 export const styles = StyleSheet.create({
     areaContent: {
-        marginVertical: 32,
-        marginHorizontal: 20,
-        justifyContent: "center",
-        alignItems: "center"
+        marginTop: 32,
+        marginBottom: 130,
+        width: width,
+        paddingHorizontal: 20,
+        backgroundColor: "#f4f4f4"
     },
     cabecalho: {
         gap: 24,

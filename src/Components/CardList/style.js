@@ -26,6 +26,6 @@ export const BotaoExcluir = styled.TouchableOpacity`
     right: -5px;
     top: -5px;
     background-color: rgba(125, 125, 125, 0.6);
-    padding: 5px 8px;
+    padding: 5px;
     border-radius: 25px;
 `

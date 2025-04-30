@@ -222,7 +222,7 @@ export const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: corPrimaria,
         borderRadius: 12,
-        padding: 14,
+        padding: 8,
         width: 162,
         height: 117,
         backgroundColor: '#509c76'
@@ -233,7 +233,7 @@ export const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'transparent',
         borderRadius: 12,
-        padding: 14,
+        padding: 8,
         width: 162,
         height: 117,
         backgroundColor: '#f3f6ff'
@@ -242,9 +242,7 @@ export const styles = StyleSheet.create({
     viewCarro: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 7,
-        marginBottom: 4,
-        width: 'auto'
+        gap: 7
     },
 
     nomeCarroAtivo: {
@@ -257,7 +255,7 @@ export const styles = StyleSheet.create({
         fontFamily: fonteNegrito,
         fontSize: 22,
         marginRight: 18,
-        color: '#545454'
+        color: '#545454',
     },
 
     placaCarroAtivo: {
@@ -266,13 +264,13 @@ export const styles = StyleSheet.create({
     },
     placaCarroDesativado: {
         marginBottom: 8,
-        color: 'rgba(0, 0, 0, 0.25)'
+        color: 'rgba(0, 0, 0, 0.25)',
     },
 
     corCarroAtivo: {
         color: 'rgba(245, 248, 255, 0.56)',
     },
     corCarroDesativado: {
-        color: 'rgba(0, 0, 0, 0.25)'
+        color: 'rgba(0, 0, 0, 0.25)',
     },
 })

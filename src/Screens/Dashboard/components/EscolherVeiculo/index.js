@@ -65,7 +65,7 @@ const EscolherVeiculo = (props) => {
                         top: -5,
                         backgroundColor: "rgba(125, 125, 125, 0.6)",
                         paddingVertical: 5,
-                        paddingHorizontal: 8,
+                        paddingHorizontal: 5,
                         borderRadius: 25
                     }}
                     onPress={() => {
@@ -84,20 +84,32 @@ const EscolherVeiculo = (props) => {
                         )
                     }}
                 >
-                    <Text>X</Text>
+                    <Feather name="x" color="#000" size={15} />
                 </TouchableOpacity>
                 <View style={styles.viewCarro}>
                     <Ionicons name="car" size={28} color={(botaoCarroAtivo === item.id ? '#fff' : '#545454')} />
-                    <Text style={(
-                        botaoCarroAtivo === item.id ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
-                    )}>{item.name}</Text>
+                    <Text 
+                        style={(
+                            botaoCarroAtivo === item.id ? styles.nomeCarroAtivo : styles.nomeCarroDesativado
+                        )}
+                    >
+                        {item.name}
+                    </Text>
                 </View>
-                <Text style={(
-                    botaoCarroAtivo === item.id ? styles.placaCarroAtivo : styles.placaCarroDesativado
-                )}>{item.license_plate}</Text>
-                <Text style={(
-                    botaoCarroAtivo === item.id ? styles.corCarroAtivo : styles.corCarroDesativado
-                )}>{item.color}</Text>
+                <Text 
+                    style={(
+                        botaoCarroAtivo === item.id ? styles.placaCarroAtivo : styles.placaCarroDesativado
+                    )}
+                >
+                    {item.license_plate}
+                </Text>
+                <Text 
+                    style={(
+                        botaoCarroAtivo === item.id ? styles.corCarroAtivo : styles.corCarroDesativado
+                    )}
+                >
+                    {item.color}
+                </Text>
             </TouchableOpacity>
         )
     }
