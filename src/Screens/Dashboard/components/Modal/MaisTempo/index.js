@@ -110,7 +110,7 @@ const MaisTempo = (props) => {
                     placeholder={{
                         label: "Selecione um item"
                     }}
-                    useNativeAndroidPickerStyle={false} // adicionado na atualização 1.1.27
+                    useNativeAndroidPickerStyle={false}
                     fixAndroidTouchableBug={true}
                     disabled={false}
                 />

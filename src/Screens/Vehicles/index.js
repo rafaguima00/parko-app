@@ -40,6 +40,7 @@ export default function Vehicles({ navigation }) {
         await api.delete(`/vehicles/${idVeiculo}`)
         .then(() => {
             Alert.alert(`Veículo ${nomeVeiculo} excluído`)
+            loadVehicles(dataUser.id)
         })
         .catch(e => {
             Alert.alert("Erro ao deletar veículo", e)
@@ -50,8 +51,10 @@ export default function Vehicles({ navigation }) {
     }
 
     useEffect(() => {
-        loadVehicles(dataUser.id)
-    }, [veiculos])
+        if(dataUser) {
+            loadVehicles(dataUser.id)
+        }
+    }, [dataUser])
 
     return (
         <ScrollView contentContainerStyle={styles.areaContent}>

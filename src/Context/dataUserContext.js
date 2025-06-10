@@ -13,20 +13,13 @@ export function DataUserProvider({ children }) {
     const [faq, setFaq] = useState([])
     
     const value = {
-        dataUser, 
-        setDataUser,
-        estacionamentos,
-        setEstacionamentos,
-        priceTable,
-        setPriceTable,
-        veiculos,
-        setVeiculos,
-        users,
-        setUsers,
-        favorites, 
-        setFavorites,
-        faq, 
-        setFaq
+        dataUser, setDataUser,
+        estacionamentos, setEstacionamentos,
+        priceTable, setPriceTable,
+        veiculos, setVeiculos,
+        users, setUsers,
+        favorites, setFavorites,
+        faq, setFaq
     }
 
     return (

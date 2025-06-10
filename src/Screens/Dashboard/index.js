@@ -23,12 +23,7 @@ function Dashboard({ navigation }) {
     const { tokenCard, cartaoSelecionado, setTokenCard, setCartaoSelecionado } = usePayment()
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
-
-    const {
-        destination,
-        novaReserva,
-        setNovaReserva
-    } = useContext(ReservaContext)
+    const { destination, novaReserva, setNovaReserva } = useContext(ReservaContext)
 
     const [informacoes, setInformacoes] = useState(true)
     const [escolherVeiculo, setEscolherVeiculo] = useState(false)
@@ -57,10 +52,13 @@ function Dashboard({ navigation }) {
                 issuer_id: cartaoSelecionado.issuer.id
             })
     
+            const id_payment = response.data.id
+            const card_brand = response.data.payment_method_id
             const status = response.data.status
+            const payment_method = response.data.payment_type_id
     
             if (status === "approved") {
-                confirmaReserva()
+                confirmaReserva(id_payment, card_brand, status, payment_method)
                 setTokenCard("")
                 setCartaoSelecionado(null)
                 return
@@ -100,8 +98,8 @@ function Dashboard({ navigation }) {
         }
     }
     
-
-    async function confirmaReserva() {
+    // Função para salvar a reserva e o estado dela na base de dados
+    async function confirmaReserva(id_payment, card_brand, status, payment_method) {
 
         await api.post("/reservations", {
             data_entrada: novaReserva.data_entrada, 
@@ -115,10 +113,8 @@ function Dashboard({ navigation }) {
             id_establishment: destination.id,
             parko_app: 1 
         })
-        .then(() => {
-            setTokenCard("")
-            setModalConfirma(false)
-            setModalMsgConfirma(true)
+        .then(res => {
+            salvarPgto(id_payment, card_brand, status, payment_method, res.data.id)
         })
         .catch(e => {
             Alert.alert("Erro ao realizar reserva", e)
@@ -128,6 +124,29 @@ function Dashboard({ navigation }) {
         })
         .finally(() => {
             setLoading(false)
+        })
+    }
+
+    // Salvar os dados do pagamento na base de dados
+    async function salvarPgto(id_payment, card_brand, status, payment_method, idReservation) {
+        await api.post("/payment-on-db", [{ 
+            id_customer: dataUser.id, 
+            id_vehicle: novaReserva.id_vehicle, 
+            id_establishment: destination.id, 
+            value: novaReserva.value.toFixed(2), 
+            payment_method: payment_method, 
+            id_payment: id_payment,
+            card_brand: card_brand,
+            id_reservation: idReservation, 
+            status: status 
+        }])
+        .then(() => {
+            setTokenCard("")
+            setModalConfirma(false)
+            setModalMsgConfirma(true)
+        })
+        .catch(e => {
+            console.log("Erro ao salvar pagamento", e)
         })
     }
     

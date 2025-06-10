@@ -14,7 +14,7 @@ const ReadApi = () => {
             setEstacionamentos(res.data)
         })
         .catch(e => {
-            console.log(e)
+            console.log(`Erro ao carregar estacionamentos: ${e}`)
         })
     }
 
@@ -24,7 +24,7 @@ const ReadApi = () => {
             setPriceTable(res.data)
         })
         .catch(e => {
-            console.log(e)
+            console.log(`Erro ao carregar tabela de preço: ${e}`)
         })
     }
 
@@ -34,7 +34,7 @@ const ReadApi = () => {
             setVeiculos(res.data)
         })
         .catch(e => {
-            console.log(e)
+            console.log(`Erro ao carregar veiculos: ${e}`)
         })
     }
 
@@ -44,18 +44,18 @@ const ReadApi = () => {
             setUsers(res.data)
         })
         .catch(e => {
-            console.log(e)
+            console.log(`Erro ao carregar usuários: ${e}`)
         })
     }
 
     const loadReservations = async () => {
-        await api.get("/reservations")
-        .then(res => {
+        try {
+            const res = await api.get("/reservations")
+
             setReservations(res.data)
-        })
-        .catch(e => {
-            console.log(e)
-        })
+        } catch (error) {
+            console.log(`Erro ao carregar reservas da parko: ${error}`)
+        }
     }
 
     const loadTabelaFixa = async (idEstacionamento) => {
@@ -64,7 +64,7 @@ const ReadApi = () => {
             setTabelaFixa(res.data)
         })
         .catch(e => {
-            console.log(e)
+            console.log(`Erro ao carregar tabela fixa: ${e}`)
         })
     }
 

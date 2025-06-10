@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import {
     SafeAreaView,
     View,
@@ -40,7 +40,7 @@ import { getFavoriteList } from "../../Mocks/errorOrRejected"
 
 export default function MapaPrincipal({ navigation }) {
 
-    const { loadParkings, loadPriceTable, loadReservations } = ReadApi()
+    const { loadReservations } = ReadApi()
 
     const [location, setLocation] = useState(null)
     const [errorMsg, setErrorMsg] = useState(null)
@@ -61,15 +61,14 @@ export default function MapaPrincipal({ navigation }) {
         setDistanceMatrix,
         setReservaFeita
     } = useContext(ReservaContext)
-
     const { 
         setDataUser, 
         estacionamentos, 
-        priceTable, 
+        setEstacionamentos,
         dataUser, 
-        setFavorites
+        setFavorites,
+        favorites
     } = useUser()
-
     const { corFonteSecundaria, corPrimaria } = theme
     
     async function getDistanceMatrix() {
@@ -85,13 +84,29 @@ export default function MapaPrincipal({ navigation }) {
     }
 
     async function returnFavorites() {
-        await api.get(`/favorites/${dataUser.id}`)
-        .then(res => {
-            setFavorites(res.data)
-        })
-        .catch(e => {
+        try {
+            const res = await api.get(`/favorites/${dataUser.id}`)
+
+            const precoEstacionamento = await Promise.all(
+                res.data.map(async (item) => {
+                    try {
+                        const res = await api.get(`/tabela_preco/${item.parking_id}`)
+
+                        return {
+                            ...item, 
+                            tempo_tolerancia: res.data[0].tempo_tolerancia,
+                            valor_hora: res.data[0].valor_hora
+                        }
+                    } catch (e) {
+                        Alert.alert(getFavoriteList, e)
+                    }
+                })
+            )
+
+            setFavorites(precoEstacionamento)
+        } catch (e) {
             setFavorites(getFavoriteList)
-        })
+        }
     }
 
     const filtrarItens = (text) => {
@@ -100,7 +115,10 @@ export default function MapaPrincipal({ navigation }) {
                 item => item.name.toLowerCase().includes(text.toLowerCase())
             )
             setItensFiltrados(resultadoPesquisa)
+        } else {
+            setItensFiltrados([])
         }
+
         setTextoDigitado(text)
     }
 
@@ -117,10 +135,9 @@ export default function MapaPrincipal({ navigation }) {
     const retornarCoordenadas = async ({ item }) => {
         try {
             setLoading(true)
-            await loadPriceTable(item.id)
             parkDestination(item)
         } catch (error) {
-            Alert.alert("Erro ao carregar tabela de preço:", error)
+            Alert.alert("Erro ao retornar coordenadas:", error)
         } finally {
             setLoading(false)
         }
@@ -136,11 +153,11 @@ export default function MapaPrincipal({ navigation }) {
             end: item.end,
             image: item.image,
             name: item.name,
-            price: priceTable?.valor_hora,
+            valor_hora: item.valor_hora,
             vagas: item.numero_vagas,
             vagas_ocupadas: item.vagas_ocupadas,
             avaliacao: item.rate,
-            tempo_tolerancia: priceTable?.tempo_tolerancia
+            tempo_tolerancia: item.tempo_tolerancia
         })
         setLoading(false)
     }
@@ -176,6 +193,40 @@ export default function MapaPrincipal({ navigation }) {
         }
 
         return navigation.navigate('Dashboard')
+    }
+
+    async function loadParkings(location) {
+        try {
+            const res = await api.get("/near-establishments", {
+                params: {
+                    user_lat: location?.latitude,
+                    user_long: location?.longitude
+                }
+            })
+
+            const estacionamentosComPreco = await Promise.all(
+                res.data.map(async item => {
+                    
+                    try {
+                        const res = await api.get(`tabela_preco/${item.id}`)
+                        const tabela = res.data[0]
+
+                        return {
+                            ...item,
+                            valor_hora: tabela.valor_hora,
+                            tempo_tolerancia: tabela.tempo_tolerancia
+                        }
+                    } catch (error) {
+                        Alert.alert("Erro ao carregar preço do estacionamento", error)
+                    }
+                })
+            )
+
+            setEstacionamentos(estacionamentosComPreco)
+
+        } catch (error) {
+            Alert.alert("Erro ao carregar estacionamentos", error)
+        }
     }
 
     useEffect(() => {
@@ -222,18 +273,17 @@ export default function MapaPrincipal({ navigation }) {
     }, [])
 
     useEffect(() => {
-        loadReservations()
-        const intervalo = setInterval(loadReservations, 5000)
-
-        return () => clearInterval(intervalo)
-    }, [])
-
-    useEffect(() => {
-        if(dataUser.id) {
-            loadParkings()
+        if (dataUser.id) {
+            loadReservations()
             returnFavorites()
         }
-    }, [dataUser.id])
+
+        if (dataUser.id && location) {
+            loadParkings(location)
+            setLoading(false)
+
+        }
+    }, [dataUser, location])
 
     useEffect(() => {
         if(destination) {
@@ -241,13 +291,6 @@ export default function MapaPrincipal({ navigation }) {
         }
     }, [destination])
 
-    useEffect(() => {
-        if(location) {
-            setLoading(false)
-        }
-    }, [location])
-
-    // Edição no código (ainda não testado) - 19/03/2025 16:00:00
     useEffect(() => {
         if(findReservation[0]) {
             setReservaFeita(true)
@@ -287,7 +330,7 @@ export default function MapaPrincipal({ navigation }) {
                             latitude: item.latitude,
                             longitude: item.longitude,
                         }}
-                        title={priceTable?.valor_hora}
+                        title={formatCurrency(item.valor_hora)}
                         onPress={() => retornarCoordenadas({ item })}
                     >
                         <Content />
@@ -427,7 +470,9 @@ export default function MapaPrincipal({ navigation }) {
                     <View style={styles.viewButtons}>
                         <TouchableOpacity style={styles.botao} activeOpacity={1}>
                             <Feather name="dollar-sign" size={18} color="#7d7d7d" />
-                            <Text style={styles.textoBotaoPreco}>{destination.price}/h</Text>
+                            <Text style={styles.textoBotaoPreco}>
+                                {`${Number(destination.valor_hora).toFixed(2).replace(".", ",")}/h`}
+                            </Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.botao} activeOpacity={1}>
                             <Ionicons name="car" size={24} color="#7d7d7d" />

@@ -21,7 +21,8 @@ export default function Favorites() {
         .then(res => {
             setFavorites(res.data)
         })
-        .catch(() => {
+        .catch(e => {
+            console.log(e)
             alert(getFavoriteList)
         })
     }

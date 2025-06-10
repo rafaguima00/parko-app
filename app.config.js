@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.29",
+      version: "1.1.32",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
@@ -27,7 +27,7 @@ export default () => {
         }
       },
       android: {
-        versionCode: 30,
+        versionCode: 33,
         adaptiveIcon: {
           foregroundImage: "./assets/icon_parko.png",
           backgroundColor: "#ffffff"
@@ -41,7 +41,8 @@ export default () => {
         permissions: [
           "ACCESS_COARSE_LOCATION",
           "ACCESS_FINE_LOCATION"
-        ]
+        ],
+        usesCleartextTraffic: true
       },
       web: {
         favicon: "./assets/favicon.png"

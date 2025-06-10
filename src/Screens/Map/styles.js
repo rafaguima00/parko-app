@@ -3,6 +3,7 @@ import { theme } from "../../Theme"
 import styled from "styled-components"
 
 const { width } = Dimensions.get('screen')
+const height = Dimensions.get('window').height
 const { fonteNegrito, corPrimaria, corNeutra } = theme
 
 export const TextFavorites = styled.Text`
@@ -19,6 +20,20 @@ export const styles = StyleSheet.create({
     },
     map: {
         flex: 1
+    },
+    calloutContainer: {
+        width: 150,
+        height: 70,
+        borderRadius: 8,
+        backgroundColor: 'white',
+        padding: 10,
+    },
+    calloutTitle: {
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    calloutDescription: {
+        fontSize: 12,
     },
     componentesMapa: {
         position: "absolute",
@@ -99,7 +114,7 @@ export const styles = StyleSheet.create({
         fontFamily: fonteNegrito, 
         fontSize: 17, 
         color: '#fff', 
-        textAlign: 'center' 
+        textAlign: 'center'
     },
     textoBotaoPreco: {
         fontSize: 16,
@@ -145,9 +160,10 @@ export const styles = StyleSheet.create({
         bottom: 48,
         backgroundColor: "#f4f4f4",
         width: "84%",
-        height: "33%",
+        height: height * 0.33,
         gap: 16,
-        paddingVertical: 10,
+        paddingTop: 16,
+        paddingBottom: 128,
         borderRadius: 22,
         marginHorizontal: 32,
         justifyContent: "space-between"
@@ -177,7 +193,8 @@ export const styles = StyleSheet.create({
     textoInicio: {
         marginRight: 10,
         fontFamily: fonteNegrito,
-        textAlign: "left"
+        textAlign: "left",
+        color: corNeutra
     },
 
     textoVeiculo: {
@@ -221,7 +238,8 @@ export const styles = StyleSheet.create({
         borderBottomLeftRadius: 22,
         borderBottomRightRadius: 22,
         justifyContent: "center",
-        marginTop: 18
+        position: "absolute",
+        bottom: 0
     },
     viewReservation: {
         gap: 16

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react"
+import { useState, useEffect, useContext, useRef } from "react"
 import {
     SafeAreaView,
     View,
@@ -174,13 +174,13 @@ function TempoEspera({ navigation, route }) {
     }
 
     function converter() {
-        if(!findReservation[0]) {
+        if (!findReservation[0]) {
             setReservaFeita(false)
             setTempo("00:00:00")
             return
         }
 
-        if(findReservation[0]?.status === "Finalizado") {
+        if (findReservation[0]?.status === "Finalizado") {
             setCode([])
             setIntervalo(false)
             setTempo("00:00:00")
@@ -192,19 +192,17 @@ function TempoEspera({ navigation, route }) {
         let dataSaidaDoCliente = findReservation[0]?.data_saida ?? ""
         const [day, month, year] = dataSaidaDoCliente.split('/')
 
-        // Retorna a data no formato YYYY-MM-DD
         let converterData = `${year}-${month}-${day}`
 
         let horaSaidaDoCliente = findReservation[0]?.hora_saida ?? ""
         let converterHora = new Date(converterData+" "+horaSaidaDoCliente).getTime()
 
-        // Verificar se as informações de data e hora estão presentes
         if (!dataSaidaDoCliente || !horaSaidaDoCliente) return
 
         const tempoAtual = new Date().getTime()
         const diferenca = converterHora - tempoAtual
 
-        if(diferenca <= 0) {
+        if (diferenca <= 0) {
             setReservaFeita(false)
             return navigation.replace('Map')
         }
@@ -212,7 +210,7 @@ function TempoEspera({ navigation, route }) {
         // Verificar se a diferença é válida
         if (isNaN(diferenca)) return
 
-        if(tempoAtual > converterHora) {
+        if  (tempoAtual > converterHora) {
             setReservaFeita(false)
             setTempo("00:00:00")
             return
@@ -306,7 +304,7 @@ function TempoEspera({ navigation, route }) {
                 <SafeAreaView style={styles.areaContent}>
                     <TouchableOpacity
                         style={styles.goBack}
-                        onPress={() => navigation.replace('Map')}>
+                        onPress={() => navigation.goBack()}>
                         <Feather name="arrow-left" size={32} color="#fff" />
                     </TouchableOpacity>
                     <View>

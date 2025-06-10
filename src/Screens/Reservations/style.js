@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 const { fonteNegrito, corPrimaria, corNeutra } = theme
 const width = Dimensions.get('screen').width
+const height = Dimensions.get('window').height
 
 export const BtRating = styled.TouchableOpacity`
     height: 34px;
@@ -57,6 +58,33 @@ export const TextFeedback = styled.Text`
     font-size: 17.5px;
 `
 
+export const EstadoReserva = styled.Text`
+    font-size: 17px;
+    font-family: 'Roboto';
+    color: #7d7d7d;
+    margin-bottom: 16px;
+`
+
+export const BotaoReserva = styled.TouchableOpacity`
+    background-color: ${props => props.background};
+    height: ${height * 0.06}px;
+    border-bottom-left-radius: 22px;
+    border-bottom-right-radius: 22px;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+`
+
+export const TextoBotao = styled.Text`
+    color: #fff;
+    font-family: 'Roboto';
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+`
+
 export const styles = StyleSheet.create({
     areaContent: {
         marginTop: 32,
@@ -81,15 +109,20 @@ export const styles = StyleSheet.create({
         backgroundColor: "#efefef",
         gap: 30,
         paddingVertical: 10,
-        // borderTopRightRadius: 22,
-        // borderTopLeftRadius: 22,
-        // borderBottomLeftRadius: 22,
-        // borderBottomRightRadius: 22,
         borderRadius: 22,
         position: "relative",
-        marginBottom: 42
+        marginBottom: 42,
+        height: height * 0.4
     },
-
+    itemListaEmAndamento: {
+        backgroundColor: "#efefef",
+        gap: 30,
+        paddingVertical: 10,
+        borderRadius: 22,
+        position: "relative",
+        marginBottom: 42,
+        height: height * 0.33
+    },
     viewEstacionamento: {
         flexDirection: "row",
         alignItems: "center",
@@ -97,10 +130,10 @@ export const styles = StyleSheet.create({
         gap: 30,
         paddingLeft: 18
     },
-
     nomeEstacionamento: {
         color: "#545454",
-        fontSize: 17
+        fontSize: 17,
+        fontWeight: 700
     }, 
 
     infoReserva: {
@@ -119,7 +152,8 @@ export const styles = StyleSheet.create({
     },
 
     infoEntrada: {
-        fontFamily: fonteNegrito
+        fontFamily: fonteNegrito,
+        color: corNeutra
     },
 
     horaEntrada: {
@@ -147,21 +181,6 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 10
     },
-
-    botao: {
-        backgroundColor: corPrimaria,
-        height: 54,
-        borderBottomLeftRadius: 22,
-        borderBottomRightRadius: 22,
-        justifyContent: "center"
-    },
-
-    textoBotao: {
-        fontFamily: fonteNegrito,
-        fontSize: 17,
-        color: "white",
-        textAlign: "center"
-    },
     reservaVazio: {
         textAlign: 'center', 
         marginVertical: 80, 
@@ -170,5 +189,57 @@ export const styles = StyleSheet.create({
         fontFamily: 'Roboto_400Regular', 
         lineHeight: 19, 
         fontSize: 16
+    },
+    viewReservation: {
+        gap: 12
+    },
+    infoVeiculo: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 10,
+        paddingHorizontal: 26
+    },
+
+    textoInicio: {
+        marginRight: 10,
+        fontFamily: fonteNegrito,
+        textAlign: "left",
+        color: corNeutra
+    },
+
+    textoVeiculo: {
+        flexDirection: "row",
+        gap: 12,
+        alignItems: 'center'
+    },
+
+    infoItemCarro: {
+        color: "#7d7d7d",
+        overflow: "hidden",
+        maxWidth: 81,
+        maxHeight: 36,
+        textAlign: "right"
+    },
+
+    infoItemPlaca: {
+        color: "#7d7d7d",
+        maxWidth: 72,
+        maxHeight: 36,
+        textAlign: "right"
+    },
+
+    infoItemCor: {
+        color: "#7d7d7d",
+        maxWidth: 70,
+        maxHeight: 36,
+        textAlign: "right"
+    },
+
+    infoItem: {
+        color: "#7d7d7d",
+        maxWidth: 100,
+        maxHeight: 36,
+        textAlign: "right"
     }
 })

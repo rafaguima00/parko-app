@@ -1,46 +1,40 @@
-import React, { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Alert, TouchableOpacity } from 'react-native'
-import DatePicker from 'react-native-modern-datepicker'
-import { theme } from "../../../../../Theme"
 import { ReservaContext } from "../../../../../Context/reservaContext"
 import { AreaView, BotaoFechar, BotaoSalvar, TextBotao } from "../style"
 import { Feather } from "react-native-vector-icons"
+import CalendarioDataHora from "../../CalendarioDataHora"
 
 const DatePickerModal = (props) => {
 
-    const {
-        setModalConfirma,
-        setModalDatePicker
-    } = props
-    const { fonteNegrito, corPrimaria } = theme
+    const { setModalConfirma, setModalDatePicker } = props
     const { setNovaReserva } = useContext(ReservaContext)
 
-    const [selected, setSelected] = useState({})
+    const hoje = new Date()
+    const [mesAtual, setMesAtual] = useState(hoje.getMonth())
+    const [anoAtual, setAnoAtual] = useState(hoje.getFullYear())
+    const [diaSelecionado, setDiaSelecionado] = useState(null)
+    const [button, setButton] = useState("calendar")
+    const [horarioEscolhido, setHorarioEscolhido] = useState("")
 
-    const formatDate = (dateString) => {
-        const [year, month, day] = dateString.split("/")
-
-        setSelected({ ...selected, date: `${day}/${month}/${year}` })
-    }
-
-    const handleSave = (dateString, timeString) => {
-        if(!dateString || !timeString) {
-            return Alert.alert("Aviso", "Selecione uma data e horário")
+    const handleSave = () => {
+        if (!diaSelecionado || !mesAtual || !anoAtual) {
+            return Alert.alert("Erro", "Selecione uma data para agendar uma reserva")
         }
+
+        if (!horarioEscolhido) {
+            return Alert.alert("Erro", "Selecione um horário para agendar uma reserva")
+        }
+
+        const dataEntradaStr = `${diaSelecionado < 10 ? "0"+diaSelecionado : diaSelecionado}/${mesAtual < 9 ? "0"+(mesAtual+1) : mesAtual+1}/${anoAtual}`
 
         setModalConfirma(true)
 
         setNovaReserva({
-            data_entrada: dateString,
-            hora_entrada: timeString+":00"
+            data_entrada: dataEntradaStr,
+            hora_entrada: horarioEscolhido+":00"
         })
     }
-
-    const today = new Date()
-    const date = today.getDate()
-    const month = today.getMonth() + 1
-    const year = today.getFullYear()
-    const converterData = year + "-" + (month < 10 ? "0"+month : month) + "-" + (date < 10 ? "0"+date : date)
 
     return (
         <AreaView>
@@ -52,38 +46,16 @@ const DatePickerModal = (props) => {
                     <Feather name="x" color="#fff" size={30} />
                 </TouchableOpacity>
             </BotaoFechar>
-
-            {/* 
-                Consultar propriedades na documentação: https://www.npmjs.com/package/@types/react-native-modern-datepicker
-            */}
-            <DatePicker
-                locale="pt"
-                mode="datepicker"
-                options={{
-                    backgroundColor: "rgb(244, 244, 244)",
-                    textHeaderColor: corPrimaria,
-                    textDefaultColor: corPrimaria,
-                    mainColor: corPrimaria,
-                    textSecondaryColor: "#7d7d7d",
-                    borderColor: corPrimaria,
-                    textHeaderFontSize: 19,
-                    defaultFont: fonteNegrito,
-                    headerFont: fonteNegrito
-                }}
-                onTimeChange={time => setSelected({ ...selected, time })}
-                onDateChange={date => formatDate(date)}
-                minimumDate={converterData}
-                minuteInterval={5}
-                selectorStartingYear={year}
-                selected={selected}
-                style={{
-                    height: "45%", 
-                    borderTopLeftRadius: 30,
-                    borderTopRightRadius: 30
+            <CalendarioDataHora
+                states={{
+                    button, setButton,
+                    mesAtual, setMesAtual,
+                    anoAtual, setAnoAtual,
+                    diaSelecionado, setDiaSelecionado,
+                    hoje, setHorarioEscolhido
                 }}
             />
-
-            <BotaoSalvar onPress={() => handleSave(selected.date, selected.time)}>
+            <BotaoSalvar largura={90} onPress={handleSave}>
                 <TextBotao>Salvar</TextBotao>
             </BotaoSalvar>
         </AreaView>

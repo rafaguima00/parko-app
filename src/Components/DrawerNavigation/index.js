@@ -77,7 +77,11 @@ function CustomDrawer() {
 
     return (
         <View style={styles.menuLateral} >
-            <Image source={logo} style={{ width: '51%', height: '6%', marginVertical: 32 }} />
+            <Image 
+                source={logo} 
+                style={{ width: '51%', height: '6%', marginVertical: 32 }} 
+                resizeMode="contain"
+            />
             <TouchableOpacity onPress={() => navigation.navigate('Profile', { register })} >
                 <Image source={fotoPerfil} style={{ width: 140, height: 140 }} />
                 <View style={styles.botaoEdit}>

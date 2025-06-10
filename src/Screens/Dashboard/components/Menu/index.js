@@ -1,18 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
-import {
-    ScrollView,
-    View,
-    TouchableOpacity,
-    Text,
-    FlatList
-} from 'react-native'
-import {
-    Ionicons,
-    FontAwesome5,
-    Feather,
-    MaterialCommunityIcons,
-    Octicons
-} from 'react-native-vector-icons'
+import { ScrollView, View, TouchableOpacity, Text, FlatList } from 'react-native'
+import { Feather, MaterialCommunityIcons, Octicons } from 'react-native-vector-icons'
 import { Botao } from '../../../../Components/Botao'
 import { BotaoClicar, MaisTempo, RenderHeader, styles, TextBlue, TextLine } from './style'
 import { theme } from '../../../../Theme'
@@ -37,17 +25,13 @@ const Menu = ({
         personalizado, 
         setTabelaFixa,
         tabelaFixa,
-        setPriceTable,
-        priceTable,
         setHoraFuncionamento,
         horaFuncionamento,
         setItemPreSelecionado,
         setTipoReserva,
         setValorPreSelecionado
     } = useContext(ReservaContext)
-
-    const { taxaHoraExtra, taxaCancelamento } = destination
-
+    const { taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
     const { corPrimaria } = theme
 
     function agendar() {
@@ -73,16 +57,6 @@ const Menu = ({
         })
     }
 
-    async function retornarTabelaDePreco() {
-        await api.get(`/tabela_preco/${destination.id}`)
-        .then(res => {
-            setPriceTable(res.data[0])
-        })
-        .catch(e => {
-            console.log("Erro ao carregar informações do estacionamento: " + e)
-        })
-    }
-
     async function retornarHorarioDeFuncionamento() {
         await api.get(`/hora_funcionamento/${destination.id}`) 
         .then(res => {
@@ -95,10 +69,10 @@ const Menu = ({
     
     function converterEscrita(hora) {
 
-        if(hora.startsWith("0")) {
+        if (hora.startsWith("0")) {
             const abr = hora.substring(1, 2)
 
-            if(abr > 1) {
+            if (abr > 1) {
                 return abr + " horas"
             }
 
@@ -111,14 +85,34 @@ const Menu = ({
     }
 
     function tempoTolerancia(tempo) {
-        if(tempo) return tempo + " minutos"
+        if (tempo) return tempo + " minutos"
     }
 
     function horarioDeFuncionamento(hora) {
-        let horaAbertura = hora?.hora_abertura ?? ""
-        let horaFechamento = hora?.hora_fechamento ?? ""
+
+        if (!hora) {
+            return null
+        }
+
+        const diaDaSemana = {
+            mon: "Segunda-feira",
+            tue: "Terça-feira",
+            wed: "Quarta-feira",
+            thu: "Quinta-feira",
+            fri: "Sexta-feira",
+            sat: "Sábado",
+            sun: "Domingo"
+        }
         
-        if(horaAbertura == horaFechamento) {
+        const mapDayWeek = diaDaSemana[new Date().toString().split(" ")[0].toLowerCase()]
+        const findOpeningHour = hora?.find(
+            item => item.dia_semana === mapDayWeek
+        )
+
+        let horaAbertura = findOpeningHour?.hora_abertura ?? ""
+        let horaFechamento = findOpeningHour?.hora_fechamento ?? ""
+        
+        if (horaAbertura == horaFechamento) {
             return "24 horas"
         }
 
@@ -129,7 +123,7 @@ const Menu = ({
         setBotaoAtivo(item.id)
         setValorPreSelecionado(item.value)
 
-        if(item.segunda_hora.startsWith("0")) {
+        if (item.segunda_hora.startsWith("0")) {
             const abr = item.segunda_hora.substring(1, 2)
 
             setItemPreSelecionado({
@@ -207,15 +201,14 @@ const Menu = ({
     useEffect(() => {
         setLoading(true)
         retornarTabelaFixaDePreco()
-        retornarTabelaDePreco()
         retornarHorarioDeFuncionamento()
     }, [])
 
     useEffect(() => {
-        if(horaFuncionamento.length > 0 && priceTable && tabelaFixa.length > 0) {
+        if (tabelaFixa.length > 0) {
             setLoading(false)
         }
-    }, [horaFuncionamento, priceTable, tabelaFixa])
+    }, [tabelaFixa])
 
     return (
         <ScrollView contentContainerStyle={styles.dashContent} >
@@ -240,7 +233,7 @@ const Menu = ({
                     <View style={styles.viewContent}>
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
-                            Horário de funcionamento: {horarioDeFuncionamento(horaFuncionamento[0])}
+                            Horário de funcionamento: {horaFuncionamento && horarioDeFuncionamento(horaFuncionamento)}
                         </Text>
                     </View>
                     <View style={styles.viewContent}>
@@ -260,7 +253,7 @@ const Menu = ({
                     <View style={styles.viewContent}>
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
-                            Tempo de tolerância: {tempoTolerancia(priceTable?.tempo_tolerancia ?? "")}
+                            Tempo de tolerância: {tempoTolerancia(tempo_tolerancia)}
                         </Text>
                     </View>
                 </View>

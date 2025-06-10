@@ -27,7 +27,7 @@ const Searching = (props) => {
 
     useEffect(() => {
         if(itensFiltrados.length == 0 && textoDigitado === "") {
-            setItensFiltrados(favorites)
+            setItensFiltrados(Array.isArray(favorites) ? favorites : [])
         }
     }, [itensFiltrados, textoDigitado])
 
@@ -71,7 +71,7 @@ const Searching = (props) => {
                 <TextFavorites>Favoritos</TextFavorites>
             }
             <View style={{ marginTop: 10 }}>
-                {itensFiltrados.slice(0, 6).map((item) => (
+                {Array.isArray(itensFiltrados) && itensFiltrados.slice(0, 6).map((item) => (
                     <TouchableOpacity 
                         key={item.id} 
                         style={{
