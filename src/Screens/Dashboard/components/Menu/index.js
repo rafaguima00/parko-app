@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { use, useContext, useEffect, useState } from 'react'
 import { ScrollView, View, TouchableOpacity, Text, FlatList } from 'react-native'
 import { Feather, MaterialCommunityIcons, Octicons } from 'react-native-vector-icons'
 import { Botao } from '../../../../Components/Botao'
@@ -29,7 +29,9 @@ const Menu = ({
         horaFuncionamento,
         setItemPreSelecionado,
         setTipoReserva,
-        setValorPreSelecionado
+        setValorPreSelecionado,
+        setPriceTable,
+        priceTable
     } = useContext(ReservaContext)
     const { taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
     const { corPrimaria } = theme
@@ -53,7 +55,17 @@ const Menu = ({
             setTabelaFixa(res.data)
         })
         .catch(e => {
-            console.log("Erro ao carregar tabela de preços: " + e)
+            console.log("Erro ao carregar tabela fixa: " + e)
+        })
+    }
+
+    async function tabelaDePrecos() {
+        await api.get(`tabela_preco/${destination.id}`)
+        .then(res => {
+            setPriceTable(res.data[0])
+        })
+        .catch(e => {
+            console.log(`Erro ao carregar tabela de preços: ${e}`)
         })
     }
 
@@ -202,6 +214,7 @@ const Menu = ({
         setLoading(true)
         retornarTabelaFixaDePreco()
         retornarHorarioDeFuncionamento()
+        tabelaDePrecos()
     }, [])
 
     useEffect(() => {

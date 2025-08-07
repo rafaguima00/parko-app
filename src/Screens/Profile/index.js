@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import {
     Image,
     View,
@@ -7,16 +7,15 @@ import {
     TextInput,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
+    TouchableOpacity
 } from "react-native"
 import { DivButton } from "./style"
 import { Octicons, Feather } from "react-native-vector-icons"
-import { TouchableOpacity } from "react-native-gesture-handler"
 import IconeEditarPerfil from "../../Components/IconEdit"
 import fotoPerfil from "../../../assets/user-2.png"
 import { theme } from '../../Theme'
 import { Botao } from "../../Components/Botao"
-import { TextInputMask } from 'react-native-masked-text'
 import { styles } from "./style"
 import api from "../../Services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -26,69 +25,77 @@ import LoadingModal from "../../Components/Loading"
 
 export default function Profile({ navigation, route }) {
 
-    const { corVermelha, corPrimaria } = theme
-
-    const [carregando, setCarregando] = useState(false)
+    const [carregando, setCarregando] = useState(true)
     const [data, setData] = useState({})
 
     const { dataUser, setDataUser } = useUser()
-    const { name } = dataUser
-    const { dados, register } = route.params
+    const { register } = route.params
+    const { corVermelha, corPrimaria } = theme
 
-    function sobreNome() {
-        const segundoNome = name.split(' ')
-        
-        carregarDados("name", segundoNome[0])
-
-        if(segundoNome.length > 1) {
-            carregarDados("sobrenome", segundoNome[1])
-        }
+    function formatarCPF(cpf) {
+        return cpf
+            .replace(/\D/g, '') 
+            .replace(/(\d{3})(\d)/, '$1.$2') 
+            .replace(/(\d{3})(\d)/, '$1.$2') 
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
     }
 
-    function carregarDados(variavel, valor) {
-        setData({ ...data, [variavel]: valor })
+    function formatarTelefone(tel) {
+        return tel
+            .replace(/\D/g, '')
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .replace(/(-\d{4})\d+?$/, '$1')
+    }
+
+    function removerMascara(valor) {
+        return valor.replace(/\D/g, '')
     }
 
     function salvarDados() {
-
         if (
-            data.name === '' ||
-            data.tel === '' ||
-            data.cpf === ''
+            data.name === "" ||
+            data.tel === "" ||
+            data.cpf === ""
         ) {
-            return Alert.alert('Aviso', 'Preencha os campos vazios')
+            return Alert.alert("Aviso", "Preencha os campos vazios")
         } 
 
         Alert.alert(
-            '',
-            'Deseja salvar os dados?',
+            "",
+            "Deseja salvar os dados?",
             [
                 {
-                    text: 'Sim',
-                    onPress: () => criarUsuario(dataUser.id)
+                    text: "Sim",
+                    onPress: () => atualizarUsuario(dataUser.id)
                 },
                 {
-                    text: 'Não'
+                    text: "Não"
                 }
             ]
         )
         
     }
 
-    async function criarUsuario(id) {
+    async function atualizarUsuario(id) {
         setCarregando(true)
+        
+        const novosDados = {
+            name: data.name,
+            cpf: removerMascara(data.cpf),
+            tel: removerMascara(data.tel)
+        }
 
-        await api.put(`/users/${id}`, { 
-            name: `${data.name} ${data.sobrenome}`, 
-            cpf: data.cpf,
-            tel: data.tel
-        })
+        await api.put(`/users/${id}`, novosDados)
         .then(() => {
-            if(register) Alert.alert(`Bem-vindo(a) ${data.name}!`)
+            if (register) {
+                Alert.alert(`Bem-vindo(a) ${data.name}!`)
+            }
+
             navigation.replace("Map")
         })
         .catch(e => {
-            Alert.alert(e.response.data.message)
+            Alert.alert(e.response?.data?.message || "Erro ao atualizar usuário")
         })
         .finally(() => {
             setCarregando(false)
@@ -128,22 +135,28 @@ export default function Profile({ navigation, route }) {
     }
 
     useEffect(() => {
-        if(name) {
-            sobreNome()
-        }
-
         (async () => {
             const token = await AsyncStorage.getItem("token")
     
-            if(register) {
-                const decode = jwtDecode(token)
-                setDataUser(decode.user)
-            } else {
-                setData(dataUser)
+            if (!token) return navigation.replace("Login")
+
+            if (token) {
+                try {
+                    const decoded = jwtDecode(token)
+                    setDataUser(decoded.user)
+                } catch (error) {
+                    alert('Erro ao efetuar login:', error)
+                    return navigation.replace("Login")
+                } finally {
+                    setCarregando(false)
+                }
             }
-        }
-        )()
+        })()
     }, [])
+
+    useEffect(() => {
+        setData(dataUser)
+    }, [dataUser])
 
     return (
         <KeyboardAvoidingView
@@ -167,80 +180,45 @@ export default function Profile({ navigation, route }) {
                     <TouchableOpacity style={styles.botaoEdit} activeOpacity={0.7} >
                         <Octicons name="pencil" size={32} color="white" />
                     </TouchableOpacity>
-                    <Text style={styles.nome}>Nome</Text>
-                    <TouchableOpacity style={styles.displayUsuario}>
+
+                    <Text style={styles.nome}>Nome completo</Text>
+                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
                         <TextInput
                             placeholder="Digite seu nome"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
                             value={data.name}
-                            onChangeText={text => carregarDados("name", text)}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity>
-
-                    <Text style={styles.nome}>Sobrenome</Text>
-                    <TouchableOpacity style={styles.displayUsuario}>
-                        <TextInput
-                            placeholder="Digite seu sobrenome"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            value={data.sobrenome}
-                            onChangeText={text => carregarDados("sobrenome", text)}
+                            onChangeText={text => setData({ ...data, text })}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
 
                     <Text style={styles.nome}>Telefone</Text>
-                    <TouchableOpacity style={styles.displayUsuario}>
-                        <TextInputMask
-                            type='cel-phone'
+                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
+                        <TextInput
                             placeholder="Digite o número do celular"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={data.tel}
-                            onChangeText={text => carregarDados("tel", text)}
+                            keyboardType="numeric"
+                            value={formatarTelefone(data.tel || '')}
+                            onChangeText={(text) => formatarTelefone(text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
-
-                    {/* <Text style={styles.nome}>E-mail</Text>
-                    <TouchableOpacity disabled style={styles.displayUsuario}>
-                        <TextInput
-                            placeholder="Email"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            value={email}
-                            editable={false}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity>
-
-                    <Text style={styles.nome}>Senha</Text>
-                    <TouchableOpacity style={styles.displayUsuario}>
-                        <TextInput
-                            placeholder="Senha"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            value={password}
-                            secureTextEntry
-                            maxLength={12}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity> */}
 
                     <Text style={styles.nome}>CPF</Text>
-                    <TouchableOpacity style={styles.displayUsuario}>
-                        <TextInputMask
-                            type='cpf'
+                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
+                        <TextInput
                             placeholder="Digite seu CPF"
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
-                            value={data.cpf}
-                            onChangeText={text => carregarDados("cpf", text)}
+                            keyboardType="numeric"
+                            value={formatarCPF(data.cpf || '')}
+                            onChangeText={(text) => formatarCPF(text)}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
+
                     <DivButton>
                         <Botao
                             children={"Desativar conta"}

@@ -7,7 +7,9 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    Text
+    Text,
+    Linking, 
+    View
 } from "react-native"
 import { Feather } from "react-native-vector-icons"
 import logo from "../../../assets/logo-parko.png"
@@ -39,11 +41,20 @@ const Register = () => {
     const [statusError, setStatusError] = useState(false)
     const [mensagemErro, setMensagemErro] = useState('')
     const [carregando, setCarregando] = useState(false)
+    const [aceitouTermos, setAceitouTermos] = useState(false)
+    const [aceitouPrivacidade, setAceitouPrivacidade] = useState(false)
 
     let register = true
 
     function realizarCadastro() {
         setCarregando(true)
+
+        if (!aceitouTermos || !aceitouPrivacidade) {
+            setStatusError(true)
+            setMensagemErro("É necessário aceitar os termos e a política de privacidade")
+            setCarregando(false)
+            return
+        }
 
         if (dados.email === "" || dados.password === "" || dados.confirmaSenha === "") {
             setStatusError(true)
@@ -92,7 +103,7 @@ const Register = () => {
                 "Bem-vindo(a)", 
                 "Preencha os seus dados para te conhecermos melhor"
             )
-            navigation.replace("Profile", { dados, register })
+            navigation.replace("Profile", { register })
         })
         .catch(e => {
             setCarregando(false)
@@ -135,6 +146,72 @@ const Register = () => {
                     setConfirmaSenha={valor => alteraDados('confirmaSenha', valor)}
                     secureTextEntry
                 />
+                <View
+                    style={{ flexDirection: "column", gap: 12 }}
+                >
+                    <TouchableOpacity 
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                        onPress={() => setAceitouTermos(!aceitouTermos)}
+                        activeOpacity={0.9}
+                    >
+                        <View 
+                            style={{
+                                height: 22,
+                                width: 22,
+                                borderWidth: 1,
+                                borderColor: '#555',
+                                marginRight: 10,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            {aceitouTermos && <Feather name="check" size={22} color="#555" />}
+                        </View>
+                        <Text>
+                            Li e concordo com os{' '} 
+                            <Text 
+                                style={{ color: '#007BFF', textDecorationLine: 'underline' }}
+                                onPress={() => {
+                                    const url = 'https://parkoapp-termsofservice.com.br/'
+                                    Linking.openURL(url)
+                                }}
+                            >
+                                Termos de Uso
+                            </Text>
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                        onPress={() => setAceitouPrivacidade(!aceitouPrivacidade)}
+                        activeOpacity={0.9}
+                    >
+                        <View 
+                            style={{
+                                height: 22,
+                                width: 22,
+                                borderWidth: 1,
+                                borderColor: '#555',
+                                marginRight: 10,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            {aceitouPrivacidade && <Feather name="check" size={22} color="#555" />}
+                        </View>
+                        <Text>
+                            Li e concordo com a{' '}
+                            <Text 
+                                style={{ color: '#007BFF', textDecorationLine: 'underline' }}
+                                onPress={() => {
+                                    const url = 'https://parkoapp-privacypolicy.com.br/'
+                                    Linking.openURL(url)
+                                }}
+                            >
+                                Política de Privacidade
+                            </Text>
+                        </Text>
+                    </TouchableOpacity>
+                </View>
                 <Login realizarCadastro={realizarCadastro} />
                 {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
                 <BotaoLogin /> */}

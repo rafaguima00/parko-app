@@ -52,7 +52,7 @@ export const ViewHeader = styled.View`
 
 export const TextSubject = styled.Text`
     color: ${corNeutra};
-    max-width: 290px;
+    width: 250px;
 `
 
 export const ButtonPlus = styled.TouchableOpacity`

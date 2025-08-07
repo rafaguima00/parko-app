@@ -42,6 +42,7 @@ const MaisTempo = (props) => {
 
         if (value === 'horas') {
             const valorPersonalizado = valorHora + (valorFracaoHora * (quantity - 1))
+            console.log(quantity)
 
             novoItem.value = valorPersonalizado
             novoItem.segunda_hora = quantity.toString()
@@ -150,7 +151,7 @@ const pickerSelectStyles = StyleSheet.create({
     placeholder: {
         // Estilo para o placeholder
         color: "#999",
-        fontSize: 16,
+        fontSize: 16
     }
 })
 
