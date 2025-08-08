@@ -22,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useUser } from "../../Context/dataUserContext"
 import { jwtDecode } from "jwt-decode"
 import LoadingModal from "../../Components/Loading"
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function Profile({ navigation, route }) {
 
@@ -92,6 +93,12 @@ export default function Profile({ navigation, route }) {
                 Alert.alert(`Bem-vindo(a) ${data.name}!`)
             }
 
+            setDataUser({ 
+                ...dataUser, 
+                name: data.name,
+                cpf: data.cpf,
+                tel: data.tel
+            })
             navigation.replace("Map")
         })
         .catch(e => {
@@ -134,25 +141,28 @@ export default function Profile({ navigation, route }) {
         })
     }
 
-    useEffect(() => {
-        (async () => {
-            const token = await AsyncStorage.getItem("token")
-    
-            if (!token) return navigation.replace("Login")
-
-            if (token) {
+    useFocusEffect(
+        useCallback(() => {
+            (async () => {
                 try {
+                    const token = await AsyncStorage.getItem("token")
+                    if (!token) return navigation.replace("Login")
+
                     const decoded = jwtDecode(token)
-                    setDataUser(decoded.user)
+                    const response = await api.get(`/users/${decoded.user.id}`)
+                    console.log(response.data[0])
+                    setData(response.data[0])
+                    setDataUser(response.data[0])
                 } catch (error) {
-                    alert('Erro ao efetuar login:', error)
-                    return navigation.replace("Login")
+                    console.error("Erro ao carregar perfil:", error)
+                    navigation.replace("Login")
                 } finally {
                     setCarregando(false)
                 }
-            }
-        })()
-    }, [])
+            })()
+        }, [])
+    )
+
 
     useEffect(() => {
         setData(dataUser)
@@ -188,7 +198,7 @@ export default function Profile({ navigation, route }) {
                             placeholderTextColor={corPrimaria}
                             style={styles.dadosUsuario}
                             value={data.name}
-                            onChangeText={text => setData({ ...data, text })}
+                            onChangeText={text => setData({ ...data, name: text })}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
@@ -201,7 +211,7 @@ export default function Profile({ navigation, route }) {
                             style={styles.dadosUsuario}
                             keyboardType="numeric"
                             value={formatarTelefone(data.tel || '')}
-                            onChangeText={(text) => formatarTelefone(text)}
+                            onChangeText={(text) => setData({ ...data, tel: text })}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>
@@ -214,7 +224,7 @@ export default function Profile({ navigation, route }) {
                             style={styles.dadosUsuario}
                             keyboardType="numeric"
                             value={formatarCPF(data.cpf || '')}
-                            onChangeText={(text) => formatarCPF(text)}
+                            onChangeText={(text) => setData({ ...data, cpf: text })}
                         />
                         <IconeEditarPerfil />
                     </TouchableOpacity>

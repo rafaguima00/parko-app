@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.32",
+      version: "1.1.34",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
@@ -17,7 +17,7 @@ export default () => {
       },
       ios: {
         supportsTablet: true,
-        bundleIdentifier: "com.rafaelgsm.parkoapp",
+        bundleIdentifier: "com.parko.application",
         config: {
           googleMapsApiKey: "AIzaSyC53Ez6WTCSavpYro9G15-vYCXmjNU1Bwk"
         },
@@ -27,7 +27,7 @@ export default () => {
         }
       },
       android: {
-        versionCode: 33,
+        versionCode: 35,
         adaptiveIcon: {
           foregroundImage: "./assets/icon_parko.png",
           backgroundColor: "#ffffff"

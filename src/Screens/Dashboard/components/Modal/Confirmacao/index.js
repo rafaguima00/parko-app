@@ -23,7 +23,7 @@ function ModalConfirmacao({
     } = useContext(ReservaContext)
 
     function confirmarVaga() {
-        if(tipoReserva == "now") {
+        if (tipoReserva == "now") {
             const dataDeHoje = new Date().getTime() // Tempo atual em milissegundos
             const dataHoraEntrada = new Date(dataDeHoje + (distanceMatrix * 1000) + 600000).toLocaleString("pt-br") // Tempo atual no formato padrão
             let dataHoraDeEntrada = dataHoraEntrada.replace(",", "").split(" ") // Separar data e hora de entrada
@@ -50,7 +50,7 @@ function ModalConfirmacao({
             })
         }
 
-        if(tipoReserva == "schedule") {
+        if (tipoReserva == "schedule") {
             const dataHoraEntrada = `${novaReserva.data_entrada}, ${novaReserva.hora_entrada}`
             let dataHoraDeEntrada = dataHoraEntrada.replace(",", "").split(" ") // Separar data e hora de entrada
 
@@ -76,7 +76,7 @@ function ModalConfirmacao({
     }
 
     useEffect(() => {
-        if(novaReserva.value) {
+        if (novaReserva.value) {
             pagamentoReserva()
         }
     }, [novaReserva.value])
