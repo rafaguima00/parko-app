@@ -150,7 +150,6 @@ export default function Profile({ navigation, route }) {
 
                     const decoded = jwtDecode(token)
                     const response = await api.get(`/users/${decoded.user.id}`)
-                    console.log(response.data[0])
                     setData(response.data[0])
                     setDataUser(response.data[0])
                 } catch (error) {
@@ -162,7 +161,6 @@ export default function Profile({ navigation, route }) {
             })()
         }, [])
     )
-
 
     useEffect(() => {
         setData(dataUser)

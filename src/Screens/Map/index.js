@@ -42,7 +42,12 @@ export default function MapaPrincipal({ navigation }) {
 
     const { loadReservations } = ReadApi()
 
-    const [location, setLocation] = useState(null)
+    const [location, setLocation] = useState({
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta,
+        longitudeDelta,
+    })
     const [errorMsg, setErrorMsg] = useState(null)
     const [modalPesquisar, setModalPesquisar] = useState(false)
     const [textoDigitado, setTextoDigitado] = useState("")
@@ -59,7 +64,8 @@ export default function MapaPrincipal({ navigation }) {
         reservaFeita,
         reservations,
         setDistanceMatrix,
-        setReservaFeita
+        setReservaFeita,
+        setPriceTable
     } = useContext(ReservaContext)
     const { 
         setDataUser, 
@@ -145,19 +151,9 @@ export default function MapaPrincipal({ navigation }) {
 
     const parkDestination = (item) => {
         setDestination({
-            id: item.id,
-            latitude: item.latitude, 
-            longitude: item.longitude,
+            ...item,
             latitudeDelta: latitudeDelta,
             longitudeDelta: longitudeDelta,
-            end: item.end,
-            image: item.image,
-            name: item.name,
-            valor_hora: item.valor_hora,
-            vagas: item.numero_vagas,
-            vagas_ocupadas: item.vagas_ocupadas,
-            avaliacao: item.rate,
-            tempo_tolerancia: item.tempo_tolerancia
         })
         setLoading(false)
     }
@@ -187,7 +183,7 @@ export default function MapaPrincipal({ navigation }) {
     }
 
     function dashboardNavigation() {
-        if(!location?.latitude || !location?.longitude) {
+        if (!location?.latitude || !location?.longitude) {
             setErrorMsg("Erro ao calcular localização ou direção do usuário")
             return
         }
@@ -196,6 +192,8 @@ export default function MapaPrincipal({ navigation }) {
     }
 
     async function loadParkings(location) {
+        if (!location?.latitude || !location?.longitude) return
+
         try {
             const res = await api.get("/near-establishments", {
                 params: {
@@ -204,25 +202,47 @@ export default function MapaPrincipal({ navigation }) {
                 }
             })
 
+            
             const estacionamentosComPreco = await Promise.all(
-                res.data.map(async item => {
-                    
+                res.data.map(async (item) => {
                     try {
-                        const res = await api.get(`tabela_preco/${item.id}`)
-                        const tabela = res.data[0]
+                        const res = await api.get(`/tabela_preco/${item.id}`)
+                        const tabela = res.data
+                        
 
-                        return {
-                            ...item,
-                            valor_hora: tabela.valor_hora,
-                            tempo_tolerancia: tabela.tempo_tolerancia
+                        if (item.type_of_charge === "hora_fracao") {
+                            setPriceTable(tabela)
+                            console.log(tabela)
+
+                            return {
+                                ...item,
+                                valor_hora: tabela[0].valor_hora,
+                                tempo_tolerancia: tabela[0].tempo_tolerancia,
+                            }
                         }
+
+                        if (item.type_of_charge === "tabela_fixa") {
+                            const response = await api.get(`/tabela_fixa/${item.id}`)
+                            const tabelaFixa = response.data
+                            setPriceTable(tabelaFixa)
+
+                            return {
+                                ...item,
+                                valor_hora: tabelaFixa[0].value,
+                                tempo_tolerancia: tabela[0].tempo_tolerancia,
+                            }
+                        }
+
+                        
+                        return item
                     } catch (error) {
-                        Alert.alert("Erro ao carregar preço do estacionamento", error)
+                        console.error("Erro ao carregar preço:", error)
+                        return item 
                     }
                 })
             )
 
-            setEstacionamentos(estacionamentosComPreco)
+            setEstacionamentos(estacionamentosComPreco.filter(Boolean))
 
         } catch (error) {
             Alert.alert("Erro ao carregar estacionamentos", error)
@@ -278,28 +298,30 @@ export default function MapaPrincipal({ navigation }) {
             returnFavorites()
         }
 
-        if (dataUser.id && location) {
-            loadParkings(location)
-            setLoading(false)
-
-        }
-    }, [dataUser, location])
+    }, [dataUser])
 
     useEffect(() => {
-        if(destination) {
+        if (location?.latitude && location?.longitude) {
+            loadParkings(location)
+            setLoading(false)
+        }
+    }, [location])
+
+    useEffect(() => {
+        if (destination) {
             getDistanceMatrix()
         }
     }, [destination])
 
     useEffect(() => {
-        if(findReservation[0]) {
+        if (findReservation[0]) {
             setReservaFeita(true)
         } else {
             setReservaFeita(false)
         }
     }, [reservations])
 
-    if (!location) {
+    if (!location.latitude || !location.longitude) {
         return <>
             <LoadingModal loading={loading} />
         </>
@@ -464,7 +486,7 @@ export default function MapaPrincipal({ navigation }) {
                         </View>
                         <View style={styles.infoDistance}>
                             <Feather name="star" size={14} color="#7d7d7d" />
-                            <Text style={styles.distanciaEstacionamento}>{destination.avaliacao}</Text>
+                            <Text style={styles.distanciaEstacionamento}>{destination.rate}</Text>
                         </View>
                     </View>
                     <View style={styles.viewButtons}>
@@ -477,7 +499,7 @@ export default function MapaPrincipal({ navigation }) {
                         <TouchableOpacity style={styles.botao} activeOpacity={1}>
                             <Ionicons name="car" size={24} color="#7d7d7d" />
                             <Text style={styles.textoBotaoPreco}>
-                                {parseInt(destination.vagas) - parseInt(destination.vagas_ocupadas)}
+                                {parseInt(destination.numero_vagas) - parseInt(destination.vagas_ocupadas)}
                             </Text>
                         </TouchableOpacity>
                         <Botao

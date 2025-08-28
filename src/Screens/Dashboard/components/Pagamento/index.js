@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { FlatList, View, Text, TouchableOpacity, Modal } from "react-native"
 import { Botao } from "../../../../Components/Botao"
 import { styles, TituloPrincipal, TopModal, VoltarTelaAnterior, FundoCinza, Taxas, LeftText, RightText } from "../../style"
@@ -19,7 +19,7 @@ const { corPrimaria } = theme
 
 const Pagamento = (props) => {
 
-    const { setPagamento, setSelecionarPgto, setAddCartao, setModalConfirma } = props.states
+    const { setPagamento, setAddCartao, setModalConfirma } = props.states
     const { voltar } = props
 
     const { valorPreSelecionado } = useContext(ReservaContext)
@@ -39,25 +39,51 @@ const Pagamento = (props) => {
 
     async function getCostumerCard(email) {
         try {
+            if (!email) return
+
             const searchResponse = await axios.get(
                 `https://api.mercadopago.com/v1/customers/search?email=${email}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    Authorization: `Bearer ${ACCESS_TOKEN}`,
                     }
                 }
             )
-        
-            const cards = searchResponse.data.results[0].cards
-        
-            if (cards) {
-                setCard(cards)
+
+            const results = searchResponse.data.results
+
+            if (results.length === 0) {
+                // Se o cliente não existir -> cria
+                const response = await axios.post(
+                    'https://api.mercadopago.com/v1/customers',
+                    { email },
+                    {
+                    headers: {
+                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    }
+                    }
+                )
+                console.log("Cliente criado:", response.data)
+                return response.data
             }
+
+            // Cliente existe
+            const existingCustomer = results[0]
+
+            if (existingCustomer.cards?.length > 0) {
+                setCard(existingCustomer.cards)
+            } else {
+                console.log("Cliente ainda não tem cartões salvos")
+            }
+
+            return existingCustomer
+
         } catch (err) {
             console.log('Erro ao buscar cliente:', err.response?.data || err.message)
+            throw err
+        } finally {
+            setLoading(false)
         }
-        
-        setLoading(false)
     }
 
     const EmptyListMessage = () => {
@@ -72,7 +98,7 @@ const Pagamento = (props) => {
 
     useEffect(() => {
         getCostumerCard(dataUser.email)
-    }, [])
+    }, [dataUser])
 
     return <>
         <View style={[styles.dashContent, styles.escolher]} >

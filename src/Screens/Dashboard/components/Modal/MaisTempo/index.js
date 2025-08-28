@@ -6,16 +6,21 @@ import { theme } from "../../../../../Theme"
 import { ReservaContext } from "../../../../../Context/reservaContext"
 import { preenchaValorPersonalizado } from "../../../../../Mocks/warnings"
 import { Feather } from "react-native-vector-icons"
+import api from "../../../../../Services/api"
+import LoadingModal from "../../../../../Components/Loading"
 
 const { corPrimaria } = theme
 
 const MaisTempo = (props) => {
 
     const { setModalMaisTempo, idDestination } = props
-    const { setPersonalizado, setTabelaFixa, tabelaFixa, priceTable } = useContext(ReservaContext)
+    const { setPersonalizado, setPriceTable, priceTable } = useContext(ReservaContext)
 
     const [quantity, setQuantity] = useState(1)
     const [value, setValue] = useState("")
+    const [valorHora, setValorHora] = useState(0)
+    const [valorFracaoHora, setValorFracaoHora] = useState(0)
+    const [loading, setLoading] = useState(true)
 
     const items = [
         { label: 'Horas', value: 'horas' },
@@ -23,14 +28,21 @@ const MaisTempo = (props) => {
         { label: 'Semana', value: 'semana' }
     ]
 
+    async function valorDaHora() {
+        try {
+            const res = await api.get(`/tabela_preco/${idDestination}`)
+            setValorHora(res.data[0].valor_hora)
+            setValorFracaoHora(res.data[0].valor_fracao_hora)
+        } catch (error) {
+            console.log(`Deu erro`, error)
+        }
+    }
+
     function salvarItem() {
         if (value == "" || quantity <= 0) {
             alert(preenchaValorPersonalizado)
             return
         }
-
-        const valorHora = priceTable?.valor_hora
-        const valorFracaoHora = priceTable?.valor_fracao_hora
 
         let novoItem = {
             id: "personalizado",
@@ -41,35 +53,34 @@ const MaisTempo = (props) => {
         }
 
         if (value === 'horas') {
-            const valorPersonalizado = valorHora + (valorFracaoHora * (quantity - 1))
-            console.log(quantity)
+            const valorPersonalizado = valorHora * quantity
 
             novoItem.value = valorPersonalizado
             novoItem.segunda_hora = quantity.toString()
         } else if (value === 'dias') {
-            const valorPersonalizado = valorHora + (valorFracaoHora * ((quantity * 24) - 1))
+            const valorPersonalizado = valorHora * (quantity * 24)
 
             novoItem.value = valorPersonalizado
             novoItem.segunda_hora = (quantity * 24).toString()
         } else if (value === 'semana') {
-            const valorPersonalizado = valorHora + (valorFracaoHora * ((quantity * 24 * 7) - 1))
+            const valorPersonalizado = valorHora * (quantity * 24 * 7)
 
             novoItem.value = valorPersonalizado
             novoItem.segunda_hora = (quantity * 24 * 7).toString()
         }
 
         // Verificar se já existe um item personalizado
-        const existePersonalizado = tabelaFixa.some(item => item.id === "personalizado")
+        const existePersonalizado = priceTable.some(item => item.id === "personalizado")
 
         if (existePersonalizado) {
             // Substituir o item personalizado
-            const novaTabelaFixa = tabelaFixa.map(item => 
+            const novaTabelaFixa = priceTable.map(item => 
                 item.id === "personalizado" ? novoItem : item
             )
-            setTabelaFixa(novaTabelaFixa)
+            setPriceTable(novaTabelaFixa)
         } else {
             // Adicionar um novo item personalizado
-            setTabelaFixa([novoItem, ...tabelaFixa])
+            setPriceTable([novoItem, ...priceTable])
         }
 
         setModalMaisTempo(false)
@@ -83,7 +94,17 @@ const MaisTempo = (props) => {
 
     useEffect(() => {
         setPersonalizado(true)
-    }, [tabelaFixa])
+    }, [priceTable])
+
+    useEffect(() => {
+        valorDaHora()
+    }, [])
+
+    useEffect(() => {
+        if (valorHora !== 0 || valorFracaoHora !== 0) {
+            setLoading(false)
+        }
+    }, [valorHora, valorFracaoHora])
 
     return <>
         <AreaView>
@@ -121,6 +142,7 @@ const MaisTempo = (props) => {
                 <TextBotao>Salvar</TextBotao>
             </BotaoSalvar>
         </AreaView>
+        <LoadingModal loading={loading} />
     </>
 }
 

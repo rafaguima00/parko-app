@@ -1,4 +1,3 @@
-import React from "react"
 import { View } from "react-native"
 import { styles, TituloPrincipal, TopModal, VoltarTelaAnterior } from "../../style"
 import { Feather } from "react-native-vector-icons"

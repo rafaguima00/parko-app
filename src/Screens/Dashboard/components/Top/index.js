@@ -32,7 +32,7 @@ function Topo({ handleImageLoaded, voltar }) {
 
     const { dataUser } = useUser()
     const { destination, distance } = useContext(ReservaContext)
-    const { id, image, name, end, vagas, avaliacao, vagas_ocupadas } = destination
+    const { id, image, name, end, numero_vagas, rate, vagas_ocupadas } = destination
 
     async function adicionarAosFavoritos() {
         setLoading(true)
@@ -125,10 +125,10 @@ function Topo({ handleImageLoaded, voltar }) {
                     <TextIcon>{distance ? `${distance.toFixed(1)} km` : ""}</TextIcon>
 
                     <Ionicons name="car" size={20} color="#0097b9" />
-                    <TextIcon>{parseInt(vagas) - parseInt(vagas_ocupadas)} vagas</TextIcon>
+                    <TextIcon>{parseInt(numero_vagas) - parseInt(vagas_ocupadas)} vagas</TextIcon>
 
                     <Feather name="star" size={20} color="#0097b9" />
-                    <TextIcon>{avaliacao ? avaliacao : 'n/a'}</TextIcon>
+                    <TextIcon>{rate ? rate : 'n/a'}</TextIcon>
                 </Icons>
             </InfoEstacionamento>
             <Modal

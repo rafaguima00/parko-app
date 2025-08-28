@@ -138,7 +138,10 @@ function Dashboard({ navigation }) {
             id_payment: id_payment,
             card_brand: card_brand,
             id_reservation: idReservation, 
-            status: status 
+            status: status,
+            value_paid: novaReserva.value.toFixed(2),
+            change_to_pay: 0,
+            change_paid: 0
         }])
         .then(() => {
             setTokenCard("")

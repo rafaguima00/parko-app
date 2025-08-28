@@ -1,13 +1,13 @@
-import { use, useContext, useEffect, useState } from 'react'
-import { ScrollView, View, TouchableOpacity, Text, FlatList } from 'react-native'
-import { Feather, MaterialCommunityIcons, Octicons } from 'react-native-vector-icons'
+import { useContext, useEffect, useState } from 'react'
+import { ScrollView, View, Text, FlatList } from 'react-native'
+import { Feather, MaterialCommunityIcons } from 'react-native-vector-icons'
 import { Botao } from '../../../../Components/Botao'
 import { BotaoClicar, MaisTempo, RenderHeader, styles, TextBlue, TextLine } from './style'
 import { theme } from '../../../../Theme'
 import { ReservaContext } from '../../../../Context/reservaContext'
-import { formatCurrency } from "../../../../Services/formatCurrency"
 import api from '../../../../Services/api'
 import LoadingModal from '../../../../Components/Loading'
+import ListaDePrecos from './components/listaDePrecos'
 
 const Menu = ({ 
     setModalDatePicker, 
@@ -22,15 +22,9 @@ const Menu = ({
 
     const { 
         destination,
-        personalizado, 
-        setTabelaFixa,
-        tabelaFixa,
         setHoraFuncionamento,
         horaFuncionamento,
-        setItemPreSelecionado,
         setTipoReserva,
-        setValorPreSelecionado,
-        setPriceTable,
         priceTable
     } = useContext(ReservaContext)
     const { taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
@@ -49,26 +43,6 @@ const Menu = ({
         setEscolherVeiculo(true)
     }
 
-    async function retornarTabelaFixaDePreco() {
-        await api.get(`/tabela_fixa/${destination.id}`)
-        .then(res => {
-            setTabelaFixa(res.data)
-        })
-        .catch(e => {
-            console.log("Erro ao carregar tabela fixa: " + e)
-        })
-    }
-
-    async function tabelaDePrecos() {
-        await api.get(`tabela_preco/${destination.id}`)
-        .then(res => {
-            setPriceTable(res.data[0])
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar tabela de preços: ${e}`)
-        })
-    }
-
     async function retornarHorarioDeFuncionamento() {
         await api.get(`/hora_funcionamento/${destination.id}`) 
         .then(res => {
@@ -79,23 +53,6 @@ const Menu = ({
         })
     }
     
-    function converterEscrita(hora) {
-
-        if (hora.startsWith("0")) {
-            const abr = hora.substring(1, 2)
-
-            if (abr > 1) {
-                return abr + " horas"
-            }
-
-            return abr + " hora"
-        }
-
-        const abreviar = hora.substring(0, hora.length)
-
-        return abreviar + " horas"
-    }
-
     function tempoTolerancia(tempo) {
         if (tempo) return tempo + " minutos"
     }
@@ -131,97 +88,17 @@ const Menu = ({
         return horaAbertura.slice(0, 5) + " - " + horaFechamento.slice(0, 5)
     }
 
-    function preSelect(item) {
-        setBotaoAtivo(item.id)
-        setValorPreSelecionado(item.value)
-
-        if (item.segunda_hora.startsWith("0")) {
-            const abr = item.segunda_hora.substring(1, 2)
-
-            setItemPreSelecionado({
-                hora_saida: (parseInt(abr) * 60) * 60 // Tempo de duração da reserva em segundos
-            })
-            return
-        }
-
-        const abreviar = item.segunda_hora.substring(0, 2)
-
-        setItemPreSelecionado({
-            hora_saida: (parseInt(abreviar) * 60) * 60 // Tempo de duração da reserva em segundos
-        })
-    }
-
-    const renderItem = ({ item }) => {
-        const botaoClicado = botaoAtivo === item.id
-
-        return <>
-            {(personalizado === true && item.id == "personalizado") && 
-                <RenderHeader
-                    style={
-                        botaoClicado ? styles.botaoHorariosAtivo : styles.botaoHorariosDesativado
-                    }
-                    onPress={() => preSelect(item)}
-                    activeOpacity={0.9}
-                >
-                    <View>
-                        <Text 
-                            style={(
-                                botaoClicado ? styles.textoBotaoAtivo : styles.textoBotaoDesativado
-                            )}
-                        >
-                            Personalizado • {converterEscrita(item?.segunda_hora ?? "")}
-                        </Text>
-                        <Text 
-                            style={(
-                                botaoClicado ? styles.textoBotaoPrecoAtivo : styles.textoBotaoPrecoDesativado
-                            )}
-                        >
-                            {formatCurrency((item?.value ?? 0) * 0.95)}
-                        </Text>
-                    </View>
-                    <View>
-                        <Octicons name="pencil" size={20} color={botaoClicado ? "white" : ""} />
-                    </View>
-                </RenderHeader>
-            }
-            {item.id != "personalizado" && 
-                <TouchableOpacity
-                    style={
-                        botaoClicado ? styles.botaoHorariosAtivo : styles.botaoHorariosDesativado
-                    }
-                    onPress={() => {
-                        preSelect(item)
-                    }}
-                    activeOpacity={0.9}>
-                    <Text
-                        style={(
-                            botaoClicado ? styles.textoBotaoAtivo : styles.textoBotaoDesativado
-                        )}>
-                        {converterEscrita(item?.segunda_hora ?? "")}
-                    </Text>
-                    <Text
-                        style={(
-                            botaoClicado ? styles.textoBotaoPrecoAtivo : styles.textoBotaoPrecoDesativado
-                        )}>
-                        {formatCurrency((item?.value ?? 0) * 0.95)}
-                    </Text>
-                </TouchableOpacity>
-            }
-        </>
-    }
-
     useEffect(() => {
         setLoading(true)
-        retornarTabelaFixaDePreco()
         retornarHorarioDeFuncionamento()
-        tabelaDePrecos()
     }, [])
 
     useEffect(() => {
-        if (tabelaFixa.length > 0) {
+        if (priceTable.length > 0) {
             setLoading(false)
+            console.log(priceTable)
         }
-    }, [tabelaFixa])
+    }, [priceTable])
 
     return (
         <ScrollView contentContainerStyle={styles.dashContent} >
@@ -278,12 +155,16 @@ const Menu = ({
                 </View>
                 <FlatList
                     horizontal
-                    data={tabelaFixa}
-                    renderItem={renderItem}
+                    data={priceTable}
+                    renderItem={(item) => (
+                        <ListaDePrecos 
+                            {...item} 
+                            botaoAtivo={botaoAtivo} 
+                            setBotaoAtivo={setBotaoAtivo} 
+                        />
+                    )}
                     keyExtractor={item => item.id.toString()}
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 10 }} // Garante espaçamento
-                    style={{ flexGrow: 0 }} // Evita restrições de altura
                 />
             </View>
 
@@ -296,9 +177,9 @@ const Menu = ({
 
             <View style={styles.botoesInferiores}>
                 {/* 
-                    Botão "Ir agora": verificar se há vagas disponíveis nos próximos momentos e confirmar a entrada da 
-                    reserva na data do dia e a hora de entrada vai ser marcado a partir do tempo estimado de chegada até 
-                    o local + tempo de tolerância. Se não tiver vagas disponíveis para o momento, mostrar um aviso indicando
+                    "Ir agora": verificar se há vagas disponíveis nos próximos momentos e confirmar a entrada da 
+                    reserva na data do dia. A hora de entrada vai ser marcado a partir do tempo estimado de chegada até 
+                    o local + o tempo de tolerância. Se não tiver vagas disponíveis para o momento, mostrar um aviso indicando
                     o horário mais próximo que terá uma vaga livre para ser reservada. Se o cliente concordar, segue o fluxo,
                     se não concordar, fecha o modal
                 */}
@@ -313,7 +194,7 @@ const Menu = ({
                 />
 
                 {/* 
-                    Botão "Agendar": verificar se tem vagas disponíveis para a hora selecionada e confirmar a vaga. Se não tiver,
+                    "Agendar": verificar se há vagas disponíveis para a hora selecionada e confirmar a vaga. Se não tiver,
                     retornar um aviso indicando para escolher outro horário e sugerir um horário que esteja mais livre
                 */}
                 <Botao

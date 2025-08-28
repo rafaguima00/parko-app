@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { 
     Text, 
     View, 
@@ -29,6 +29,8 @@ export default function Payments({ navigation }) {
 
     async function getCostumerCard(email) {
         try {
+            if (!email) return
+
             const searchResponse = await axios.get(
                 `https://api.mercadopago.com/v1/customers/search?email=${email}`,
                 {
@@ -37,17 +39,42 @@ export default function Payments({ navigation }) {
                     }
                 }
             )
-        
-            const cards = searchResponse.data.results[0].cards
-        
-            if (cards) {
-                setCard(cards)
+
+            const results = searchResponse.data.results
+
+            if (results.length === 0) {
+                // Se o cliente não existir -> cria
+                const response = await axios.post(
+                    'https://api.mercadopago.com/v1/customers',
+                    { email },
+                    {
+                    headers: {
+                        Authorization: `Bearer ${ACCESS_TOKEN}`,
+                    }
+                    }
+                )
+
+                return response.data
             }
+
+            // Cliente existe
+            const existingCustomer = results[0]
+
+            if (existingCustomer.cards?.length > 0) {
+                const filterCards = existingCustomer.cards.filter(item => item.customer_id === existingCustomer.id)
+                setCard(filterCards)
+            } else {
+                console.log("Cliente ainda não tem cartões salvos")
+            }
+
+            return existingCustomer
+
         } catch (err) {
             console.log('Erro ao buscar cliente:', err.response?.data || err.message)
+            throw err
+        } finally {
+            setLoading(false)
         }
-        
-        setLoading(false)
     }
 
     const EmptyListMessage = () => {
@@ -60,7 +87,7 @@ export default function Payments({ navigation }) {
 
     useEffect(() => {
         getCostumerCard(dataUser.email)
-    }, [])
+    }, [dataUser])
 
     return <>
         <ScrollView contentContainerStyle={styles.areaContent}>

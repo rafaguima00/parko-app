@@ -30,12 +30,12 @@ const DeleteCard = () => {
                         }
                     }
                 )
-                .then(() => {
-                    const cardDeleted = card.filter(item => item.id != idCard)
-                    setCard(cardDeleted)
-                    Alert.alert("Cartão deletado.")
-                })
-                .catch(e => Alert.alert("Erro ao deletar cartão", e))
+                    .then(() => {
+                        const cardDeleted = card.filter(item => item.id != idCard)
+                        setCard(cardDeleted)
+                        Alert.alert("Cartão deletado.")
+                    })
+                    .catch(e => Alert.alert("Erro ao deletar cartão", e))
             }
         } catch (err) {
             console.log(err.response?.data || err.message)

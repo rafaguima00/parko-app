@@ -73,9 +73,13 @@ const FormCard = () => {
                 `https://api.mercadopago.com/v1/card_tokens?public_key=${PUBLIC_KEY}`,
                 {
                     card_number: cardData.card_number.replace(/\s/g, ''),
-                    cardholder_name: cardData.name,
-                    doc_type: 'CPF',
-                    doc_number: cardData.cpf.replace(/\D/g, ''),
+                    cardholder: {
+                        name: cardData.name,
+                        identification: {
+                            type: "CPF",
+                            number: cardData.cpf.replace(/\D/g, '')
+                        }
+                    },
                     expiration_month: cardData.date_time.split('/')[0],
                     expiration_year: `20${cardData.date_time.split('/')[1]}`,
                     security_code: cardData.cvc
@@ -89,7 +93,7 @@ const FormCard = () => {
         } catch (e) {
             setErro(true)
 
-            if (e.response && e.response.data && e.response.data.message) {
+            if (e.response.data.message) {
                 setMensagemErro(e.response.data.message)
             } else if (e.message === 'Network Error') {
                 setMensagemErro("Sem conexão com o servidor")
@@ -117,7 +121,7 @@ const FormCard = () => {
             const existingCustomer = searchResponse.data.results[0]
             const customerCards = searchResponse.data.results[0].cards
 
-            if(customerCards.length == 2) {
+            if (customerCards.length == 2) {
                 Alert.alert("Aviso", "O cliente só pode adicionar no máximo 2 cartões provisoriamente")
                 setCardData({
                     name: "",
@@ -148,6 +152,7 @@ const FormCard = () => {
             return response.data
         } catch (error) {
             Alert.alert('Erro ao criar cliente:', error.message)
+            throw error
         }
     }
 
@@ -168,6 +173,7 @@ const FormCard = () => {
             return response.data
         } catch (error) {
             console.log('Erro ao salvar cartão')
+            throw error
         }
     }
 
@@ -180,7 +186,7 @@ const FormCard = () => {
             const newCard = await saveCard(customer.id, cardToken)
 
 
-            if(newCard !== undefined) {
+            if (newCard !== undefined) {
                 setCard([ ...card, newCard ])
                 setCardData({
                     name: "",
@@ -249,9 +255,9 @@ const FormCard = () => {
             />
         </CardForm>
         {erro ?
-        <View style={{marginVertical: 7}}>
-            <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
-        </View> : ""
+            <View style={{marginVertical: 7}}>
+                <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
+            </View> : ""
         }
         <Botao
             estilo={{ marginHorizontal: 32 }}

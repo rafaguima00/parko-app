@@ -1,11 +1,8 @@
-import React from "react"
 import { Alert, View, Image } from "react-native"
 import { BotaoExcluir, DadosCartao, ViewCard } from "./style"
 import { useUser } from "../../Context/dataUserContext"
 import DeleteCard from "../../Services/DeleteCard"
 import { Feather } from "react-native-vector-icons"
-import master from "../../../assets/Group-90.png"
-import visa from "../../../assets/Group-85.png"
 
 const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
 
