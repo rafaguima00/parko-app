@@ -52,7 +52,7 @@ const ReservasConcluidas = ({ item, userReservations, setLoading }) => {
     async function sendFeedback(itemId) {
         setLoading(true)
 
-        if(!itemId) {
+        if (!itemId) {
             alert(selectRate)
             setLoading(false)
 
@@ -66,21 +66,21 @@ const ReservasConcluidas = ({ item, userReservations, setLoading }) => {
             rate: avaliacao, 
             comments: comments
         })
-        .then(() => {
-            alert(feedbackSent)
+            .then(() => {
+                alert(feedbackSent)
 
-            const updatedReservations = userReservations.map(item =>
-                item.id === feedback ? { ...item, rated: avaliacao } : item
-            )
-            setReservations(updatedReservations)
-            setFeedback(null)
-        })
-        .catch(e => {
-            alert(feedbackNotSent + e)
-        })
-        .finally(() => {
-            setLoading(false)
-        })
+                const updatedReservations = userReservations.map(item =>
+                    item.id === feedback ? { ...item, rated: avaliacao } : item
+                )
+                setReservations(updatedReservations)
+                setFeedback(null)
+            })
+            .catch(e => {
+                alert(feedbackNotSent + e)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     return <>

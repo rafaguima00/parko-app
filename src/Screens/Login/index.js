@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
     Image,
-    Text,
     KeyboardAvoidingView,
     Platform,
-    TouchableOpacity,
     ScrollView
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -43,19 +41,19 @@ const Login = () => {
             email: dados.email,
             password: dados.senha
         })
-        .then(res => {
-            AsyncStorage.setItem("token", JSON.stringify(res.data.token))
-        })
-        .then(() => {
-            navigation.replace("Map")
-        })
-        .catch(e => {
-            setStatusError(true)
-            setMensagemErro(e.response.data.message)
-        })
-        .finally(() => {
-            setCarregando(false)
-        })
+            .then(res => {
+                AsyncStorage.setItem("token", JSON.stringify(res.data.token))
+            })
+            .then(() => {
+                navigation.replace("Map")
+            })
+            .catch(e => {
+                setStatusError(true)
+                setMensagemErro(e.response.data.message)
+            })
+            .finally(() => {
+                setCarregando(false)
+            })
     }
 
     function realizarLogin() {
@@ -79,6 +77,7 @@ const Login = () => {
 
             setCarregando(false)
         }
+        
         checkLogin()
     }, [navigation])
 

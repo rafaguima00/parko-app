@@ -5,7 +5,8 @@ import {
     Image,
     FlatList,
     ScrollView,
-    Alert
+    Alert,
+    Dimensions
 } from "react-native"
 import veiculo from "../../../assets/image_vehicle.png"
 import { theme } from "../../Theme"
@@ -51,7 +52,7 @@ export default function Vehicles({ navigation }) {
     }
 
     useEffect(() => {
-        if(dataUser) {
+        if (dataUser) {
             loadVehicles(dataUser.id)
         }
     }, [dataUser])
@@ -79,14 +80,16 @@ export default function Vehicles({ navigation }) {
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
             />
-            <Botao 
-                children={'Adicionar'}
-                corDeFundo={corPrimaria}
-                corDoTexto={'#fff'}
-                negrito
-                largura={'100%'}
-                aoPressionar={() => navigation.navigate('Register Vehicle')}
-            />
+            <View style={{ alignItems: "center" }}>
+                <Botao 
+                    children={"Adicionar"}
+                    corDeFundo={corPrimaria}
+                    corDoTexto={"#fff"}
+                    negrito
+                    largura={"100%"}
+                    aoPressionar={() => navigation.navigate("Register Vehicle")}
+                />
+            </View>
             <LoadingModal loading={loading} />
         </ScrollView>
     )

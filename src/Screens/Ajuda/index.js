@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { 
     SafeAreaView, 
     StatusBar, 
@@ -44,15 +44,15 @@ const Ajuda = () => {
 
     async function getData() {
         await api.get("/faq")
-        .then(res => {
-            setFaq(res.data)
-        })
-        .catch(() => {
-            setFaq("erro ao carregar dados")
-        })
-        .finally(() => {
-            setLoading(false)
-        })
+            .then(res => {
+                setFaq(res.data)
+            })
+            .catch(() => {
+                setFaq("erro ao carregar dados")
+            })
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     const renderHeader = () => (

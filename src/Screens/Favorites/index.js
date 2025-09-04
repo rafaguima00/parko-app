@@ -1,9 +1,5 @@
-import React, { useEffect } from "react"
-import {
-    Text,
-    FlatList,
-    SafeAreaView
-} from "react-native"
+import { useEffect } from "react"
+import { Text, FlatList, SafeAreaView } from "react-native"
 import { Separator, styles } from "./style"
 import { emptyFavorite } from "../../Mocks/emptyList"
 import { useUser } from "../../Context/dataUserContext"
@@ -22,14 +18,13 @@ export default function Favorites() {
             setFavorites(res.data)
         })
         .catch(e => {
-            console.log(e)
             alert(getFavoriteList)
         })
     }
 
     useEffect(() => {
         returnFavorites()
-    }, [])
+    }, [dataUser])
 
     const EmptyListMessage = () => {
         return (

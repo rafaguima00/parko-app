@@ -5,6 +5,7 @@ import styled from "styled-components"
 const { fonteNegrito, corPrimaria, corNeutra } = theme
 const width = Dimensions.get('screen').width
 const height = Dimensions.get('window').height
+const isTablet = width >= 750
 
 export const BtRating = styled.TouchableOpacity`
     height: 34px;
@@ -112,7 +113,8 @@ export const styles = StyleSheet.create({
         borderRadius: 22,
         position: "relative",
         marginBottom: 42,
-        height: height * 0.4
+        height: height * 0.4,
+        aspectRatio: 0.77
     },
     itemListaEmAndamento: {
         backgroundColor: "#efefef",
@@ -121,7 +123,8 @@ export const styles = StyleSheet.create({
         borderRadius: 22,
         position: "relative",
         marginBottom: 42,
-        height: height * 0.33
+        height: height * 0.33,
+        aspectRatio: 0.77
     },
     viewEstacionamento: {
         flexDirection: "row",

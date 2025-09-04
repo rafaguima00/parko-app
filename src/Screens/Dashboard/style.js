@@ -6,7 +6,7 @@ const { fonteNegrito, corPrimaria, corNeutra } = theme
 
 export const AreaView = styled.SafeAreaView`
     display: flex;
-    align-items: center;
+    align-items: stretch;
 `
 
 export const TopModal = styled.View`

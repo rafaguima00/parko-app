@@ -1,13 +1,14 @@
-import { useContext, useEffect, useState } from 'react'
-import { ScrollView, View, Text, FlatList } from 'react-native'
-import { Feather, MaterialCommunityIcons } from 'react-native-vector-icons'
-import { Botao } from '../../../../Components/Botao'
-import { BotaoClicar, MaisTempo, RenderHeader, styles, TextBlue, TextLine } from './style'
-import { theme } from '../../../../Theme'
-import { ReservaContext } from '../../../../Context/reservaContext'
-import api from '../../../../Services/api'
-import LoadingModal from '../../../../Components/Loading'
-import ListaDePrecos from './components/listaDePrecos'
+import { useContext, useEffect, useState } from "react"
+import { ScrollView, View, Text, FlatList } from "react-native"
+import { Feather, MaterialCommunityIcons } from "react-native-vector-icons"
+import { Botao } from "../../../../Components/Botao"
+import { BotaoClicar, MaisTempo, styles, TextBlue, TextLine } from "./style"
+import { theme } from "../../../../Theme"
+import { ReservaContext } from "../../../../Context/reservaContext"
+import api from "../../../../Services/api"
+import LoadingModal from "../../../../Components/Loading"
+import ListaDePrecos from "./components/listaDePrecos"
+import { STATUS_APP } from "@env"
 
 const Menu = ({ 
     setModalDatePicker, 
@@ -45,12 +46,12 @@ const Menu = ({
 
     async function retornarHorarioDeFuncionamento() {
         await api.get(`/hora_funcionamento/${destination.id}`) 
-        .then(res => {
-            setHoraFuncionamento(res.data)
-        })
-        .catch(e => {
-            console.log("Erro ao carregar horário de funcionamento: " + e)
-        })
+            .then(res => {
+                setHoraFuncionamento(res.data)
+            })
+            .catch(e => {
+                console.log("Erro ao carregar horário de funcionamento: " + e)
+            })
     }
     
     function tempoTolerancia(tempo) {
@@ -94,9 +95,8 @@ const Menu = ({
     }, [])
 
     useEffect(() => {
-        if (priceTable.length > 0) {
+        if (priceTable.length > 0 || STATUS_APP === "test") {
             setLoading(false)
-            console.log(priceTable)
         }
     }, [priceTable])
 
@@ -143,7 +143,7 @@ const Menu = ({
                     <View style={styles.viewContent}>
                         <Feather name="clock" size={18} color="#7d7d7d" />
                         <Text style={styles.textContent}>
-                            Tempo de tolerância: {tempoTolerancia(tempo_tolerancia)}
+                            Tempo de tolerância: {tempo_tolerancia && tempoTolerancia(tempo_tolerancia)}
                         </Text>
                     </View>
                 </View>
@@ -153,6 +153,7 @@ const Menu = ({
                 <View>
                     <Text style={styles.textoHorarios}>Horários</Text>
                 </View>
+                {priceTable ? 
                 <FlatList
                     horizontal
                     data={priceTable}
@@ -165,11 +166,13 @@ const Menu = ({
                     )}
                     keyExtractor={item => item.id.toString()}
                     showsHorizontalScrollIndicator={false}
-                />
+                /> : 
+                "Nenhum horário disponível"
+                }
             </View>
 
             <MaisTempo>
-                <BotaoClicar onPress={() => setModalMaisTempo(true)}>
+                <BotaoClicar activeOpacity={0.7} onPress={() => setModalMaisTempo(true)}>
                     <TextLine>Ainda precisa de mais tempo?</TextLine> 
                     <TextBlue>Clica aqui.</TextBlue>
                 </BotaoClicar>

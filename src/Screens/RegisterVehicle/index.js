@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Text, View, ActivityIndicator, Alert, SafeAreaView } from "react-native"
+import { useState } from "react"
+import { Text, View, Dimensions, Alert, SafeAreaView } from "react-native"
 import { ScrollView, TextInput } from "react-native-gesture-handler"
 import { styles } from "./style"
 import { theme } from "../../Theme"
@@ -12,6 +12,8 @@ import LoadingModal from "../../Components/Loading"
 export default function RegisterVehicle({ navigation }) {
 
     const { corPrimaria } = theme
+    const { width } = Dimensions.get("screen")
+    const isTablet = width >= 750
 
     const [dados, setDados] = useState({
         nome: "",
@@ -71,14 +73,14 @@ export default function RegisterVehicle({ navigation }) {
         if (dados.nome === "" || dados.placa === "" || dados.cor === "") {
             setErro(true)
             setLoading(false)
-            setMensagemErro('Preencha todos os campos')
+            setMensagemErro("Preencha todos os campos")
             return
         }
         
         if (dados.placa.length < 7) {
             setErro(true)
             setLoading(false)
-            setMensagemErro('Placa de veículo inválida')
+            setMensagemErro("Placa de veículo inválida")
             return
         } 
 
@@ -97,24 +99,27 @@ export default function RegisterVehicle({ navigation }) {
                             style={styles.input}
                             value={item.value}
                             onChangeText={item.onChange}
-                            autoCapitalize={item.id == 2 ? 'characters' : 'words'}
+                            autoCapitalize={item.id == 2 ? "characters" : "words"}
                             maxLength={item.id == 2 ? 7 : undefined}
                         />
                     ))}
                     {erro &&
                         <View>
-                            <Text style={{ color: 'red' }}>{mensagemErro}</Text>
+                            <Text style={{ color: "red" }}>{mensagemErro}</Text>
                         </View>
                     }
                 </View>
-                <Botao
-                    estilo={{ marginHorizontal: 32 }}
-                    children={"Confirmar"}
-                    corDeFundo={corPrimaria}
-                    corDoTexto={'#fff'}
-                    negrito
-                    aoPressionar={adicionarVeiculo}
-                />
+                <View style={{ alignItems: "center" }}>
+                    <Botao
+                        estilo={{ marginHorizontal: 32 }}
+                        children={"Confirmar"}
+                        corDeFundo={corPrimaria}
+                        corDoTexto={"#fff"}
+                        largura={isTablet ? "50%" : "100%"}
+                        negrito
+                        aoPressionar={adicionarVeiculo}
+                    />
+                </View>
             </ScrollView>
             <LoadingModal loading={loading} />
         </SafeAreaView>

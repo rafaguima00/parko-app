@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import logo from "../../../assets/logo-parko.png"
 import {
     View,
@@ -19,6 +19,7 @@ import LoadingModal from "../Loading"
 import { errorLogout } from "../../Mocks/errorOrRejected"
 
 function CustomDrawer() {
+
     const navigation = useNavigation()
 
     const { corPrimaria } = theme
@@ -46,32 +47,32 @@ function CustomDrawer() {
         {
             navigate: "Veiculos",
             nameIcon: "disc",
-            texto: 'Veículos'
+            texto: "Veículos"
         },
         {
             navigate: "Reservas",
             nameIcon: "calendar",
-            texto: 'Histórico'
+            texto: "Histórico"
         },
         {
             navigate: "Pagamento",
             nameIcon: "dollar-sign",
-            texto: 'Pagamentos'
+            texto: "Pagamentos"
         },
         // {
         //     navigate: "Descontos",
         //     nameIcon: "percent",
-        //     texto: 'Descontos'
+        //     texto: "Descontos"
         // },
         {
             navigate: "Favoritos",
             nameIcon: "heart",
-            texto: 'Favoritos'
+            texto: "Favoritos"
         },
         {
             navigate: "Ajuda",
             nameIcon: "help-circle",
-            texto: 'Ajuda'
+            texto: "Ajuda"
         }
     ]
 
@@ -79,10 +80,10 @@ function CustomDrawer() {
         <View style={styles.menuLateral} >
             <Image 
                 source={logo} 
-                style={{ width: '51%', height: '6%', marginVertical: 32 }} 
+                style={{ width: "51%", height: "6%", marginVertical: 32 }} 
                 resizeMode="contain"
             />
-            <TouchableOpacity onPress={() => navigation.navigate('Profile', { register })} >
+            <TouchableOpacity onPress={() => navigation.navigate("Profile", { register })} >
                 <Image source={fotoPerfil} style={{ width: 140, height: 140 }} />
                 <View style={styles.botaoEdit}>
                     <Octicons name="pencil" size={24} color="white" />
@@ -97,7 +98,7 @@ function CustomDrawer() {
                             navigation.navigate(item.navigate)
                         }}
                     >
-                        <Feather name={item.nameIcon} size={19} color={'#545454'} />
+                        <Feather name={item.nameIcon} size={19} color={"#545454"} />
                         <Text style={styles.link}>{item.texto}</Text>
                     </TouchableOpacity>
                 ))}
@@ -105,8 +106,8 @@ function CustomDrawer() {
             <Botao
                 children={"Sair"}
                 corDeFundo={corPrimaria}
-                largura={'70%'}
-                corDoTexto={'#fff'}
+                largura={"70%"}
+                corDoTexto={"#fff"}
                 negrito
                 aoPressionar={() => {
                     Alert.alert(

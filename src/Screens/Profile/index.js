@@ -189,43 +189,49 @@ export default function Profile({ navigation, route }) {
                         <Octicons name="pencil" size={32} color="white" />
                     </TouchableOpacity>
 
-                    <Text style={styles.nome}>Nome completo</Text>
-                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
-                        <TextInput
-                            placeholder="Digite seu nome"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            value={data.name}
-                            onChangeText={text => setData({ ...data, name: text })}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity>
+                    <View>
+                        <Text style={styles.nome}>Nome completo</Text>
+                        <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
+                            <TextInput
+                                placeholder="Digite seu nome"
+                                placeholderTextColor={corPrimaria}
+                                style={styles.dadosUsuario}
+                                value={data.name}
+                                onChangeText={text => setData({ ...data, name: text })}
+                            />
+                            <IconeEditarPerfil />
+                        </TouchableOpacity>
+                    </View>
 
-                    <Text style={styles.nome}>Telefone</Text>
-                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
-                        <TextInput
-                            placeholder="Digite o número do celular"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            keyboardType="numeric"
-                            value={formatarTelefone(data.tel || '')}
-                            onChangeText={(text) => setData({ ...data, tel: text })}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity>
+                    <View>
+                        <Text style={styles.nome}>Telefone</Text>
+                        <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
+                            <TextInput
+                                placeholder="Digite o número do celular"
+                                placeholderTextColor={corPrimaria}
+                                style={styles.dadosUsuario}
+                                keyboardType="numeric"
+                                value={formatarTelefone(data.tel || '')}
+                                onChangeText={(text) => setData({ ...data, tel: text })}
+                            />
+                            <IconeEditarPerfil />
+                        </TouchableOpacity>
+                    </View>
 
-                    <Text style={styles.nome}>CPF</Text>
-                    <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
-                        <TextInput
-                            placeholder="Digite seu CPF"
-                            placeholderTextColor={corPrimaria}
-                            style={styles.dadosUsuario}
-                            keyboardType="numeric"
-                            value={formatarCPF(data.cpf || '')}
-                            onChangeText={(text) => setData({ ...data, cpf: text })}
-                        />
-                        <IconeEditarPerfil />
-                    </TouchableOpacity>
+                    <View>
+                        <Text style={styles.nome}>CPF</Text>
+                        <TouchableOpacity style={styles.displayUsuario} activeOpacity={0.7}>
+                            <TextInput
+                                placeholder="Digite seu CPF"
+                                placeholderTextColor={corPrimaria}
+                                style={styles.dadosUsuario}
+                                keyboardType="numeric"
+                                value={formatarCPF(data.cpf || '')}
+                                onChangeText={(text) => setData({ ...data, cpf: text })}
+                            />
+                            <IconeEditarPerfil />
+                        </TouchableOpacity>
+                    </View>
 
                     <DivButton>
                         <Botao
@@ -234,6 +240,7 @@ export default function Profile({ navigation, route }) {
                             negrito
                             corDoTexto={'#fff'}
                             aoPressionar={() => alertWarning(dataUser.id)}
+                            largura={"100%"}
                         />
                         <Botao
                             children={"Salvar"}
@@ -241,6 +248,7 @@ export default function Profile({ navigation, route }) {
                             negrito
                             corDoTexto={'#fff'}
                             aoPressionar={salvarDados}
+                            largura={"100%"}
                         />
                     </DivButton>
                 </View>

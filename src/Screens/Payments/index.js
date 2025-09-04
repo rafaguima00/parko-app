@@ -111,14 +111,16 @@ export default function Payments({ navigation }) {
                 ListEmptyComponent={EmptyListMessage}
                 showsHorizontalScrollIndicator={false}
             />
-            <Botao
-                children={"Adicionar"}
-                largura={"100%"}
-                corDeFundo={corPrimaria}
-                negrito
-                corDoTexto={"#fff"}
-                aoPressionar={() => navigation.navigate("Cadastrar Cartao")}
-            />
+            <View style={{ alignItems: "center" }}>
+                <Botao
+                    children={"Adicionar"}
+                    largura={"100%"}
+                    corDeFundo={corPrimaria}
+                    negrito
+                    corDoTexto={"#fff"}
+                    aoPressionar={() => navigation.navigate("Cadastrar Cartao")}
+                />
+            </View>
             <LoadingModal loading={loading} />
         </ScrollView>
     </>

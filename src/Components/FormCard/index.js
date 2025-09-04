@@ -1,25 +1,27 @@
-import { TextInputMask } from 'react-native-masked-text'
-import { TextInput, Text, Alert, View } from 'react-native'
-import { CardForm, FlexCVC, styles } from './style'
-import { usePayment } from '../../Context/paymentContext'
-import { theme } from '../../Theme'
-import { useEffect, useState } from 'react'
-import LoadingModal from '../Loading'
-import { Botao } from '../Botao'
-import axios from 'axios'
-import { useUser } from '../../Context/dataUserContext'
+import { TextInputMask } from "react-native-masked-text"
+import { TextInput, Text, Alert, View, Dimensions } from "react-native"
+import { CardForm, FlexCVC, styles } from "./style"
+import { usePayment } from "../../Context/paymentContext"
+import { theme } from "../../Theme"
+import { useState } from "react"
+import LoadingModal from "../Loading"
+import { Botao } from "../Botao"
+import axios from "axios"
+import { useUser } from "../../Context/dataUserContext"
 import { PUBLIC_KEY, ACCESS_TOKEN } from "@env"
 
 const FormCard = () => {
 
     const [erro, setErro] = useState(false)
-    const [mensagemErro, setMensagemErro] = useState('')
+    const [mensagemErro, setMensagemErro] = useState("")
     const [loading, setLoading] = useState(false)
 
     const { cardData, setCardData, setCard, card } = usePayment()
     const { dataUser } = useUser()
 
     const { corPrimaria } = theme
+    const { width } = Dimensions.get("screen")
+    const isTablet = width >= 750
 
     async function adicionarCartao() {
         setLoading(true)
@@ -39,7 +41,7 @@ const FormCard = () => {
         }
 
         // Validação de formato dos dados
-        if (!/^\d{15,16}$/.test(cardData.card_number.replace(/\s/g, ''))) {
+        if (!/^\d{15,16}$/.test(cardData.card_number.replace(/\s/g, ""))) {
             setErro(true)
             setMensagemErro("Número do cartão inválido")
             setLoading(false)
@@ -60,7 +62,7 @@ const FormCard = () => {
             return
         }
 
-        if (!/^\d{11}$/.test(cardData.cpf.replace(/\D/g, ''))) {
+        if (!/^\d{11}$/.test(cardData.cpf.replace(/\D/g, ""))) {
             setErro(true)
             setMensagemErro("CPF inválido")
             setLoading(false)
@@ -72,16 +74,16 @@ const FormCard = () => {
             const response = await axios.post(
                 `https://api.mercadopago.com/v1/card_tokens?public_key=${PUBLIC_KEY}`,
                 {
-                    card_number: cardData.card_number.replace(/\s/g, ''),
+                    card_number: cardData.card_number.replace(/\s/g, ""),
                     cardholder: {
                         name: cardData.name,
                         identification: {
                             type: "CPF",
-                            number: cardData.cpf.replace(/\D/g, '')
+                            number: cardData.cpf.replace(/\D/g, "")
                         }
                     },
-                    expiration_month: cardData.date_time.split('/')[0],
-                    expiration_year: `20${cardData.date_time.split('/')[1]}`,
+                    expiration_month: cardData.date_time.split("/")[0],
+                    expiration_year: `20${cardData.date_time.split("/")[1]}`,
                     security_code: cardData.cvc
                 }
             )
@@ -95,13 +97,13 @@ const FormCard = () => {
 
             if (e.response.data.message) {
                 setMensagemErro(e.response.data.message)
-            } else if (e.message === 'Network Error') {
+            } else if (e.message === "Network Error") {
                 setMensagemErro("Sem conexão com o servidor")
             } else {
                 setMensagemErro("Erro ao salvar cartão")
             }
 
-            console.log('Erro ao criar token:', e.response ? e.response.data : e)
+            console.log("Erro ao criar token:", e.response ? e.response.data : e)
         } finally {
             setLoading(false)
         }
@@ -138,7 +140,7 @@ const FormCard = () => {
             }
 
             const response = await axios.post(
-                'https://api.mercadopago.com/v1/customers',
+                "https://api.mercadopago.com/v1/customers",
                 {
                     email: email, 
                 },
@@ -151,7 +153,7 @@ const FormCard = () => {
 
             return response.data
         } catch (error) {
-            Alert.alert('Erro ao criar cliente:', error.message)
+            Alert.alert("Erro ao criar cliente:", error.message)
             throw error
         }
     }
@@ -172,7 +174,7 @@ const FormCard = () => {
 
             return response.data
         } catch (error) {
-            console.log('Erro ao salvar cartão')
+            console.log("Erro ao salvar cartão")
             throw error
         }
     }
@@ -221,7 +223,7 @@ const FormCard = () => {
             <TextInputMask
                 placeholder="Número do cartão"
                 maxLength={19}
-                type='credit-card'
+                type="credit-card"
                 value={cardData.card_number}
                 onChangeText={text => setCardData({ ...cardData, card_number: text })}
                 style={styles.input}
@@ -229,7 +231,7 @@ const FormCard = () => {
             <FlexCVC>
                 <TextInputMask
                     placeholder="Validade (MM/YY)"
-                    type='datetime'
+                    type="datetime"
                     value={cardData.date_time}
                     onChangeText={text => setCardData({ ...cardData, date_time: text })}
                     style={styles.inputInferior}
@@ -238,9 +240,9 @@ const FormCard = () => {
                 <TextInputMask
                     placeholder="CVC"
                     style={styles.inputInferior}
-                    type='custom'
+                    type="custom"
                     options={{
-                        mask: '9999'
+                        mask: "9999"
                     }}
                     value={cardData.cvc}
                     onChangeText={text => setCardData({ ...cardData, cvc: text })}
@@ -248,7 +250,7 @@ const FormCard = () => {
             </FlexCVC>
             <TextInputMask
                 placeholder="CPF do titular"
-                type='cpf'
+                type="cpf"
                 value={cardData.cpf}
                 onChangeText={text => setCardData({ ...cardData, cpf: text })}
                 style={styles.input}
@@ -256,17 +258,20 @@ const FormCard = () => {
         </CardForm>
         {erro ?
             <View style={{marginVertical: 7}}>
-                <Text style={{ color: 'red', textAlign: 'center' }}>{mensagemErro}</Text>
+                <Text style={{ color: "red", textAlign: "center" }}>{mensagemErro}</Text>
             </View> : ""
         }
-        <Botao
-            estilo={{ marginHorizontal: 32 }}
-            children={'Adicionar'}
-            corDeFundo={corPrimaria}
-            corDoTexto={'#fff'}
-            negrito
-            aoPressionar={adicionarCartao}
-        />
+        <View style={{ alignItems: "center" }}>
+            <Botao
+                estilo={{ marginHorizontal: 32 }}
+                children={"Adicionar"}
+                corDeFundo={corPrimaria}
+                corDoTexto={"#fff"}
+                negrito
+                aoPressionar={adicionarCartao}
+                largura={isTablet ? "50%" : "100%"}
+            />
+        </View>
         <LoadingModal loading={loading} />
     </>
 }

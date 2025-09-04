@@ -9,9 +9,9 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
         width: width
     },
-    imagem: {
-        width: width * 0.6, 
-        height: (width * 0.6) * 0.5,
+    imagem: { 
+        width: "70%",
+        maxWidth: 300,
         marginVertical: 8,
         paddingHorizontal: 32
     },

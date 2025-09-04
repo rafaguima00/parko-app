@@ -1,29 +1,33 @@
-import { 
-    View, 
-    TouchableOpacity, 
-    Text, 
-    Image 
-} from "react-native"
+import { View, TouchableOpacity, Text, Image } from "react-native"
 import { TextInput } from "react-native-paper"
 import { styles, TextFavorites } from "../styles"
 import { theme } from "../../../Theme"
 import { Feather } from "react-native-vector-icons"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useUser } from "../../../Context/dataUserContext"
 
 const Searching = (props) => {
 
-    const { 
-        setModalPesquisar, 
-        setTextoDigitado, 
-        setItensFiltrados,
-        itensFiltrados, 
-        textoDigitado 
-    } = props.state
-    const { filtrarItens, retornarCoordenadas } = props
+    const { retornarCoordenadas, setModalPesquisar } = props
     const { corPrimaria, corFonteSecundaria } = theme
 
-    const { favorites } = useUser()
+    const { estacionamentos, favorites } = useUser()
+    
+    const [textoDigitado, setTextoDigitado] = useState("")
+    const [itensFiltrados, setItensFiltrados] = useState([])
+
+    const filtrarItens = (text) => {
+        if (text) {
+            const resultadoPesquisa = estacionamentos.filter(
+                item => item.name.toLowerCase().includes(text.toLowerCase())
+            )
+            setItensFiltrados(resultadoPesquisa)
+        } else {
+            setItensFiltrados([])
+        }
+
+        setTextoDigitado(text)
+    }
 
     useEffect(() => {
         if(itensFiltrados.length == 0 && textoDigitado === "") {

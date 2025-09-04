@@ -5,6 +5,7 @@ import styled from "styled-components"
 const { width } = Dimensions.get('screen')
 const height = Dimensions.get('window').height
 const { fonteNegrito, corPrimaria, corNeutra } = theme
+const isTablet = width >= 750
 
 export const TextFavorites = styled.Text`
     color: ${corNeutra};
@@ -107,7 +108,7 @@ export const styles = StyleSheet.create({
         borderRadius: 16,
         borderColor: "#7d7d7d",
         padding: 12,
-        width: 100,
+        width: isTablet ? 200 : 100,
         height: 50
     },
     textoBotao: { 

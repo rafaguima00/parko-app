@@ -23,6 +23,7 @@ export const Botao = ({
                     justifyContent: "center",
                     width: largura,
                     height: altura,
+                    maxWidth: 450,
                     padding: 12,
                     borderRadius: 50
                 }

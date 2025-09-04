@@ -10,8 +10,8 @@ export const styles = StyleSheet.create({
         width: width
     },
     imagem: {
-        width: width * 0.6, 
-        height: (width * 0.6) * 0.5,
+        width: "70%",
+        maxWidth: 300,
         marginVertical: 8,
         paddingHorizontal: 32
     },

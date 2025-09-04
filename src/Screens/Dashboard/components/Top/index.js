@@ -1,29 +1,37 @@
-import React, { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect } from "react"
 import { 
     View, 
-    Image, 
     TouchableOpacity,
-    Dimensions,
     Modal,
     ActivityIndicator,
     StyleSheet,
-    ImageBackground
-} from 'react-native'
+    ImageBackground,
+    Dimensions
+} from "react-native"
 import { 
     Feather, 
     MaterialIcons, 
     FontAwesome, 
     Ionicons, 
     MaterialCommunityIcons 
-} from 'react-native-vector-icons'
+} from "react-native-vector-icons"
 import { ReservaContext } from "../../../../Context/reservaContext"
 import { useUser } from "../../../../Context/dataUserContext"
-import { BotoesSuperiores, InfoEstacionamento, Nome, Local, Endereco, Icons, TextIcon } from "./style"
+import { 
+    BotoesSuperiores, 
+    InfoEstacionamento, 
+    Nome, 
+    Local, 
+    Endereco, 
+    Icons, 
+    TextIcon 
+} from "./style"
 import api from "../../../../Services/api"
 import { addFavorite, removeFavorite } from "../../../../Mocks/errorOrRejected"
 import { addFavoriteConfirmed } from "../../../../Mocks/confirmed"
 
-const { width, height } = Dimensions.get('window')
+const { width } = Dimensions.get("screen")
+const isTablet = width >= 750
 
 function Topo({ handleImageLoaded, voltar }) {
 
@@ -71,17 +79,17 @@ function Topo({ handleImageLoaded, voltar }) {
 
     async function retornarFavorito() {
         await api.get(`/favorites/${dataUser.id}`)
-        .then(res => {
-            const result = res.data
-            const filterResult = result.find(item => item.parking_id == destination.id)
-            
-            if(filterResult) {
-                setFavoritoAtivado(true)
-            }
-        })
-        .catch(() => {
-            console.log("Erro ao verificar estacionamento favorito")
-        })
+            .then(res => {
+                const result = res.data
+                const filterResult = result.find(item => item.parking_id == destination.id)
+                
+                if(filterResult) {
+                    setFavoritoAtivado(true)
+                }
+            })
+            .catch(() => {
+                console.log("Erro ao verificar estacionamento favorito")
+            })
     }
 
     useEffect(() => {
@@ -109,43 +117,45 @@ function Topo({ handleImageLoaded, voltar }) {
                     <MaterialIcons 
                         name={(favoritoAtivado ? "favorite" : "favorite-border")} 
                         size={28} 
-                        color={(favoritoAtivado ? 'red' : '#fff')} 
+                        color={(favoritoAtivado ? "red" : "#fff")} 
                         style={{ padding: 30 }}
                     />
                 </TouchableOpacity>
             </BotoesSuperiores>
             <InfoEstacionamento>
-                <Nome>{name}</Nome>
+                <Nome>{name || ""}</Nome>
                 <Local>
                     <MaterialCommunityIcons name="map-marker" size={14} color="#f4f4f4" />
-                    <Endereco>{end}</Endereco>
+                    <Endereco>{end || ""}</Endereco>
                 </Local>
                 <Icons>
                     <FontAwesome name="arrows-h" size={16} color="#0097b9" />
                     <TextIcon>{distance ? `${distance.toFixed(1)} km` : ""}</TextIcon>
 
                     <Ionicons name="car" size={20} color="#0097b9" />
-                    <TextIcon>{parseInt(numero_vagas) - parseInt(vagas_ocupadas)} vagas</TextIcon>
+                    <TextIcon>
+                        {numero_vagas && parseInt(numero_vagas) - parseInt(vagas_ocupadas)} vagas
+                    </TextIcon>
 
                     <Feather name="star" size={20} color="#0097b9" />
-                    <TextIcon>{rate ? rate : 'n/a'}</TextIcon>
+                    <TextIcon>{rate ? rate : "n/a"}</TextIcon>
                 </Icons>
             </InfoEstacionamento>
             <Modal
                 visible={loading}
                 transparent={true}
                 onRequestClose={() => {}}
-                animationType='fade'
+                animationType="fade"
             >
                 <View
                     style={{
-                        backgroundColor: 'rgba(125, 125, 125, 0.6)',
+                        backgroundColor: "rgba(125, 125, 125, 0.6)",
                         flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                        alignItems: "center",
+                        justifyContent: "center"
                     }}
                 >
-                    <ActivityIndicator size={'small'} color={'#fff'} />
+                    <ActivityIndicator size={"small"} color={"#fff"} />
                 </View>
             </Modal> 
         </View>
@@ -154,13 +164,13 @@ function Topo({ handleImageLoaded, voltar }) {
 
 const estilo = StyleSheet.create({
     imageBackground: { 
-        width: width, 
-        height: height * 0.28
+        width: "100%", 
+        aspectRatio: isTablet ? 16 / 7 : 16 / 9
     },
     overlay: {
         ...StyleSheet.absoluteFillObject, // preenche todo o espaço do ImageBackground
-        backgroundColor: '#000',
-        opacity: 0.4, // ajusta o escurecimento
+        backgroundColor: "#000",
+        opacity: 0.4
     }
 })
 

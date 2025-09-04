@@ -162,7 +162,11 @@ function Dashboard({ navigation }) {
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <ScrollView 
+                contentContainerStyle={{ flexGrow: 1 }} 
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+            >
                 <AreaView>
 
                     <Topo

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { 
     Text, 
     View, 
@@ -38,20 +38,22 @@ export default function Reservations() {
     return (
         <View style={styles.areaContent}>
             <TopArrowLeft children={"Reservas"} />
-            <FlatList 
-                style={{ marginTop: 36, marginHorizontal: 40 }}
-                data={userReservations}
-                renderItem={item => (
-                    <ReservationsList 
-                        {...item} 
-                        setLoading={setLoading} 
-                        userReservations={userReservations}
-                    />
-                )}
-                keyExtractor={item => item.id}
-                ListEmptyComponent={EmptyListMessage}
-                showsVerticalScrollIndicator={false}
-            />
+            <View style={{ alignItems: "center" }}>
+                <FlatList 
+                    style={{ marginTop: 36, marginHorizontal: 40 }}
+                    data={userReservations}
+                    renderItem={item => (
+                        <ReservationsList 
+                            {...item} 
+                            setLoading={setLoading} 
+                            userReservations={userReservations}
+                        />
+                    )}
+                    keyExtractor={item => item.id}
+                    ListEmptyComponent={EmptyListMessage}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
             <LoadingModal loading={loading} /> 
         </View>
     )

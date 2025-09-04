@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 const { width } = Dimensions.get('screen')
 const { fonteNegrito, corPrimaria } = theme
+const isTablet = width >= 750
 
 export const styles = StyleSheet.create({
     content: {
@@ -15,12 +16,14 @@ export const styles = StyleSheet.create({
         height: 420
     },
     perfil: {
+        position: "relative",
         backgroundColor: "white",
         marginTop: -100,
         marginBottom: 50,
         paddingHorizontal: 48,
         alignSelf: "center",
-        width: width,
+        alignItems: "center",
+        width: width
     },
     botaoEdit: {
         backgroundColor: "#523499",
@@ -50,7 +53,8 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 24
+        marginBottom: 24,
+        width: isTablet ? 480 : "100%"
     },
     dadosUsuario: {
         fontFamily: fonteNegrito,
@@ -68,5 +72,7 @@ export const styles = StyleSheet.create({
 export const DivButton = styled.View`
     display: flex;
     flex-direction: column;
+    width: 100%;
     gap: 20px;
+    align-items: center;
 `
