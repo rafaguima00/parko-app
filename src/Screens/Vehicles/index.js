@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
     Text,
     View,
     Image,
     FlatList,
     ScrollView,
-    Alert,
-    Dimensions
+    Alert
 } from "react-native"
 import veiculo from "../../../assets/image_vehicle.png"
 import { theme } from "../../Theme"
@@ -39,16 +38,16 @@ export default function Vehicles({ navigation }) {
         setLoading(true)
 
         await api.delete(`/vehicles/${idVeiculo}`)
-        .then(() => {
-            Alert.alert(`Veículo ${nomeVeiculo} excluído`)
-            loadVehicles(dataUser.id)
-        })
-        .catch(e => {
-            Alert.alert("Erro ao deletar veículo", e)
-        })
-        .finally(() => {
-            setLoading(false)
-        })
+            .then(() => {
+                Alert.alert(`Veículo ${nomeVeiculo} excluído`)
+                loadVehicles(dataUser.id)
+            })
+            .catch(e => {
+                Alert.alert("Erro ao deletar veículo", e)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     useEffect(() => {

@@ -8,9 +8,18 @@ const isTablet = width >= 750
 
 export const styles = StyleSheet.create({
     content: {
-        backgroundColor: "white",
-        alignItems: "center"
+        backgroundColor: "#fff",
+        alignItems: "center",
+        minHeight: "100%"
     },
+    topView: {
+        flexDirection: "row", 
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: width,
+        paddingHorizontal: 40,
+        paddingBottom: 20
+    },  
     top: {
         width: width,
         height: 420
@@ -18,7 +27,6 @@ export const styles = StyleSheet.create({
     perfil: {
         position: "relative",
         backgroundColor: "white",
-        marginTop: -100,
         marginBottom: 50,
         paddingHorizontal: 48,
         alignSelf: "center",
@@ -75,4 +83,5 @@ export const DivButton = styled.View`
     width: 100%;
     gap: 20px;
     align-items: center;
+    margin-top: 32px;
 `

@@ -6,7 +6,7 @@ export default () => {
     expo: {
       name: "Parko",
       slug: "parko-app",
-      version: "1.1.37",
+      version: "1.1.40",
       orientation: "portrait",
       icon: "./assets/icon_parko.png",
       userInterfaceStyle: "light",
@@ -27,12 +27,10 @@ export default () => {
         }
       },
       android: {
-        compileSdkVersion: 35,
-        targetSdkVersion: 35,
-        versionCode: 38,
+        versionCode: 41,
         adaptiveIcon: {
           foregroundImage: "./assets/icon_parko.png",
-          backgroundColor: "#ffffff"
+          backgroundColor: "#509C76"
         },
         package: "com.rafaelgsm.parkoapp",
         config: {
@@ -49,7 +47,10 @@ export default () => {
       web: {
         favicon: "./assets/favicon.png"
       },
-      plugins: ["expo-font"],
+      plugins: [
+        "./withAndroidTargetSdkVersion.js",
+        "expo-font"
+      ],
       extra: {
         eas: {
           projectId: process.env.EAS_PROJECT_ID

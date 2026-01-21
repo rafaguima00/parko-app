@@ -171,23 +171,24 @@ export default function Profile({ navigation, route }) {
             behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
         >
             <ScrollView contentContainerStyle={styles.content}>
-                <View>
+                <View style={styles.topView}>
                     <TouchableOpacity
                         onPress={() => navigation.replace("Map")}
-                        style={{ marginHorizontal: 36, marginTop: 38 }}
+                        style={{ marginTop: 38 }}
                         activeOpacity={0.9}
                     >
                         <Feather name="arrow-left" size={36} color="black" />
                     </TouchableOpacity>
-                    <View>
+                    {/* <View>
                         <Image source={fotoPerfil} style={styles.top} />
-                    </View>
+                    </View> */}
+                    <View></View>
                 </View>
     
                 <View style={styles.perfil}>
-                    <TouchableOpacity style={styles.botaoEdit} activeOpacity={0.7} >
+                    {/* <TouchableOpacity style={styles.botaoEdit} activeOpacity={0.7} >
                         <Octicons name="pencil" size={32} color="white" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <View>
                         <Text style={styles.nome}>Nome completo</Text>
