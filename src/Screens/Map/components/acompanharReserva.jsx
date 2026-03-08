@@ -1,14 +1,13 @@
 import { Image, Text, TouchableOpacity, View } from "react-native"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { theme } from "../../../Theme"
 import { styles } from "../styles"
 import { useNavigation } from "@react-navigation/native"
-import { useContext } from "react"
-import { ReservaContext } from "../../../Context/reservaContext"
+import { useReservation } from "../../../Context/reservaContext"
 
 const AcompanharReserva = (props) => {
 
-    const { reservaFeita } = useContext(ReservaContext)
+    const { reservaFeita } = useReservation()
     const { findReservation } = props
     const { 
         color,

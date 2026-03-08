@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { Modal, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import Topo from "./components/Top"
 import { AreaView } from "./style"

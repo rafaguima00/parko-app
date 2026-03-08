@@ -2,15 +2,16 @@ import { KeyboardAvoidingView, Platform, Text, TouchableOpacity } from "react-na
 import { styles } from "../styles"
 import { theme } from "../../../Theme"
 import { LinearGradient } from "expo-linear-gradient"
-import { Feather } from "react-native-vector-icons"
-import { useContext } from "react"
-import { ReservaContext } from "../../../Context/reservaContext"
+import { Feather } from "@expo/vector-icons"
+import { useReservation } from "../../../Context/reservaContext"
+import { useUser } from "../../../Context/dataUserContext"
 
-const EstouIndoPara = (props) => {
+const EstouIndoPara = () => {
 
-    const { setModalPesquisar } = props
     const { corPrimaria, corFonteSecundaria } = theme
-    const { destination, reservaFeita } = useContext(ReservaContext)
+
+    const { setModalPesquisar } = useUser()
+    const { destination, reservaFeita } = useReservation()
 
     return <>
         {(!destination && !reservaFeita) &&

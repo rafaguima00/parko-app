@@ -15,7 +15,7 @@ import {
 } from "../style"
 import { Feather } from "react-native-vector-icons"
 import { emptyCard } from "../../../Mocks/emptyList"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { ReservaContext } from "../../../Context/reservaContext"
 import { usePayment } from "../../../Context/paymentContext"
 import CardList from "../../../Components/CardList"

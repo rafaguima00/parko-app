@@ -5,4 +5,6 @@ const api = axios.create({
     baseURL: STATUS_APP === "test" ? `http://${HOST}:3300/api` : URL_API
 })
 
+console.log(HOST)
+
 export default api

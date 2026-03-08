@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from "react"
+import { useEffect } from "react"
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { theme } from "../../../../../Theme"
 import { Botao } from "../../../../../Components/Botao"
-import { ReservaContext } from "../../../../../Context/reservaContext"
+import { useReservation } from "../../../../../Context/reservaContext"
 import LoadingModal from "../../../../../Components/Loading"
 import { reservaConfirmada } from "../../../../../Mocks/confirmed"
 
@@ -20,7 +20,7 @@ function ModalConfirmacao({
         distanceMatrix,
         tipoReserva,
         itemPreSelecionado
-    } = useContext(ReservaContext)
+    } = useReservation()
 
     function confirmarVaga() {
         if (tipoReserva == "now") {

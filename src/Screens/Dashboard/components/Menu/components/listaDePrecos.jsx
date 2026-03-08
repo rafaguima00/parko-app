@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View } from "react-native"
 import { RenderHeader, styles } from "../style"
 import { ReservaContext } from "../../../../../Context/reservaContext"
 import { useContext } from "react"
-import { formatCurrency } from "../../../../../Services/formatCurrency"
+import { formatCurrency } from "../../../../../Utils/formatCurrency"
 import { Octicons } from "react-native-vector-icons"
 
 const ListaDePrecos = ({ item, botaoAtivo, setBotaoAtivo }) => {

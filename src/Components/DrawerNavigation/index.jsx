@@ -7,7 +7,7 @@ import {
     Alert,
     TouchableOpacity
 } from "react-native"
-import { Feather, Octicons } from "react-native-vector-icons"
+import { Feather, Octicons } from "@expo/vector-icons"
 import { theme } from "../../Theme"
 import { useNavigation } from "@react-navigation/native"
 import { Botao } from "../Botao"

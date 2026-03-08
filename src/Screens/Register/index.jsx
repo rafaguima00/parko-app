@@ -11,11 +11,10 @@ import {
     Linking, 
     View
 } from "react-native"
-import { Feather } from "react-native-vector-icons"
+import { Feather } from "@expo/vector-icons"
 import logo from "../../../assets/logo-parko.png"
 import Inputs from "./components/inputs"
 import Login from "./components/loginBotao"
-import BotaoLogin from "../../Components/LoginSocialMedia"
 import api from "../../Services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import LoadingModal from "../../Components/Loading"
@@ -213,8 +212,7 @@ const Register = () => {
                     </TouchableOpacity>
                 </View>
                 <Login realizarCadastro={realizarCadastro} />
-                {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>
-                <BotaoLogin /> */}
+                {/* <Text style={styles.separacao}> ──────────  ou  ──────────</Text>*/}
                 <LoadingModal loading={carregando} />
             </ScrollView>
         </KeyboardAvoidingView>

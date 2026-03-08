@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { 
     View, 
     TouchableOpacity,
@@ -15,7 +15,7 @@ import {
     Ionicons, 
     MaterialCommunityIcons 
 } from "react-native-vector-icons"
-import { ReservaContext } from "../../../../Context/reservaContext"
+import { useReservation } from "../../../../Context/reservaContext"
 import { useUser } from "../../../../Context/dataUserContext"
 import { 
     BotoesSuperiores, 
@@ -39,15 +39,15 @@ function Topo({ handleImageLoaded, voltar }) {
     const [loading, setLoading] = useState(false)
 
     const { dataUser } = useUser()
-    const { destination, distance } = useContext(ReservaContext)
+    const { destination, distance } = useReservation()
     const { id, image, name, end, numero_vagas, rate, vagas_ocupadas } = destination
 
     async function adicionarAosFavoritos() {
         setLoading(true)
 
-        if(favoritoAtivado === false) {
+        if (favoritoAtivado === false) {
             await api.post("/favorites", { 
-                id_user: dataUser.id, 
+                id_user: dataUser?.id, 
                 id_establishment: id
             })
             .then(() => {
@@ -61,7 +61,7 @@ function Topo({ handleImageLoaded, voltar }) {
         } else {
             await api.delete("/favorites", { 
                 data: {
-                    id_user: dataUser.id, 
+                    id_user: dataUser?.id, 
                     id_establishment: id
                 }
             })
@@ -78,12 +78,12 @@ function Topo({ handleImageLoaded, voltar }) {
     }
 
     async function retornarFavorito() {
-        await api.get(`/favorites/${dataUser.id}`)
+        await api.get(`/favorites/${dataUser?.id}`)
             .then(res => {
                 const result = res.data
-                const filterResult = result.find(item => item.parking_id == destination.id)
+                const filterResult = result.find(item => item.parking_id == destination?.id)
                 
-                if(filterResult) {
+                if (filterResult) {
                     setFavoritoAtivado(true)
                 }
             })

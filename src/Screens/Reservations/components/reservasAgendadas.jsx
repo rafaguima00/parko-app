@@ -1,6 +1,6 @@
 import { View, Image, Text, Modal } from "react-native"
 import { BotaoReserva, EstadoReserva, styles, TextoBotao } from "../style"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { theme } from "../../../Theme"
 import { useState } from "react"
 import ModalCancelarReserva from "../modal/cancelarReserva"

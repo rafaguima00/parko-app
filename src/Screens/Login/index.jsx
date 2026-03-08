@@ -42,6 +42,7 @@ const Login = () => {
             password: dados.senha
         })
             .then(res => {
+                console.log(res.data)
                 AsyncStorage.setItem("token", JSON.stringify(res.data.token))
             })
             .then(() => {

@@ -1,10 +1,9 @@
-import React from "react"
 import { Snackbar } from "react-native-paper"
 import { View } from "react-native"
 
 export default function Alerta({ 
     message, 
-    error=false, 
+    error= false, 
     setError 
 }) {
     return (

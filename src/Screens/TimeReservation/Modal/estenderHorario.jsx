@@ -19,7 +19,7 @@ import {
     RenderHeader 
 } from "../style"
 import { ReservaContext } from "../../../Context/reservaContext"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { Feather, Octicons } from "react-native-vector-icons"
 import { selecionarValor } from "../../../Mocks/warnings"
 import ModalMaisTempo from "./ModalMaisTempo"

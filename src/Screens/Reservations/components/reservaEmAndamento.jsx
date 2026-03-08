@@ -1,6 +1,6 @@
 import { View, Image, Text } from "react-native"
 import { BotaoReserva, EstadoReserva, styles, TextoBotao } from "../style"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { theme } from "../../../Theme"
 import { useNavigation } from "@react-navigation/native"
 

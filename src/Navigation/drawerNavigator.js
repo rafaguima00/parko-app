@@ -1,3 +1,4 @@
+import "react-native-gesture-handler"
 import { createDrawerNavigator } from "@react-navigation/drawer"
 import MapaPrincipal from "../Screens/Map"
 import CustomDrawer from "../Components/DrawerNavigation"

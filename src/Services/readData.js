@@ -1,56 +1,55 @@
 import { useUser } from "../Context/dataUserContext"
-import { useContext } from "react"
-import { ReservaContext } from "../Context/reservaContext"
+import { useReservation } from "../Context/reservaContext"
 import api from "./api"
 
 const ReadApi = () => {
 
     const { setEstacionamentos, setPriceTable, setVeiculos, setUsers } = useUser()
-    const { setReservations, setTabelaFixa } = useContext(ReservaContext)
+    const { setReservations, setTabelaFixa } = useReservation()
 
-    const loadParkings = async () => {
-        await api.get("/establishments")
-        .then(res => {
-            setEstacionamentos(res.data)
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar estacionamentos: ${e}`)
-        })
+    const loadParkings = async (id) => {
+        await api.get(`/establishments/${id}`)
+            .then(res => {
+                setEstacionamentos(res.data)
+            })
+            .catch(e => {
+                console.log(`Erro ao carregar estacionamentos: ${e}`)
+            })
     }
 
     const loadPriceTable = async (idEstacionamento) => {
         await api.get(`tabela_preco/${idEstacionamento}`)
-        .then(res => {
-            setPriceTable(res.data)
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar tabela de preço: ${e}`)
-        })
+            .then(res => {
+                setPriceTable(res.data)
+            })
+            .catch(e => {
+                console.log(`Erro ao carregar tabela de preço: ${e}`)
+            })
     }
 
     const loadVehicles = async (id) => {
         await api.get(`vehicles/${id}`)
-        .then(res => {
-            setVeiculos(res.data)
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar veiculos: ${e}`)
-        })
+            .then(res => {
+                setVeiculos(res.data)
+            })
+            .catch(e => {
+                console.log(`Erro ao carregar veiculos: ${e}`)
+            })
     }
 
     const loadUsers = async () => {
         await api.get("/users")
-        .then(res => {
-            setUsers(res.data)
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar usuários: ${e}`)
-        })
+            .then(res => {
+                setUsers(res.data)
+            })
+            .catch(e => {
+                console.log(`Erro ao carregar usuários: ${e}`)
+            })
     }
 
-    const loadReservations = async () => {
+    const loadReservations = async (id) => {
         try {
-            const res = await api.get("/reservations")
+            const res = await api.get(`/reservations/user/${id}`)
 
             setReservations(res.data)
         } catch (error) {
@@ -60,12 +59,12 @@ const ReadApi = () => {
 
     const loadTabelaFixa = async (idEstacionamento) => {
         await api.get(`/tabela_fixa/${idEstacionamento}`)
-        .then(res => {
-            setTabelaFixa(res.data)
-        })
-        .catch(e => {
-            console.log(`Erro ao carregar tabela fixa: ${e}`)
-        })
+            .then(res => {
+                setTabelaFixa(res.data)
+            })
+            .catch(e => {
+                console.log(`Erro ao carregar tabela fixa: ${e}`)
+            })
     }
 
     return { 

@@ -1,21 +1,24 @@
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import { styles } from "../styles"
 import { Content } from "../../../Components/Marker"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { Alert } from "react-native"
 import MapViewDirections from "react-native-maps-directions"
 import { GOOGLE_API_KEY, STATUS_APP } from "@env"
 import { theme } from "../../../Theme"
-import { useContext, useRef } from "react"
-import { ReservaContext } from "../../../Context/reservaContext"
+import { useRef } from "react"
+import { useReservation } from "../../../Context/reservaContext"
 import { useUser } from "../../../Context/dataUserContext"
+import { mapStyle } from "../../../Mocks/mapStyle"
+import useDistance from "../hooks/useDestination"
 
 const MainMap = (props) => {
 
-    const { location, retornarCoordenadas } = props
+    const { setLoading } = props
     const { corRoxa } = theme
-    const { destination, setDestination, setDistance } = useContext(ReservaContext)
-    const { estacionamentos } = useUser()
+    const { destination, setDestination, setDistance } = useReservation()
+    const { estacionamentos, location, userLocation } = useUser()
+    const { retornarCoordenadas } = useDistance()
 
     const mapEl = useRef(null)
     
@@ -29,12 +32,14 @@ const MainMap = (props) => {
     return <>
         <MapView
             style={styles.map}
-            initialRegion={location}
+            region={location}
             showsUserLocation={true}
             loadingEnabled={true}
             mapType="standard"
             ref={mapEl}
             provider={PROVIDER_GOOGLE}
+            showsPointsOfInterest={false}
+            customMapStyle={mapStyle}
         >
             {estacionamentos.map(item => (
                 <Marker
@@ -44,7 +49,7 @@ const MainMap = (props) => {
                         longitude: item.longitude,
                     }}
                     title={formatCurrency(item.valor_hora)}
-                    onPress={() => retornarCoordenadas({ item })}
+                    onPress={() => retornarCoordenadas({ item }, setLoading)}
                 >
                     <Content />
                 </Marker>
@@ -52,7 +57,7 @@ const MainMap = (props) => {
 
             {destination &&
                 <MapViewDirections
-                    origin={location}
+                    origin={userLocation}
                     destination={{
                         latitude: destination?.latitude, 
                         longitude: destination?.longitude

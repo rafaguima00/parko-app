@@ -48,6 +48,7 @@ export default () => {
         favicon: "./assets/favicon.png"
       },
       plugins: [
+        "@react-native-community/datetimepicker",
         "./withAndroidTargetSdkVersion.js",
         "expo-font"
       ],

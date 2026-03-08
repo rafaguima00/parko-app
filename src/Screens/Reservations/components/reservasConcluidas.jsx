@@ -13,7 +13,7 @@ import {
     TxtQuit 
 } from "../style"
 import { Text } from "react-native"
-import { formatCurrency } from "../../../Services/formatCurrency"
+import { formatCurrency } from "../../../Utils/formatCurrency"
 import { useUser } from "../../../Context/dataUserContext"
 import { useContext, useState } from "react"
 import { ReservaContext } from "../../../Context/reservaContext"

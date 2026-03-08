@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native"
 import { View, TouchableOpacity, Text } from "react-native"
 
 const BotaoLoginCadastro = ({ realizarLogin }) => {
+    
     const navigation = useNavigation()
 
     return (

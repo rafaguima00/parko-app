@@ -1,6 +1,6 @@
 # Aplicativo da Parko 
 
-<p align="center">
+<p>
   <img src="assets/logo-parko.png" alt="Parko App" />
 </p>
 

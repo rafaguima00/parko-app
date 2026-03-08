@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 
 export const ReservaContext = createContext({})
 
@@ -62,3 +62,5 @@ export function ReservaProvider({ children }) {
         </ReservaContext.Provider>
     )
 }
+
+export const useReservation = () => useContext(ReservaContext)

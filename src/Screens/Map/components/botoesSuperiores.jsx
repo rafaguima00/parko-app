@@ -1,14 +1,16 @@
 import { useNavigation } from "@react-navigation/native"
 import { styles } from "../styles"
-import { Feather, Ionicons } from "react-native-vector-icons"
+import { Feather, Ionicons } from "@expo/vector-icons"
 import { TouchableOpacity, View } from "react-native"
-import { useContext } from "react"
-import { ReservaContext } from "../../../Context/reservaContext"
+import { useReservation } from "../../../Context/reservaContext"
+import { useUser } from "../../../Context/dataUserContext"
 
 const BotoesSuperiores = () => {
 
     const navigation = useNavigation()
-    const { destination, reservaFeita, setDestination } = useContext(ReservaContext)
+    
+    const { destination, reservaFeita, setDestination } = useReservation()
+    const { setEstacionamentos } = useUser()
 
     return <>
         <View style={styles.componentesMapa}>
@@ -38,6 +40,7 @@ const BotoesSuperiores = () => {
                     style={[styles.icone, { position: "absolute", left: 0 }]}
                     onPress={() => {
                         setDestination(null)
+                        setEstacionamentos([])
                     }}
                 >
                     <Feather name="arrow-left" size={28} />

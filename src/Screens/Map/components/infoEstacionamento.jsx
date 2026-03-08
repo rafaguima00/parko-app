@@ -3,16 +3,19 @@ import { styles } from "../styles"
 import { Botao } from "../../../Components/Botao"
 import { useNavigation } from "@react-navigation/native"
 import { theme } from "../../../Theme"
-import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from "react-native-vector-icons"
-import { useContext, useEffect } from "react"
-import { ReservaContext } from "../../../Context/reservaContext"
+import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
+import { useReservation } from "../../../Context/reservaContext"
+import { useUser } from "../../../Context/dataUserContext"
 
 const InfoEstacionamento = (props) => {
 
-    const { location, setErrorMsg } = props
+    const { setErrorMsg } = props
     const { corPrimaria } = theme
+
     const navigation = useNavigation()
-    const { destination, distance, reservaFeita } = useContext(ReservaContext)
+    const { destination, distance, reservaFeita } = useReservation()
+    const { location } = useUser()
+
     const { end, name, numero_vagas, rate, vagas_ocupadas, valor_hora } = destination ?? {}
     const width = Dimensions.get("screen").width
     const isTablet = width >= 750
