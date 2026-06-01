@@ -115,7 +115,7 @@ const useParkings = () => {
     }
 
     async function loadParkings(location, radius) {
-
+        console.log("Load parkings")
         try {
             const res = await api.get("/search-establishments", {
                 params: {
@@ -131,7 +131,10 @@ const useParkings = () => {
                         const res = await api.get(`/tabela_preco/${item.id}`)
                         const tabela = res.data
 
+                        console.log(item.type_of_charge)
+
                         if (item.type_of_charge === "hora_fracao") {
+                            console.log(tabela)
                             setPriceTable(tabela)
 
                             return {
@@ -144,6 +147,8 @@ const useParkings = () => {
                         if (item.type_of_charge === "tabela_fixa") {
                             const response = await api.get(`/tabela_fixa/${item.id}`)
                             const tabelaFixa = response.data
+
+                            console.log(tabelaFixa)
                             setPriceTable(tabelaFixa)
 
                             return {

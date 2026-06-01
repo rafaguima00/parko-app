@@ -27,14 +27,16 @@ export default function MapaPrincipal({ navigation }) {
         destination,
         reservaFeita,
         reservations,
-        setReservaFeita
+        setReservaFeita,
+        setDestination
     } = useReservation()
 
     const { 
         dataUser, setDataUser,
         location, setLocation,
         setUserLocation,
-        modalPesquisar, setModalPesquisar
+        modalPesquisar, setModalPesquisar,
+        setEstacionamentos
     } = useUser()
     
     const { getDistanceMatrix } = useDistance()

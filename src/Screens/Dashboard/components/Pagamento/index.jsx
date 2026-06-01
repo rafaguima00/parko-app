@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { FlatList, View, Text, TouchableOpacity, Modal } from "react-native"
 import { Botao } from "../../../../Components/Botao"
 import { styles, TituloPrincipal, TopModal, VoltarTelaAnterior, FundoCinza, Taxas, LeftText, RightText } from "../../style"
@@ -6,7 +6,7 @@ import { theme } from "../../../../Theme"
 import { emptyCard } from "../../../../Mocks/emptyList"
 import { formatCurrency } from "../../../../Utils/formatCurrency"
 import { Feather } from "react-native-vector-icons"
-import { ReservaContext } from "../../../../Context/reservaContext"
+import { useReservation } from "../../../../Context/reservaContext"
 import { usePayment } from "../../../../Context/paymentContext"
 import CardList from "../../../../Components/CardList"
 import { useUser } from "../../../../Context/dataUserContext"
@@ -22,7 +22,7 @@ const Pagamento = (props) => {
     const { setPagamento, setAddCartao, setModalConfirma } = props.states
     const { voltar } = props
 
-    const { valorPreSelecionado } = useContext(ReservaContext)
+    const { valorPreSelecionado } = useReservation()
     const { card, setCard, cartaoSelecionado, setCartaoSelecionado } = usePayment()
     const { dataUser } = useUser()
 
@@ -58,12 +58,12 @@ const Pagamento = (props) => {
                     'https://api.mercadopago.com/v1/customers',
                     { email },
                     {
-                    headers: {
-                        Authorization: `Bearer ${ACCESS_TOKEN}`,
-                    }
+                        headers: {
+                            Authorization: `Bearer ${ACCESS_TOKEN}`,
+                        }
                     }
                 )
-                console.log("Cliente criado:", response.data)
+
                 return response.data
             }
 

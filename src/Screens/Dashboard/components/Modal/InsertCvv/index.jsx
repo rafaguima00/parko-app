@@ -2,8 +2,8 @@ import { usePayment } from "../../../../../Context/paymentContext"
 import { BotaoFechar, BotaoSalvar, TextBotao, AreaView, CampoDeTexto, Header, MsgConfirmacao } from "../style"
 import { TextInput } from "react-native-paper"
 import { theme } from "../../../../../Theme"
-import { useContext, useEffect, useState } from "react"
-import { ReservaContext } from "../../../../../Context/reservaContext"
+import { useEffect, useState } from "react"
+import { useReservation } from "../../../../../Context/reservaContext"
 import { PUBLIC_KEY, ACCESS_TOKEN } from "@env"
 import axios from "axios"
 import { Feather } from "react-native-vector-icons"
@@ -18,10 +18,10 @@ const InsertCvv = (props) => {
     const { setPagamento, setModalConfirma, total } = props
     const { setModalCvv } = props.states
     const { cvv, setCvv, setTokenCard, cartaoSelecionado, tokenCard } = usePayment()
-    const { itemPreSelecionado, setItemPreSelecionado } = useContext(ReservaContext)
+    const { itemPreSelecionado, setItemPreSelecionado } = useReservation()
 
     async function confirmar(card_id) {
-        if(cvv === "") {
+        if (cvv === "") {
             setError(true)
             setMsgError("Insira o código CVV do seu cartão")
             return
@@ -55,7 +55,7 @@ const InsertCvv = (props) => {
     }
 
     useEffect(() => {
-        if(tokenCard !== "") {
+        if (tokenCard !== "") {
             setCvv("")
             setError(false)
             setMsgError("")

@@ -42,7 +42,21 @@ function Dashboard({ navigation }) {
     async function pagamentoReserva() {
         setLoading(true)
     
+        const name = dataUser.name.split(" ")
+        const payer_name = name[0]
+        const payer_surname = name[name.length - 1] ?? ""
+
+        console.log(JSON.stringify({
+                token: tokenCard,
+                transaction_amount: novaReserva.value,
+                customer_id: cartaoSelecionado.customer_id,
+                description: `Parking: ${destination.name}`,
+                payment_method_id: cartaoSelecionado.payment_method.id,
+                issuer_id: cartaoSelecionado.issuer.id
+            }))
+
         try {
+            // Adicionar mais informações para aumentar as chances do pagamento ser aprovado
             const response = await api.post("/create_payment", {
                 token: tokenCard,
                 transaction_amount: novaReserva.value,
@@ -61,6 +75,7 @@ function Dashboard({ navigation }) {
                 confirmaReserva(id_payment, card_brand, status, payment_method)
                 setTokenCard("")
                 setCartaoSelecionado(null)
+
                 return
             } 
             
@@ -69,11 +84,13 @@ function Dashboard({ navigation }) {
                     "Pagamento Rejeitado",
                     "O pagamento foi rejeitado. Por favor, verifique seu cartão ou tente novamente."
                 )
+
                 setTokenCard("")
                 setCartaoSelecionado(null)
                 setPagamento(true)
                 setModalConfirma(false)
                 setLoading(false)
+
                 return
             } 
             
@@ -81,13 +98,15 @@ function Dashboard({ navigation }) {
                 "Pagamento Pendente",
                 "Seu pagamento está em análise. Você será notificado assim que for aprovado."
             )
+
             setTokenCard("")
             setLoading(false)
             
-    
         } catch (e) {
             const errorMessage = e.response?.data?.error.message || "Erro inesperado. Tente novamente mais tarde."
+            console.log(e.response.data.error.cause)
             Alert.alert("Erro ao realizar pagamento", errorMessage)
+
             setModalConfirma(false)
             setInformacoes(true)
             setNovaReserva({})
@@ -100,6 +119,7 @@ function Dashboard({ navigation }) {
     
     // Função para salvar a reserva e o estado dela na base de dados
     async function confirmaReserva(id_payment, card_brand, status, payment_method) {
+        console.log("Confirmando reserva")
 
         await api.post("/reservations", {
             data_entrada: novaReserva.data_entrada, 

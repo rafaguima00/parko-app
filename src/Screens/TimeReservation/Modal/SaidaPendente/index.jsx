@@ -10,7 +10,7 @@ export default function SaidaPendente(props) {
     const { modalSaidaPendente, setModalSaidaPendente } = props.states
     
     useEffect(() => {
-        if(modalSaidaPendente) {
+        if (modalSaidaPendente) {
             const timer = setTimeout(() => {
                 setModalSaidaPendente(false)
             }, 4000)

@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import {
-    SafeAreaView,
     View,
     TouchableOpacity,
     Modal,
@@ -16,7 +15,7 @@ import SelecionarPgto from "./Modal/selecionarPgto"
 import ModalConfirmacao from "./Modal/confirmacao"
 import ModalMsgConfirmacao from "./Modal/msgConfirmacao"
 import { Botao } from "../../Components/Botao"
-import { ReservaContext } from "../../Context/reservaContext"
+import { useReservation } from "../../Context/reservaContext"
 import { 
     Clock, 
     ConfirmationCode, 
@@ -55,6 +54,7 @@ function TempoEspera({ navigation, route }) {
     const [tempo, setTempo] = useState("00:00:00")
 
     const codigoGeradoRef = useRef(false)
+    const timerRef = useState(null)
 
     const { loadReservations, loadTabelaFixa } = ReadApi()
     const { dataUser } = useUser()
@@ -65,15 +65,17 @@ function TempoEspera({ navigation, route }) {
         code,
         setExpiresAt,
         expiresAt
-    } = useContext(ReservaContext)
+    } = useReservation()
 
-    const { idDestination, idReservation } = route?.params
+    const { idDestination, idReservation } = route?.params ?? {}
 
-    const findReservation = reservations.filter(
-        item => item.id_costumer == dataUser.id && 
-        (item.status == "Confirmado" || item.status == "Recusado" || item.status == "Finalizado") && 
-        item.id == idReservation
-    )
+    const reservation = useMemo(() => {
+        return reservations.find(item =>
+            item.id_costumer == dataUser.id &&
+            ["Confirmado", "Recusado", "Finalizado"].includes(item.status) &&
+            item.id == idReservation
+        )
+    }, [reservations, dataUser.id, idReservation])
 
     const abreModalEstendeHora = () => {
         setModalEstendeHora(true)
@@ -103,7 +105,7 @@ function TempoEspera({ navigation, route }) {
     function filterRequest(data) {
         const request = data.filter(item => item.id_reservation == idReservation)
         
-        if(request.length > 0) {
+        if (request.length > 0) {
             setModalNovaFinalizacao(true)
             return
         }
@@ -113,28 +115,31 @@ function TempoEspera({ navigation, route }) {
     }
 
     async function botaoFinalizar() {
-        await api.get(`/request_end/${findReservation[0].id_establishment}`)
-        .then(res => {
-            filterRequest(res.data)
-        })
-        .catch(e => {
-            console.log(e)
-        })
+        if (!reservation) return
+
+        await api.get(`/request_end/${reservation?.id_establishment}`)
+            .then(res => {
+                console.log(res.data)
+                filterRequest(res.data)
+            })
+            .catch(e => {
+                console.log(e)
+            })
     }
 
     function filterReservation(data) {
         const reservation = data.map(item => item.status_reservation)
 
-        if(reservation[0] == 3) {
+        if (reservation[0] == 3) {
             verificarReservaRecusada()
             return
         }
 
-        if(reservation[0] == 4) {
+        if (reservation[0] == 4) {
             setCode([])
             setIntervalo(false)
             setTempo("00:00:00")
-            setReservaFeita(false)
+            //setReservaFeita(false)
             setModalSaidaAprovada(true)
             return
         }
@@ -155,13 +160,13 @@ function TempoEspera({ navigation, route }) {
         const { data_saida, hora_saida, value } = novaReserva
 
         await api.put(`/reservations/${idReservation}`, {
-            data_entrada: findReservation[0].data_entrada,
-            hora_entrada: findReservation[0].hora_entrada,
+            data_entrada: reservation.data_entrada,
+            hora_entrada: reservation.hora_entrada,
             data_saida: data_saida,
             hora_saida: hora_saida,
-            value: findReservation[0].value + value,
+            value: reservation.value + value,
             status: 2,
-            id_vehicle: findReservation[0].id_vehicle
+            id_vehicle: reservation.id_vehicle
         })
         .then(() => {
             setModalConfirma(false)
@@ -174,27 +179,27 @@ function TempoEspera({ navigation, route }) {
     }
 
     function converter() {
-        if (!findReservation[0]) {
-            setReservaFeita(false)
+        if (!reservation) {
+            //setReservaFeita(false)
             setTempo("00:00:00")
             return
         }
 
-        if (findReservation[0]?.status === "Finalizado") {
+        if (reservation?.status === "Finalizado") {
             setCode([])
             setIntervalo(false)
             setTempo("00:00:00")
-            setReservaFeita(false)
+            //setReservaFeita(false)
             setModalSaidaAprovada(true)
             return
         }
 
-        let dataSaidaDoCliente = findReservation[0]?.data_saida ?? ""
+        let dataSaidaDoCliente = reservation?.data_saida ?? ""
         const [day, month, year] = dataSaidaDoCliente.split('/')
 
         let converterData = `${year}-${month}-${day}`
 
-        let horaSaidaDoCliente = findReservation[0]?.hora_saida ?? ""
+        let horaSaidaDoCliente = reservation?.hora_saida ?? ""
         let converterHora = new Date(converterData+" "+horaSaidaDoCliente).getTime()
 
         if (!dataSaidaDoCliente || !horaSaidaDoCliente) return
@@ -202,19 +207,19 @@ function TempoEspera({ navigation, route }) {
         const tempoAtual = new Date().getTime()
         const diferenca = converterHora - tempoAtual
 
-        if (diferenca <= 0) {
-            setReservaFeita(false)
-            return navigation.replace('Map')
-        }
+        // if (diferenca <= 0) {
+        //      setReservaFeita(false)
+        //     return navigation.replace('Map')
+        // }
 
-        // Verificar se a diferença é válida
-        if (isNaN(diferenca)) return
+        // // Verificar se a diferença é válida
+        // if (isNaN(diferenca)) return
 
-        if  (tempoAtual > converterHora) {
-            setReservaFeita(false)
-            setTempo("00:00:00")
-            return
-        }
+        // if  (tempoAtual > converterHora) {
+        //     setReservaFeita(false)
+        //     setTempo("00:00:00")
+        //     return
+        // }
 
         let horas = Math.floor(diferenca / (1000 * 60 * 60))
         let minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60))
@@ -268,31 +273,31 @@ function TempoEspera({ navigation, route }) {
     }, [])
 
     useEffect(() => {
-        loadReservations()
-        loadTabelaFixa(idDestination)
-    }, [dataUser.id])
+        if (!dataUser?.id) return
+
+        loadReservations(dataUser?.id)
+        if (idDestination) {
+            loadTabelaFixa(idDestination)
+        }
+    }, [dataUser?.id, idDestination])
 
     useEffect(() => {
-        let intervalo
+        if (!reservation) return
 
-        if(findReservation[0]) {
-            converter()
-            intervalo = setInterval(converter, 1000)
+        converter()
 
-            return () => clearInterval(intervalo)
-        }
-    }, [reservations])
+        const interval = setInterval(converter, 1000)
+
+        return () => clearInterval(interval)
+    }, [reservation])
 
     useEffect(() => {
-        let tempo
+        if (!intervalo || !idReservation) return
 
-        if(intervalo === true) {
-            getReservations()
-            tempo = setInterval(getReservations, 1500)
+        const interval = setInterval(getReservations, 1500)
 
-            return () => clearInterval(tempo)
-        }
-    }, [intervalo])
+        return () => clearInterval(interval)
+    }, [intervalo, idReservation])
 
     return (
 
@@ -301,7 +306,7 @@ function TempoEspera({ navigation, route }) {
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <SafeAreaView style={styles.areaContent}>
+                <View style={styles.areaContent}>
                     <TouchableOpacity
                         style={styles.goBack}
                         onPress={() => navigation.goBack()}>
@@ -404,7 +409,7 @@ function TempoEspera({ navigation, route }) {
                         <ModalConfirmacao
                             handleClose={() => setModalConfirma(false)}
                             estenderTempo={estenderTempo}
-                            findReservation={findReservation}
+                            findReservation={reservation}
                         />
                     </Modal>
 
@@ -424,7 +429,7 @@ function TempoEspera({ navigation, route }) {
                         animationType="fade"
                     >
                         <FinalizarReserva  
-                            findReservation={findReservation[0]}
+                            findReservation={reservation}
                             states={{
                                 setModalFinalizarReserva,
                                 setModalAguardar
@@ -487,7 +492,7 @@ function TempoEspera({ navigation, route }) {
                             }}
                         />
                     </Modal>
-                </SafeAreaView>
+                </View>
             </ScrollView>
         </KeyboardAvoidingView>
     )

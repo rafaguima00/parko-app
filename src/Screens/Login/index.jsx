@@ -13,6 +13,7 @@ import BotaoLoginCadastro from "./components/loginCadastro"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import api from "../../Services/api"
 import LoadingModal from "../../Components/Loading"
+import { STATUS_APP } from "@env"
 
 const Login = () => {
     
@@ -80,6 +81,11 @@ const Login = () => {
         }
         
         checkLogin()
+
+        if (STATUS_APP === "test") {
+            AsyncStorage.clear()
+        }
+        
     }, [navigation])
 
     return (

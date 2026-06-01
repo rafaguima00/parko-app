@@ -33,7 +33,7 @@ function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
     const textMessage = mensagemFinal()
 
     useEffect(() => {
-        if(modalAtivo) {
+        if (modalAtivo) {
             const timer = setTimeout(() => {
                 handleClose()
                 navigation.navigate('Mapa Principal')

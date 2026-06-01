@@ -15,7 +15,7 @@ export default function SaidaAprovada(props) {
     const { setDestination, setReservaFeita } = useContext(ReservaContext)
     
     useEffect(() => {
-        if(modalSaidaAprovada) {
+        if (modalSaidaAprovada) {
             const timer = setTimeout(() => {
                 setModalSaidaAprovada(false)
                 setReservaFeita(false)

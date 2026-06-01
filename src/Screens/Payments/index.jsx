@@ -86,7 +86,9 @@ export default function Payments({ navigation }) {
     }
 
     useEffect(() => {
-        getCostumerCard(dataUser.email)
+        if (dataUser) {
+            getCostumerCard(dataUser.email)
+        }
     }, [dataUser])
 
     return <>

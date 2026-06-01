@@ -10,7 +10,7 @@ export default function ModalAguardarNovaFinalizacao(props) {
     const { modalNovaFinalizacao, setModalNovaFinalizacao } = props.states
     
     useEffect(() => {
-        if(modalNovaFinalizacao) {
+        if (modalNovaFinalizacao) {
             const timer = setTimeout(() => {
                 setModalNovaFinalizacao(false)
             }, 6000)

@@ -15,8 +15,8 @@ const CardList = ({ item, cartaoSelecionado, setCartaoSelecionado }) => {
         return `${replaced} ${last}`
     }
 
-    function handleCardPress(id) {
-        setCartaoSelecionado(id)
+    function handleCardPress(item) {
+        setCartaoSelecionado(item)
     }
 
     return <>

@@ -40,7 +40,7 @@ function Topo({ handleImageLoaded, voltar }) {
 
     const { dataUser } = useUser()
     const { destination, distance } = useReservation()
-    const { id, image, name, end, numero_vagas, rate, vagas_ocupadas } = destination
+    const { id, image, name, end, numero_vagas, rate, vagas_ocupadas } = destination || {}
 
     async function adicionarAosFavoritos() {
         setLoading(true)

@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { ScrollView, View, Text, FlatList } from "react-native"
 import { Feather, MaterialCommunityIcons } from "react-native-vector-icons"
 import { Botao } from "../../../../Components/Botao"
 import { BotaoClicar, MaisTempo, styles, TextBlue, TextLine } from "./style"
 import { theme } from "../../../../Theme"
-import { ReservaContext } from "../../../../Context/reservaContext"
+import { useReservation } from "../../../../Context/reservaContext"
 import api from "../../../../Services/api"
 import LoadingModal from "../../../../Components/Loading"
 import ListaDePrecos from "./components/listaDePrecos"
@@ -27,8 +27,8 @@ const Menu = ({
         horaFuncionamento,
         setTipoReserva,
         priceTable
-    } = useContext(ReservaContext)
-    const { taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination
+    } = useReservation()
+    const { taxaHoraExtra, taxaCancelamento, tempo_tolerancia } = destination || {}
     const { corPrimaria } = theme
 
     function agendar() {
