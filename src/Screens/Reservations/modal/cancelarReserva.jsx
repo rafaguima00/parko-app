@@ -10,15 +10,19 @@ import {
     TextPage
 } from './style'
 import { useState } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { Alert, TouchableOpacity } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { theme } from '../../../Theme'
+import api from '../../../Services/api'
+import { STATUS_APP, ACCESS_TOKEN } from "@env"
+import LoadingModal from "../../../Components/Loading"
 
 const { corPrimaria } = theme
 
-const ModalCancelarReserva = ({ setModalCancelarReserva }) => {
+const ModalCancelarReserva = ({ setModalCancelarReserva, id }) => {
 
     const [value, setValue] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const items = [
         { label: 'Ocupação indevida', value: 'ocupação' },
@@ -29,7 +33,83 @@ const ModalCancelarReserva = ({ setModalCancelarReserva }) => {
         { label: 'Outros', value: 'outros' }
     ]
 
+    const salvarReembolsoNoBanco = async (refunds, id_reservation) => {
+        try {
+            const response = await api.put(
+                `/update-payment-on-db`, 
+                {
+                    value_refunded: refunds.amount, 
+                    id_payment: refunds.payment_id, 
+                    id_reservation
+                }
+            )
+
+            setModalCancelarReserva(false)
+        } catch (error) {
+            console.log(error.response.data)
+        }
+    }
+
+    const criarReembolso = async (payment) => {
+        setLoading(true)
+
+        const amount = (payment.value_paid * 0.8).toFixed(2)
+        
+        try {
+            const response = await api.post(
+                `/payment/${payment.id_payment}/refunds`, 
+                {
+                    amount: Number(amount),
+                    id_reservation: payment.id_reservation
+                }
+            )
+
+            Alert.alert(
+                "Reembolso solicitado",
+                "Seu reembolso está sendo processado. Você será notificado quando for concluído."
+            )
+
+            if (response.data.status === "approved") {
+                salvarReembolsoNoBanco(
+                    response.data, 
+                    payment.id_reservation
+                )
+            }
+        } catch (error) {
+            Alert.alert(
+                "Erro ao solicitar reembolso",
+                error.response.data.error.message
+            )
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const carregarIdPagamento = async () => {
+
+        await api.get(`/search-payment/${id}`)
+            .then(res => {
+                Alert.alert(
+                    "Tem certeza que deseja cancelar a reserva?",
+                    "Ao cancelar a reserva, você será reembolsado(a) com até 80% do valor da reserva",
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => criarReembolso(res.data[0])
+                        },
+                        {
+                            text: 'Cancelar'
+                        }
+                    ]
+                )
+            })
+            .catch(e => {
+                Alert.alert(e.response)
+            })
+    }
+
     return <>
+        <LoadingModal loading={loading} />
         <AreaView>
             <BotaoFechar>
                 <TouchableOpacity 
@@ -58,7 +138,7 @@ const ModalCancelarReserva = ({ setModalCancelarReserva }) => {
             </CampoDeTexto>
 
             <BotaoSalvar 
-                onPress={() => {}}
+                onPress={carregarIdPagamento}
                 activeOpacity={0.7}
             >
                 <TextBotao>Cancelar</TextBotao>

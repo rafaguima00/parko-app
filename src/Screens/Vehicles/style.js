@@ -1,9 +1,8 @@
-import { StyleSheet, Dimensions } from "react-native"
+import { StyleSheet } from "react-native"
 import { theme } from "../../Theme"
 import styled from "styled-components"
 
 const { corPrimaria, fonteNegrito } = theme
-const width = Dimensions.get('screen').width
 
 export const SelecionarVeiculo = styled.TouchableOpacity`
     box-shadow: 5px 10px #000;
@@ -13,7 +12,7 @@ export const styles = StyleSheet.create({
     areaContent: {
         marginTop: 32,
         marginBottom: 130,
-        width: width,
+        flexGrow: 1,
         paddingHorizontal: 20,
         backgroundColor: "#f4f4f4"
     },
@@ -34,6 +33,9 @@ export const styles = StyleSheet.create({
         alignSelf: "center"
     },
     imagemVeiculo: {
+        width: 200,
+        height: 200,
+        resizeMode: "contain",
         alignSelf: "center"
     },
     selectVehicle: {
@@ -52,8 +54,8 @@ export const styles = StyleSheet.create({
         borderColor: corPrimaria,
         borderRadius: 12,
         padding: 14,
-        width: 180,
-        height: 130,
+        width: 170,
+        maxWidth: '80%',
         backgroundColor: corPrimaria
     },
     botaoDesativado: {

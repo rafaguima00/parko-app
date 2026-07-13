@@ -5,13 +5,15 @@ import { latitudeDelta, longitudeDelta } from "../../../Mocks/location"
 import { Alert } from "react-native"
 import { DISTANCE_MATRIX_API_KEY } from "@env"
 import ReadApi from "../../../Services/readData"
+import useParkings from "../../../Hooks/useParkings"
+import { useEffect } from "react"
 
 const useDistance = () => {
 
     const { destination, setDestination, setDistanceMatrix } = useReservation()
     const { location } = useUser()
 
-    const { loadParkings } = ReadApi()
+    const { loadParkings } = useParkings()
 
     async function getDistanceMatrix() {
 
@@ -32,7 +34,13 @@ const useDistance = () => {
         try {
             setLoading(true)
 
-            await loadParkings(item.id)
+            await loadParkings(
+                {
+                    latitude: item.latitude,
+                    longitude: item.longitude
+                },
+                0.1
+            )
 
             setDestination({
                 ...item,

@@ -17,8 +17,7 @@ const ReservasAgendadas = ({ item }) => {
 
     return <>
         <View>
-            <EstadoReserva>Reserva Agendada</EstadoReserva>
-            <View style={styles.itemListaEmAndamento}>
+            <View style={styles.itemLista}>
                 <View style={styles.viewEstacionamento}>
                     <Image 
                         style={{ width: 45, height: 45, borderRadius: 50, borderWidth: 2, borderColor: corPrimaria }}
@@ -66,7 +65,7 @@ const ReservasAgendadas = ({ item }) => {
             onRequestClose={() => {}}
             transparent={true}
         >
-            <ModalCancelarReserva setModalCancelarReserva={setModalCancelarReserva} />
+            <ModalCancelarReserva setModalCancelarReserva={setModalCancelarReserva} id={item.id} />
         </Modal>
     </>
 }

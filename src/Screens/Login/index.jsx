@@ -43,7 +43,6 @@ const Login = () => {
             password: dados.senha
         })
             .then(res => {
-                console.log(res.data)
                 AsyncStorage.setItem("token", JSON.stringify(res.data.token))
             })
             .then(() => {
@@ -81,10 +80,6 @@ const Login = () => {
         }
         
         checkLogin()
-
-        if (STATUS_APP === "test") {
-            AsyncStorage.clear()
-        }
         
     }, [navigation])
 

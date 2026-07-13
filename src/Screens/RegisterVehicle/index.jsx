@@ -8,6 +8,7 @@ import api from "../../Services/api"
 import { useUser } from "../../Context/dataUserContext"
 import TopArrowLeft from "../../Components/TopArrowLeft"
 import LoadingModal from "../../Components/Loading"
+import ReadApi from "../../Services/readData"
 
 export default function RegisterVehicle({ navigation }) {
 
@@ -21,6 +22,8 @@ export default function RegisterVehicle({ navigation }) {
         cor: ""
     })
     const { dataUser } = useUser()
+
+    const { loadVehicles } = ReadApi()
 
     const [erro, setErro] = useState(false)
     const [mensagemErro, setMensagemErro] = useState("")
@@ -56,6 +59,8 @@ export default function RegisterVehicle({ navigation }) {
         })
         .then(() => {
             Alert.alert("Veículo adicionado com sucesso")
+            loadVehicles(dataUser.id)
+
             navigation.goBack()
         })
         .catch(e => {

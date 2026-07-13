@@ -20,9 +20,8 @@ const Suggestions = (props) => {
                 <TouchableOpacity 
                     key={item.id} 
                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 15,
+                        flexDirection: 'column',
+                        alignItems: 'start',
                         marginBottom: 8,
                         borderBottomColor: '#7d7d7d',
                         borderBottomWidth: 1,
@@ -33,7 +32,7 @@ const Suggestions = (props) => {
                     <Text style={styles.nome}>
                         {item.mainText}
                     </Text>{", "}
-                    <Text>
+                    <Text style={styles.address}>
                         {item.secondaryText}
                     </Text>
                 </TouchableOpacity>

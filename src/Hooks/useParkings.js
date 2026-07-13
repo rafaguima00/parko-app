@@ -41,6 +41,7 @@ const useParkings = () => {
 
             if (data.status === "ZERO_RESULTS") {
                 setError(true)
+
                 return (
                     <Alerta 
                         error={error} 
@@ -63,6 +64,7 @@ const useParkings = () => {
             }
 
             setError(true)
+
             return <Alerta 
                 error={error} 
                 setError={setError} 
@@ -79,7 +81,7 @@ const useParkings = () => {
 
     async function autocompletePlaces(address, setSuggestions) {
 
-        if (address === "") {
+        if (!address) {
             setSuggestions([])
 
             return
@@ -115,7 +117,6 @@ const useParkings = () => {
     }
 
     async function loadParkings(location, radius) {
-        console.log("Load parkings")
         try {
             const res = await api.get("/search-establishments", {
                 params: {
@@ -131,10 +132,7 @@ const useParkings = () => {
                         const res = await api.get(`/tabela_preco/${item.id}`)
                         const tabela = res.data
 
-                        console.log(item.type_of_charge)
-
-                        if (item.type_of_charge === "hora_fracao") {
-                            console.log(tabela)
+                        if (item?.type_of_charge === "hora_fracao") {
                             setPriceTable(tabela)
 
                             return {
@@ -144,11 +142,10 @@ const useParkings = () => {
                             }
                         }
 
-                        if (item.type_of_charge === "tabela_fixa") {
+                        if (item?.type_of_charge === "tabela_fixa") {
                             const response = await api.get(`/tabela_fixa/${item.id}`)
                             const tabelaFixa = response.data
 
-                            console.log(tabelaFixa)
                             setPriceTable(tabelaFixa)
 
                             return {
@@ -168,6 +165,7 @@ const useParkings = () => {
 
             if (estacionamentosComPreco.length === 0) {
                 setError(true)
+                
                 return (
                     <Alerta 
                         error={error} 
@@ -178,7 +176,6 @@ const useParkings = () => {
             }
 
             setEstacionamentos(estacionamentosComPreco.filter(Boolean))
-
         } catch (error) {
             Alert.alert("Erro ao carregar estacionamentos", String(error))
         }
@@ -186,7 +183,9 @@ const useParkings = () => {
 
     useEffect(() => {
         if (radius > 0 && location) {
+            console.log("executando parkings")
             setModalPesquisar(false)
+
             loadParkings(location, radius)
         }
     }, [location, radius])

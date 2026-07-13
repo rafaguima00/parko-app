@@ -66,6 +66,10 @@ export const EstadoReserva = styled.Text`
     margin-bottom: 16px;
 `
 
+export const ViewAllReservations = styled.View`
+    margin-bottom: 24px;
+`
+
 export const BotaoReserva = styled.TouchableOpacity`
     background-color: ${props => props.background};
     height: ${height * 0.06}px;
@@ -114,16 +118,6 @@ export const styles = StyleSheet.create({
         position: "relative",
         marginBottom: 42,
         height: height * 0.4,
-        aspectRatio: 0.77
-    },
-    itemListaEmAndamento: {
-        backgroundColor: "#efefef",
-        gap: 30,
-        paddingVertical: 10,
-        borderRadius: 22,
-        position: "relative",
-        marginBottom: 42,
-        height: height * 0.33,
         aspectRatio: 0.77
     },
     viewEstacionamento: {

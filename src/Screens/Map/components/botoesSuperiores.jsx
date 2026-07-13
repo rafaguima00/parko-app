@@ -9,7 +9,7 @@ const BotoesSuperiores = () => {
 
     const navigation = useNavigation()
     
-    const { destination, reservaFeita, setDestination } = useReservation()
+    const { destination, reservaFeita, setDestination, setPriceTable } = useReservation()
     const { setEstacionamentos } = useUser()
 
     return <>
@@ -41,6 +41,7 @@ const BotoesSuperiores = () => {
                     onPress={() => {
                         setDestination(null)
                         setEstacionamentos([])
+                        setPriceTable({})
                     }}
                 >
                     <Feather name="arrow-left" size={28} />

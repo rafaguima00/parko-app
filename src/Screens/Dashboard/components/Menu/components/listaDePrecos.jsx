@@ -1,14 +1,15 @@
 import { Text, TouchableOpacity, View } from "react-native"
 import { RenderHeader, styles } from "../style"
-import { ReservaContext } from "../../../../../Context/reservaContext"
-import { useContext } from "react"
+import { useReservation } from "../../../../../Context/reservaContext"
 import { formatCurrency } from "../../../../../Utils/formatCurrency"
 import { Octicons } from "react-native-vector-icons"
 
 const ListaDePrecos = ({ item, botaoAtivo, setBotaoAtivo }) => {
     const botaoClicado = botaoAtivo === item.id
 
-    const { personalizado, destination, setValorPreSelecionado, setItemPreSelecionado } = useContext(ReservaContext)
+    const { personalizado, destination, setValorPreSelecionado, setItemPreSelecionado } = useReservation()
+
+    console.log(destination)
 
     function converterEscrita(hora) {
 

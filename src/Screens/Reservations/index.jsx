@@ -4,7 +4,7 @@ import {
     View, 
     FlatList
 } from "react-native"
-import { styles } from "./style"
+import { EstadoReserva, styles } from "./style"
 import ReadApi from "../../Services/readData"
 import { ReservaContext } from "../../Context/reservaContext"
 import { useUser } from "../../Context/dataUserContext"
@@ -22,6 +22,7 @@ export default function Reservations() {
     const [loading, setLoading] = useState(false)
     
     const userReservations = reservations.filter(item => item.id_costumer == dataUser.id)
+    const existeReservaPendente = userReservations.some(item => item.status == "Pendente")
 
     const EmptyListMessage = () => {
         return (
@@ -32,7 +33,7 @@ export default function Reservations() {
     }
 
     useEffect(() => {
-        loadReservations()
+        loadReservations(dataUser.id)
     }, [])
 
     return (
@@ -40,7 +41,7 @@ export default function Reservations() {
             <TopArrowLeft children={"Reservas"} />
             <View style={{ alignItems: "center" }}>
                 <FlatList 
-                    style={{ marginTop: 36, marginHorizontal: 40 }}
+                    style={{ marginTop: 22, marginHorizontal: 40 }}
                     data={userReservations}
                     renderItem={item => (
                         <ReservationsList 
@@ -51,6 +52,8 @@ export default function Reservations() {
                     )}
                     keyExtractor={item => item.id}
                     ListEmptyComponent={EmptyListMessage}
+                    ListHeaderComponent={() => existeReservaPendente ? <EstadoReserva>Reserva Agendada</EstadoReserva> : <></>}
+                    ListFooterComponent={<View style={{ height: 80 }} />}
                     showsVerticalScrollIndicator={false}
                 />
             </View>

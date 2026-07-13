@@ -11,6 +11,7 @@ import { useReservation } from "../../../Context/reservaContext"
 import { useUser } from "../../../Context/dataUserContext"
 import { mapStyle } from "../../../Mocks/mapStyle"
 import useDistance from "../hooks/useDestination"
+import LoadingModal from "../../../Components/Loading"
 
 const MainMap = (props) => {
 
@@ -48,7 +49,7 @@ const MainMap = (props) => {
                         latitude: item.latitude,
                         longitude: item.longitude,
                     }}
-                    title={formatCurrency(item.valor_hora)}
+                    title={formatCurrency((item?.valor_hora) * 0.95)}
                     onPress={() => retornarCoordenadas({ item }, setLoading)}
                 >
                     <Content />

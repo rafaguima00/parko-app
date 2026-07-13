@@ -67,6 +67,7 @@ export default function MapaPrincipal({ navigation }) {
                     latitudeDelta: latitudeDelta,
                     longitudeDelta: longitudeDelta
                 })
+                
                 setUserLocation({
                     latitude: location.coords.latitude,
                     longitude: location.coords.longitude,

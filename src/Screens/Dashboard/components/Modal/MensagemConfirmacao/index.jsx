@@ -36,7 +36,7 @@ function ModalMsgConfirmacao({ modalAtivo, handleClose }) {
         if (modalAtivo) {
             const timer = setTimeout(() => {
                 handleClose()
-                navigation.navigate('Mapa Principal')
+                navigation.navigate("Map")
             }, 4000)
 
             return () => clearTimeout(timer)

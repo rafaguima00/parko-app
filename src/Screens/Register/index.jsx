@@ -78,14 +78,30 @@ const Register = () => {
             tel: "", 
             data_nasc: ""
         })
-        .then(() => {
-            handleLogin()
+            .then(res => {
+                validateEmail(res.data.id)
+            })
+            .catch(e => {
+                setStatusError(true)
+                setMensagemErro(e.response.data.message)
+                setCarregando(false)
+            })
+    }
+
+    async function validateEmail(id) {
+        await api.post("/users/email-validator", {
+            id: id,
+            email: dados.email
         })
-        .catch(e => {
-            setStatusError(true)
-            setMensagemErro(e.response.data.message)
-            setCarregando(false)
-        })
+            .then(res => {
+                console.log(res.data.message)
+            })
+            .catch(e => {
+                console.log(e.response.data.message)
+            })
+            .finally(() => {
+                setCarregando(false)
+            })
     }
 
     async function handleLogin() {

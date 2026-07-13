@@ -23,6 +23,7 @@ import { useUser } from "../../Context/dataUserContext"
 import { jwtDecode } from "jwt-decode"
 import LoadingModal from "../../Components/Loading"
 import { useFocusEffect } from '@react-navigation/native'
+import axios from "axios"
 
 export default function Profile({ navigation, route }) {
 
@@ -88,25 +89,25 @@ export default function Profile({ navigation, route }) {
         }
 
         await api.put(`/users/${id}`, novosDados)
-        .then(() => {
-            if (register) {
-                Alert.alert(`Bem-vindo(a) ${data.name}!`)
-            }
+            .then(() => {
+                if (register) {
+                    Alert.alert(`Bem-vindo(a) ${data.name}!`)
+                }
 
-            setDataUser({ 
-                ...dataUser, 
-                name: data.name,
-                cpf: data.cpf,
-                tel: data.tel
+                setDataUser({ 
+                    ...dataUser, 
+                    name: data.name,
+                    cpf: data.cpf,
+                    tel: data.tel
+                })
+                navigation.replace("Map")
             })
-            navigation.replace("Map")
-        })
-        .catch(e => {
-            Alert.alert(e.response?.data?.message || "Erro ao atualizar usuário")
-        })
-        .finally(() => {
-            setCarregando(false)
-        })
+            .catch(e => {
+                Alert.alert(e.response?.data?.message || "Erro ao atualizar usuário")
+            })
+            .finally(() => {
+                setCarregando(false)
+            })
     }
 
     const alertWarning = (id) => {
@@ -186,9 +187,9 @@ export default function Profile({ navigation, route }) {
                 </View>
     
                 <View style={styles.perfil}>
-                    {/* <TouchableOpacity style={styles.botaoEdit} activeOpacity={0.7} >
+                    <TouchableOpacity style={styles.botaoEdit} activeOpacity={0.7} >
                         <Octicons name="pencil" size={32} color="white" />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
 
                     <View>
                         <Text style={styles.nome}>Nome completo</Text>

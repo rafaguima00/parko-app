@@ -126,6 +126,9 @@ export const styles = StyleSheet.create({
         color: "#545454",
         fontSize: 17
     },
+    address: {
+        color: "#7D7D7D",
+    },
     selecionarOpcao: {
         flexDirection: 'row',
         alignItems: 'center',

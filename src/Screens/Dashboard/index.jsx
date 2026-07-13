@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { Modal, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import Topo from "./components/Top"
 import { AreaView } from "./style"
 import ModalConfirmacao from "./components/Modal/Confirmacao"
 import ModalMsgConfirmacao from "./components/Modal/MensagemConfirmacao"
 import DatePickerModal from "./components/Modal/DatePicker"
-import { ReservaContext } from "../../Context/reservaContext"
+import { useReservation } from "../../Context/reservaContext"
 import { useUser } from "../../Context/dataUserContext"
 import Menu from "./components/Menu"
 import ReadApi from "../../Services/readData"
@@ -23,7 +23,7 @@ function Dashboard({ navigation }) {
     const { tokenCard, cartaoSelecionado, setTokenCard, setCartaoSelecionado } = usePayment()
     const { veiculos, dataUser } = useUser()
     const { loadVehicles } = ReadApi()
-    const { destination, novaReserva, setNovaReserva } = useContext(ReservaContext)
+    const { destination, novaReserva, setNovaReserva } = useReservation()
 
     const [informacoes, setInformacoes] = useState(true)
     const [escolherVeiculo, setEscolherVeiculo] = useState(false)
@@ -45,15 +45,6 @@ function Dashboard({ navigation }) {
         const name = dataUser.name.split(" ")
         const payer_name = name[0]
         const payer_surname = name[name.length - 1] ?? ""
-
-        console.log(JSON.stringify({
-                token: tokenCard,
-                transaction_amount: novaReserva.value,
-                customer_id: cartaoSelecionado.customer_id,
-                description: `Parking: ${destination.name}`,
-                payment_method_id: cartaoSelecionado.payment_method.id,
-                issuer_id: cartaoSelecionado.issuer.id
-            }))
 
         try {
             // Adicionar mais informações para aumentar as chances do pagamento ser aprovado
@@ -84,6 +75,8 @@ function Dashboard({ navigation }) {
                     "Pagamento Rejeitado",
                     "O pagamento foi rejeitado. Por favor, verifique seu cartão ou tente novamente."
                 )
+                
+                confirmaReserva(id_payment, card_brand, status, payment_method)
 
                 setTokenCard("")
                 setCartaoSelecionado(null)
@@ -98,6 +91,8 @@ function Dashboard({ navigation }) {
                 "Pagamento Pendente",
                 "Seu pagamento está em análise. Você será notificado assim que for aprovado."
             )
+
+            confirmaReserva(id_payment, card_brand, status, payment_method)
 
             setTokenCard("")
             setLoading(false)
@@ -119,7 +114,6 @@ function Dashboard({ navigation }) {
     
     // Função para salvar a reserva e o estado dela na base de dados
     async function confirmaReserva(id_payment, card_brand, status, payment_method) {
-        console.log("Confirmando reserva")
 
         await api.post("/reservations", {
             data_entrada: novaReserva.data_entrada, 
@@ -134,6 +128,19 @@ function Dashboard({ navigation }) {
             parko_app: 1 
         })
         .then(res => {
+            if (status !== "approved") {
+                salvarPgto(
+                    id_payment, 
+                    card_brand, 
+                    status, 
+                    payment_method, 
+                    res.data.id,
+                    0
+                )
+
+                return
+            }
+
             salvarPgto(id_payment, card_brand, status, payment_method, res.data.id)
         })
         .catch(e => {
@@ -148,18 +155,25 @@ function Dashboard({ navigation }) {
     }
 
     // Salvar os dados do pagamento na base de dados
-    async function salvarPgto(id_payment, card_brand, status, payment_method, idReservation) {
+    async function salvarPgto(
+        id_payment, 
+        card_brand, 
+        status, 
+        payment_method, 
+        idReservation,
+        value_paid = novaReserva.value.toFixed(2)
+    ) {
         await api.post("/payment-on-db", [{ 
             id_customer: dataUser.id, 
             id_vehicle: novaReserva.id_vehicle, 
             id_establishment: destination.id, 
             value: novaReserva.value.toFixed(2), 
-            payment_method: payment_method, 
-            id_payment: id_payment,
-            card_brand: card_brand,
             id_reservation: idReservation, 
-            status: status,
-            value_paid: novaReserva.value.toFixed(2),
+            payment_method, 
+            id_payment,
+            card_brand,
+            status,
+            value_paid,
             change_to_pay: 0,
             change_paid: 0
         }])

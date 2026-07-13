@@ -14,15 +14,33 @@ const useFavorites = () => {
             const precoEstacionamento = await Promise.all(
                 res.data.map(async (item) => {
                     try {
-                        const res = await api.get(`/tabela_preco/${item.parking_id}`)
+                        const res = await api.get(`/tabela_preco/${item.id}`)
+                        const tabela = res.data
 
-                        return {
-                            ...item, 
-                            tempo_tolerancia: res.data[0].tempo_tolerancia,
-                            valor_hora: res.data[0].valor_hora
+                        if (item.type_of_charge === "hora_fracao") {
+
+                            return {
+                                ...item,
+                                valor_hora: tabela[0].valor_hora,
+                                tempo_tolerancia: tabela[0].tempo_tolerancia,
+                            }
                         }
-                    } catch (e) {
-                        Alert.alert(getFavoriteList, e)
+
+                        if (item.type_of_charge === "tabela_fixa") {
+                            const response = await api.get(`/tabela_fixa/${item.id}`)
+                            const tabelaFixa = response.data
+
+                            return {
+                                ...item,
+                                valor_hora: tabelaFixa[0].value,
+                                tempo_tolerancia: tabela[0].tempo_tolerancia,
+                            }
+                        }
+                        
+                        return item
+                    } catch (error) {
+                        console.error(error)
+                        return item 
                     }
                 })
             )

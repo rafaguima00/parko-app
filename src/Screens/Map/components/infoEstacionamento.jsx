@@ -51,7 +51,7 @@ const InfoEstacionamento = (props) => {
                     <TouchableOpacity style={styles.botao} activeOpacity={1}>
                         <Feather name="dollar-sign" size={18} color="#7d7d7d" />
                         <Text style={styles.textoBotaoPreco}>
-                            {`${Number(valor_hora).toFixed(2).replace(".", ",")}/h`}
+                            {`${(valor_hora * 0.95).toFixed(2).replace(".", ",")}/h`}
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.botao} activeOpacity={1}>
